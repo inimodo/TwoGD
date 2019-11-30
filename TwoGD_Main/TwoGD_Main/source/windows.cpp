@@ -14,6 +14,16 @@ int win::i_Width;
 HANDLE __stdcall CreateExec(HINSTANCE h_Instance);
 long __stdcall WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam);
 
+
+DWORD __stdcall wWinProcess(LPVOID lp_Void)
+{
+	while (gdupdate() != NULL)
+	{
+
+	}
+
+	return 0; 
+}
 int __stdcall wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow)
 {
 	if (gdmain() == NULL)
@@ -28,17 +38,15 @@ int __stdcall wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_
 	UpdateWindow(win::hd_WindowHandle);
 
 	win::hdc_WindowHdc = GetDC(win::hd_WindowHandle);
-	while (GetMessage(&win::msg_WindowMessage, NULL, 0, 0)>0)
-	{
-		if (gdupdate() == NULL)
-		{
 
-			return NULL;
-		}
+	HANDLE hwd_Thread = CreateThread(0,0, wWinProcess,0,0,NULL);
+
+	while ((GetMessage(&win::msg_WindowMessage, NULL, 0, 0) > 0))
+	{
 		TranslateMessage(&win::msg_WindowMessage);
 		DispatchMessage(&win::msg_WindowMessage);
 	}
-
+	CloseHandle(hwd_Thread);
 	gdclose();
 
 	ReleaseDC(NULL, win::hdc_WindowHdc);
