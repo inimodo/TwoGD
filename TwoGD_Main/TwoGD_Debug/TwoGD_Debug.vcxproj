@@ -84,6 +84,7 @@
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)\TwoGD</AdditionalLibraryDirectories>
       <AdditionalDependencies>TwoGD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>wWinMainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -100,6 +101,7 @@
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)\TwoGD</AdditionalLibraryDirectories>
       <AdditionalDependencies>TwoGD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>wWinMainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,6 +120,7 @@
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)\TwoGD</AdditionalLibraryDirectories>
       <AdditionalDependencies>TwoGD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>wWinMainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -136,6 +139,7 @@
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)\TwoGD</AdditionalLibraryDirectories>
       <AdditionalDependencies>TwoGD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>wWinMainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

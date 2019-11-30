@@ -76,12 +76,14 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TwoGD_File\source;$(SolutionDir)TwoGD_Render\source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
-      <OutputFile>$(SolutionDir)\TwoGD\TwoGD.lib</OutputFile>
-      <AdditionalDependencies>TwoGD_File.lib;TwoGD_Render.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\TwoGD</AdditionalLibraryDirectories>
+      <OutputFile>$(SolutionDir)TwoGD\TwoGD.lib</OutputFile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -90,12 +92,14 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TwoGD_File\source;$(SolutionDir)TwoGD_Render\source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
-      <OutputFile>$(SolutionDir)\TwoGD\TwoGD.lib</OutputFile>
-      <AdditionalDependencies>TwoGD_File.lib;TwoGD_Render.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\TwoGD</AdditionalLibraryDirectories>
+      <OutputFile>$(SolutionDir)TwoGD\TwoGD.lib</OutputFile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -106,16 +110,18 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TwoGD_File\source;$(SolutionDir)TwoGD_Render\source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <OutputFile>$(SolutionDir)\TwoGD\TwoGD.lib</OutputFile>
-      <AdditionalDependencies>TwoGD_File.lib;TwoGD_Render.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\TwoGD</AdditionalLibraryDirectories>
+      <OutputFile>$(SolutionDir)TwoGD\TwoGD.lib</OutputFile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -126,23 +132,29 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TwoGD_File\source;$(SolutionDir)TwoGD_Render\source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <OutputFile>$(SolutionDir)\TwoGD\TwoGD.lib</OutputFile>
-      <AdditionalDependencies>TwoGD_File.lib;TwoGD_Render.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\TwoGD</AdditionalLibraryDirectories>
+      <OutputFile>$(SolutionDir)TwoGD\TwoGD.lib</OutputFile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="source\twogd.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\assetloader.cpp" />
+    <ClCompile Include="source\console.cpp" />
+    <ClCompile Include="source\render.cpp" />
+    <ClCompile Include="source\types.cpp" />
+    <ClCompile Include="source\windows.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
