@@ -9,7 +9,7 @@ void display::CleanBuffer()
 {
 	memset((void *)d_pOutputStream, 0, i_OutputSize * sizeof(DWORD));
 }
-_STATUS
+__STATUS
 display::Prepare(int i_Width, int i_Height)
 {
 	i_OutputSize = i_Width * i_Height;
@@ -21,7 +21,7 @@ display::Prepare(int i_Width, int i_Height)
 	i_Pixels[0] = i_Width;
 	return GD_TASK_OKAY;
 }
-_STATUS __stdcall
+__STATUS __WAY
 display::SetPixel(GDPOINT * p_pPoint, GDCOLOR * c_pColor)
 {
 	__REGISTER u_int i_rIndex = _TOINDEX(p_pPoint->f_Pos[0], p_pPoint->f_Pos[1]);
@@ -31,7 +31,7 @@ display::SetPixel(GDPOINT * p_pPoint, GDCOLOR * c_pColor)
 	}
 	return GD_OUTOFBOUND;
 }
-_STATUS __stdcall
+__STATUS __WAY
 display::DrawLine(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor)
 {
 	GDPOINT p_Delta = (*p_pPointA) - (*p_pPointB), p_Temp;
@@ -45,7 +45,7 @@ display::DrawLine(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor)
 	return GD_TASK_OKAY;
 
 }
-_STATUS __stdcall
+__STATUS __WAY
 display::DrawRect(GDPOINT* p_pPointA, GDPOINT* p_pPointB, GDCOLOR* c_pColor)
 {
 	GDPOINT p_Temp(p_pPointA->f_Pos[0], p_pPointA->f_Pos[1]);
@@ -56,7 +56,7 @@ display::DrawRect(GDPOINT* p_pPointA, GDPOINT* p_pPointB, GDCOLOR* c_pColor)
 	}
 	return GD_TASK_OKAY;
 }
-_STATUS __stdcall
+__STATUS __WAY
 display::DrawHLine(GDPOINT* p_pPoint, u_int  i_Length, GDCOLOR* c_pColor)
 {
 	__REGISTER int i_rIndex = _TOINDEX(p_pPoint->f_Pos[0], p_pPoint->f_Pos[1]);
@@ -66,7 +66,7 @@ display::DrawHLine(GDPOINT* p_pPoint, u_int  i_Length, GDCOLOR* c_pColor)
 	}
 	return GD_TASK_OKAY;
 }
-_STATUS __stdcall
+__STATUS __WAY
 display::DrawVLine(GDPOINT* p_pPoint, u_int  i_Length, GDCOLOR* c_pColor)
 {
 	__REGISTER int i_rIndex = _TOINDEX(p_pPoint->f_Pos[0], p_pPoint->f_Pos[1]);

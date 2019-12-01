@@ -50,7 +50,7 @@ DWORD gd_color::GetAsHex()
 {
 	return RGB(c_Color[0], c_Color[1], c_Color[2]);
 }
-gd_color::gd_color(_VALUE c_R, _VALUE c_G, _VALUE c_B)
+gd_color::gd_color(uchar c_R, uchar c_G, uchar c_B)
 {
 	c_Color[0] = c_R;
 	c_Color[1] = c_G;

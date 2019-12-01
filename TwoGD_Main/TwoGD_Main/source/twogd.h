@@ -1,23 +1,7 @@
-
-// TwoGD Socket for C++ 
-// Markus Kotar @ UCPSystems.com 2019
-
 #pragma once
+
 #define _ALLOW_REGISTER_USE
-
-#pragma comment(lib, "User32.lib")
-#pragma comment(lib, "user32.lib")
-#pragma comment(lib, "Gdi32.lib")
-
-#ifndef UNICODE
-#define UNICODE
-#endif 
-
 #define _CRT_SECURE_NO_WARNINGS
-
-#ifndef _ACIT_
-#define _ACIT_
-#endif
 
 #include <iostream>
 #include <xmmintrin.h>
@@ -25,29 +9,23 @@
 #include <math.h>
 #include <windows.h>
 
-#define TOCLIENTWIDTH(x) (win::i_Width-16)
-#define TOCLIENTHEIGHT(x) (win::i_Height-39)
+#pragma comment(lib, "User32.lib")
+#pragma comment(lib, "user32.lib")
+#pragma comment(lib, "Gdi32.lib")
 
-#define FROMCLIENTWIDTH(x) (x+16)
-#define FROMCLIENTHEIGHT(x) (x+39)
+// TwoGD Socket for C++ 
+// Markus Kotar @ UCPSystems.com 2019
 
-extern HANDLE __stdcall CreateExec(HINSTANCE h_Instance);
-extern long __stdcall WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam);
-extern int __stdcall wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow);
+#ifndef UNICODE
+#define UNICODE
+#endif 
 
-/*
-	ENTRYPOINT MUST BE:
-	-> wWinMainCRTStartup
 
-	FUNCTIONS:
-	unsigned char __fastcall win::main() { return 1; } //Gets Calledd once before Window Creation
-	unsigned char __fastcall win::update() { return 1; } // Gets Called every "WindowProc" Call
-	void __cdecl win::close() { } // Gets Called before window closing
-*/
+#ifndef _ACIT_
+#define _ACIT_
+#endif
 
-extern unsigned char __cdecl gdmain();
-extern unsigned char __cdecl gdupdate();
-extern void __cdecl gdclose();
+#define __WAY __stdcall
 
 #ifdef _ALLOW_REGISTER_USE
 #define __REGISTER register
@@ -55,23 +33,42 @@ extern void __cdecl gdclose();
 #define __REGISTER 
 #endif
 
+
+extern HANDLE __WAY CreateExec(HINSTANCE h_Instance);
+extern long __WAY WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam);
+extern int __WAY wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow);
+
+/*
+	ENTRYPOINT MUST BE:
+	-> wWinMainCRTStartup
+
+	FUNCTIONS:
+	unsigned char __WAY win::main() { return 1; } //Gets Calledd once before Window Creation
+	unsigned char __WAY win::update() { return 1; } // Gets Called every "WindowProc" Call
+	void __WAY win::close() { } // Gets Called before window closing
+*/
+
+extern unsigned char __WAY gdmain();
+extern unsigned char __WAY gdupdate();
+extern void __WAY gdclose();
+
+typedef unsigned char uchar;
+typedef unsigned int u_int;
+#define __STATUS uchar
+
 #define GD_ALLOC_FAILED 0x1F
 #define GD_TASK_OKAY 0x1A
 #define GD_FILE_FAILED 0x2F
 #define GD_OUTOFBOUND 0x2F
 
-#define _VALUE uchar
-#define _STATUS uchar
-
-typedef unsigned char uchar;
-typedef unsigned int u_int;
-
+#define _TOCLIENTWIDTH(x) (win::i_Width-16)
+#define _TOCLIENTHEIGHT(x) (win::i_Height-39)
+#define _FROMCLIENTWIDTH(x) (x+16)
+#define _FROMCLIENTHEIGHT(x) (x+39)
 #define _TOINDEX(x,y) ((int)y * this->i_Pixels[0] + (int)x)
 #define _TOROW(y) ((int)y * this->i_Pixels[0])
-
 #define _PTOP(POI) GDPOINT(((POINT)POI).x,((POINT)POI).y)
 
-#define __WAY __stdcall
 
 extern void  SetScreenBuffer(DWORD* dw_ColorStream, int i_Width, int i_Height);
 extern void  GetCursorPosition();
@@ -101,16 +98,16 @@ namespace win {
 
 typedef class gd_console {
 public:
-	FILE * __stdcall Create(const wchar_t* c_ConsoleTitle);
-	FILE* __stdcall Create();
+	FILE * __WAY Create(const wchar_t* c_ConsoleTitle);
+	FILE* __WAY Create();
 
-	void __stdcall Clear();
-	BOOL __stdcall Destroy();
-	BOOL __stdcall Rename(const wchar_t* c_ConsoleTitle);
+	void __WAY Clear();
+	BOOL __WAY Destroy();
+	BOOL __WAY Rename(const wchar_t* c_ConsoleTitle);
 
-	void __stdcall SetColor(const int i_HexColor);
+	void __WAY SetColor(const int i_HexColor);
 private:
-	FILE * __stdcall AllocC();
+	FILE * __WAY AllocC();
 }GDCONSOLE;
 
 typedef struct gd_color {
@@ -146,20 +143,38 @@ public:
 	u_int i_OutputSize;
 
 
-	_STATUS __stdcall SetPixel(GDPOINT * p_pPoint, GDCOLOR * c_pColor);
-	_STATUS __stdcall DrawLine(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor);
-	_STATUS __stdcall DrawRect(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor);
-	_STATUS __stdcall DrawHLine(GDPOINT * p_pPoint, u_int  i_Length, GDCOLOR * c_pColor);
-	_STATUS __stdcall DrawVLine(GDPOINT * p_pPoint, u_int  i_Length, GDCOLOR * c_pColor);
+	__STATUS __WAY SetPixel(GDPOINT * p_pPoint, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawLine(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawRect(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawHLine(GDPOINT * p_pPoint, u_int  i_Length, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawVLine(GDPOINT * p_pPoint, u_int  i_Length, GDCOLOR * c_pColor);
 
 	void CleanBuffer();
 
-	_STATUS Prepare(int i_Width, int i_Height);
-	_STATUS Dispose();
+	__STATUS Prepare(int i_Width, int i_Height);
+	__STATUS Dispose();
 
 }GDDISPLAY;
 
 // vmf / bmf
 typedef class mapformat {
-	
+protected:
+	FILE * f_Stream;
+	__STATUS __WAY OpenStream(const char* c_StreamName);
+	__STATUS __WAY CloseStream();
+
 }GFMAPFORMAT;
+
+typedef class vectormap : GFMAPFORMAT {
+	GDPOINT p_Anchor;
+	GDPOINT * p_Point;
+	u_int * i_Connection;
+	GDCOLOR * c_Color;
+	u_int i_Connections, i_Points;
+	
+	__STATUS __WAY Read();
+}GFVECTORMAP;
+
+typedef class bitmap : GFMAPFORMAT {
+
+}GFBITMAP;

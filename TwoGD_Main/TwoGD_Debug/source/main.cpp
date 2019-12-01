@@ -7,7 +7,7 @@ GDDISPLAY gd_Display;
 GDCOLOR gdc_Test(255,255,255);
 GDPOINT gdp_POne(0,0);
 GDPOINT gdp_PTwo(100,100);
-unsigned char __cdecl gdmain() {
+unsigned char __WAY gdmain() {
 	win::i_Width =300;
 	win::i_Height = 300;
 	gd_Console.Create();
@@ -16,7 +16,7 @@ unsigned char __cdecl gdmain() {
 	gd_Display.CleanBuffer();
 	return TRUE;
 }
-unsigned char __cdecl gdupdate() {
+unsigned char __WAY gdupdate() {
 	gd_Display.CleanBuffer();
 	gdp_PTwo.f_Pos[1] = rand()%300;
 	gdp_PTwo.f_Pos[0] = rand()%300;
@@ -27,7 +27,7 @@ unsigned char __cdecl gdupdate() {
 	return TRUE;
 
 }
-void __cdecl gdclose() {
+void __WAY gdclose() {
 	gd_Display.Dispose();
 
 }

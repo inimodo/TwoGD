@@ -11,11 +11,11 @@ int win::i_Height;
 int win::i_Width;
 
 
-HANDLE __stdcall CreateExec(HINSTANCE h_Instance);
-long __stdcall WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam);
+HANDLE __WAY CreateExec(HINSTANCE h_Instance);
+long __WAY WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam);
 
 
-DWORD __stdcall wWinProcess(LPVOID lp_Void)
+DWORD __WAY wWinProcess(LPVOID lp_Void)
 {
 	while (gdupdate() != NULL)
 	{
@@ -24,7 +24,7 @@ DWORD __stdcall wWinProcess(LPVOID lp_Void)
 
 	return 0; 
 }
-int __stdcall wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow)
+int __WAY wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow)
 {
 	if (gdmain() == NULL)
 	{
@@ -52,20 +52,20 @@ int __stdcall wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_
 	ReleaseDC(NULL, win::hdc_WindowHdc);
 	return NULL;
 }
-HANDLE __stdcall CreateExec(HINSTANCE h_Instance) {
+HANDLE __WAY CreateExec(HINSTANCE h_Instance) {
 	win::w_WndClass.hbrBackground = (HBRUSH)(2);
 	win::w_WndClass = { 0 };
 	win::w_WndClass.lpfnWndProc = (WNDPROC)WindowProc;
 	win::w_WndClass.hInstance = h_Instance;
-	win::w_WndClass.lpszClassName = win::c_WinClassName;
+	win::w_WndClass.lpszClassName = (LPCSTR)win::c_WinClassName;
 
 	RegisterClass(&win::w_WndClass);
 
 	win::h_Instance = h_Instance;
 	win::hd_WindowHandle = CreateWindowEx(
 		win::dw_ExStyle,
-		win::c_WinClassName,
-		win::c_WinTitle,
+		(LPCSTR)win::c_WinClassName,
+		(LPCSTR)win::c_WinTitle,
 		win::dw_Style,
 		win::i_XPos,
 		win::i_YPos,
@@ -78,7 +78,7 @@ HANDLE __stdcall CreateExec(HINSTANCE h_Instance) {
 	);
 	return win::hd_WindowHandle;
 }
-long __stdcall WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam)
+long __WAY WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam)
 {
 	if (msg_Message == WM_LBUTTONDOWN) {
 		if (win::v_pMouseDown != NULL) {
