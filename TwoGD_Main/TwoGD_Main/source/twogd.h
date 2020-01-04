@@ -14,7 +14,7 @@
 #pragma comment(lib, "Gdi32.lib")
 
 // TwoGD Socket for C++ 
-// Markus Kotar @ UCPSystems.com 2019
+// Markus Kotar @ UCPSystems.com 2019/2020
 
 #ifndef UNICODE
 #define UNICODE
@@ -130,6 +130,13 @@ public:
 
 }GDPOINT;
 
+typedef struct gd_line {
+	GDPOINT p_Point[2];
+	GDCOLOR c_Color;
+}GDLINE;
+
+
+
 double Distance2(GDPOINT p_PosOne, GDPOINT p_PosTwo);
 
 GDPOINT operator - (GDPOINT  &p_Pos1, GDPOINT  &p_Pos2);
@@ -167,12 +174,18 @@ protected:
 
 typedef class vectormap : GFMAPFORMAT {
 	GDPOINT p_Anchor;
-	GDPOINT * p_Point;
-	u_int * i_Connection;
-	GDCOLOR * c_Color;
-	u_int i_Connections, i_Points;
+	GDPOINT * p_pPoint;
+	GDCOLOR * c_pColor;
+	GDLINE * l_pLines;
+	u_int i_Connections, i_Points,i_Colors;
 	
-	__STATUS __WAY Read();
+	__STATUS __WAY ReadHeader();
+	__STATUS __WAY LoadFile();
+public:
+	__STATUS __WAY Read(const char* c_StreamName);
+
+	__STATUS __WAY Prepare();
+	__STATUS __WAY Dispose();
 }GFVECTORMAP;
 
 typedef class bitmap : GFMAPFORMAT {

@@ -7,6 +7,9 @@ GDDISPLAY gd_Display;
 GDCOLOR gdc_Test(255,255,255);
 GDPOINT gdp_POne(0,0);
 GDPOINT gdp_PTwo(100,100);
+
+GFVECTORMAP vmf_Map;
+
 unsigned char __WAY gdmain() {
 	win::i_Width =300;
 	win::i_Height = 300;
@@ -14,6 +17,10 @@ unsigned char __WAY gdmain() {
 
 	gd_Display.Prepare(win::i_Width, win::i_Height);
 	gd_Display.CleanBuffer();
+
+	printf("%d\n",sizeof(GDLINE));
+	printf("RES:: %X \n",vmf_Map.Read("C:\\Users\\PyroJunkie\\Desktop\\Testobjects\\obj1.vmf"));
+
 	return TRUE;
 }
 unsigned char __WAY gdupdate() {
