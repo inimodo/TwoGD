@@ -1,8 +1,9 @@
 #include"twogd.h"
 
 GDCONSOLE gd_Console;
-GDDISPLAY gd_Display;
+GDCODEC gd_Display;
 
+//memmove
 
 GDCOLOR gdc_Test(255,255,255);
 GDPOINT gdp_POne(0,0);
@@ -18,7 +19,6 @@ unsigned char __WAY gdmain() {
 	gd_Display.Prepare(win::i_Width, win::i_Height);
 	gd_Display.CleanBuffer();
 
-	printf("%d\n",sizeof(GDLINE));
 	printf("RES:: %X \n",vmf_Map.Read("C:\\Users\\PyroJunkie\\Desktop\\Testobjects\\obj1.vmf"));
 
 	return TRUE;

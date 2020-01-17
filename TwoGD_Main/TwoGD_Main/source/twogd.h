@@ -143,27 +143,30 @@ GDPOINT operator - (GDPOINT  &p_Pos1, GDPOINT  &p_Pos2);
 GDPOINT operator + (GDPOINT  &p_Pos1, GDPOINT  &p_Pos2);
 GDPOINT operator * (GDPOINT  &p_Pos1, int &i_Lenght);
 
-typedef class display {
+typedef class canvas {
 public:
 	u_int i_Pixels[2];
 	DWORD * d_pOutputStream;
 	u_int i_OutputSize;
 
+	__STATUS __WAY CleanBuffer();
 
+	__STATUS __WAY Prepare(int i_Width, int i_Height);
+	__STATUS __WAY Dispose();
+}GDCANVAS;
+
+
+typedef class codec : public GDCANVAS {
+public:
 	__STATUS __WAY SetPixel(GDPOINT * p_pPoint, GDCOLOR * c_pColor);
 	__STATUS __WAY DrawLine(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor);
 	__STATUS __WAY DrawRect(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor);
 	__STATUS __WAY DrawHLine(GDPOINT * p_pPoint, u_int  i_Length, GDCOLOR * c_pColor);
 	__STATUS __WAY DrawVLine(GDPOINT * p_pPoint, u_int  i_Length, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawBitmap(DWORD * d_pBuffer, GDPOINT * p_pPos, int  i_Width);
+}GDCODEC;
 
-	void CleanBuffer();
-
-	__STATUS Prepare(int i_Width, int i_Height);
-	__STATUS Dispose();
-
-}GDDISPLAY;
-
-// vmf / bmf
+// vmf 
 typedef class mapformat {
 protected:
 	FILE * f_Stream;
@@ -172,7 +175,7 @@ protected:
 
 }GFMAPFORMAT;
 
-typedef class vectormap : GFMAPFORMAT {
+typedef class vectormap : public GFMAPFORMAT {
 	GDPOINT p_Anchor;
 	GDPOINT * p_pPoint;
 	GDCOLOR * c_pColor;
@@ -188,6 +191,7 @@ public:
 	__STATUS __WAY Dispose();
 }GFVECTORMAP;
 
-typedef class bitmap : GFMAPFORMAT {
+typedef class bitmap : public GDCODEC {
+
 
 }GFBITMAP;

@@ -1,5 +1,30 @@
 #include "twogd.h"
+__STATUS __WAY
+canvas::Dispose()
+{
+	free(d_pOutputStream);
+	return GD_TASK_OKAY;
 
+}
+__STATUS __WAY
+canvas::CleanBuffer()
+{
+	memset((void *)d_pOutputStream, 0, i_OutputSize * sizeof(DWORD));
+	return GD_TASK_OKAY;
+
+}
+__STATUS
+canvas::Prepare(int i_Width, int i_Height)
+{
+	i_OutputSize = i_Width * i_Height;
+	d_pOutputStream = (DWORD *)malloc(sizeof(DWORD)*i_OutputSize);
+	if (d_pOutputStream == NULL) {
+		return GD_ALLOC_FAILED;
+	}
+	i_Pixels[1] = i_Height;
+	i_Pixels[0] = i_Width;
+	return GD_TASK_OKAY;
+}
 void GDPOINT::Delta(GDPOINT p_Pos)
 {
 	f_Pos[0] = f_Pos[0] - p_Pos.f_Pos[0];
