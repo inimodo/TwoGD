@@ -163,7 +163,7 @@ public:
 	__STATUS __WAY DrawRect(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor);
 	__STATUS __WAY DrawHLine(GDPOINT * p_pPoint, u_int  i_Length, GDCOLOR * c_pColor);
 	__STATUS __WAY DrawVLine(GDPOINT * p_pPoint, u_int  i_Length, GDCOLOR * c_pColor);
-	__STATUS __WAY DrawBitmap(DWORD * d_pBuffer, GDPOINT * p_pPos, int  i_Width);
+	__STATUS __WAY DrawBitmap(DWORD * d_pBuffer, GDPOINT * p_pPos, u_int  i_Pixels[2]);
 }GDCODEC;
 
 // vmf 
@@ -176,12 +176,13 @@ protected:
 }GFMAPFORMAT;
 
 typedef class vectormap : public GFMAPFORMAT {
+public:
 	GDPOINT p_Anchor;
 	GDPOINT * p_pPoint;
 	GDCOLOR * c_pColor;
 	GDLINE * l_pLines;
 	u_int i_Connections, i_Points,i_Colors;
-	
+private:
 	__STATUS __WAY ReadHeader();
 	__STATUS __WAY LoadFile();
 public:

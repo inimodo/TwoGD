@@ -55,3 +55,13 @@ codec::DrawVLine(GDPOINT* p_pPoint, u_int  i_Length, GDCOLOR* c_pColor)
 	}
 	return GD_TASK_OKAY;
 }
+__STATUS __WAY
+codec::DrawBitmap(DWORD * d_pBuffer, GDPOINT * p_pPos, u_int  i_Pixel[2])
+{
+	__REGISTER int i_rIndex = _TOINDEX(p_pPos->f_Pos[0], p_pPos->f_Pos[1]);
+	for (u_int i_Row = 0; i_Row < i_Pixel[1]; i_Row++)
+	{
+		memmove((void*)(this->d_pOutputStream+ (i_rIndex + (i_Row*this->i_Pixels[0]))), (void*)(d_pBuffer+ i_Row * i_Pixel[0]), i_Pixel[0]* sizeof(DWORD));
+	}
+	return GD_TASK_OKAY;
+}
