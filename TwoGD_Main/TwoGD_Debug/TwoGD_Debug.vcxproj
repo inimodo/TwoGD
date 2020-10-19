@@ -76,7 +76,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TwoGD_Render\source;$(SolutionDir)TwoGD_File\source;$(SolutionDir)TwoGD_Main\source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TwoGD_Main\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -93,7 +93,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TwoGD_Render\source;$(SolutionDir)TwoGD_File\source;$(SolutionDir)TwoGD_Main\source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TwoGD_Main\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -112,7 +112,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TwoGD_Render\source;$(SolutionDir)TwoGD_File\source;$(SolutionDir)TwoGD_Main\source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TwoGD_Main\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -131,7 +131,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TwoGD_Render\source;$(SolutionDir)TwoGD_File\source;$(SolutionDir)TwoGD_Main\source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TwoGD_Main\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -143,7 +143,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\obj1.vmf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

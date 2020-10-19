@@ -147,14 +147,14 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="source\twogd.h" />
+    <ClInclude Include="src\twogd.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\assetloader.cpp" />
-    <ClCompile Include="source\console.cpp" />
-    <ClCompile Include="source\render.cpp" />
-    <ClCompile Include="source\types.cpp" />
-    <ClCompile Include="source\windows.cpp" />
+    <ClCompile Include="src\assetloader.cpp" />
+    <ClCompile Include="src\console.cpp" />
+    <ClCompile Include="src\render.cpp" />
+    <ClCompile Include="src\types.cpp" />
+    <ClCompile Include="src\windows.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

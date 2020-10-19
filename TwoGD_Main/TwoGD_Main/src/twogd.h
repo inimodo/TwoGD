@@ -65,13 +65,8 @@ typedef unsigned int u_int;
 #define _TOCLIENTHEIGHT(x) (win::i_Height-39)
 #define _FROMCLIENTWIDTH(x) (x+16)
 #define _FROMCLIENTHEIGHT(x) (x+39)
-#define _TOINDEX(x,y) ((int)y * this->i_Pixels[0] + (int)x)
-#define _TOROW(y) ((int)y * this->i_Pixels[0])
+
 #define _PTOP(POI) GDPOINT(((POINT)POI).x,((POINT)POI).y)
-
-
-extern void  SetScreenBuffer(DWORD* dw_ColorStream, int i_Width, int i_Height);
-extern void  GetCursorPosition();
 
 namespace win {
 	const static DWORD dw_ExStyle = 0;
@@ -135,13 +130,14 @@ typedef struct gd_line {
 	GDCOLOR c_Color;
 }GDLINE;
 
-
-
 double Distance2(GDPOINT p_PosOne, GDPOINT p_PosTwo);
 
 GDPOINT operator - (GDPOINT  &p_Pos1, GDPOINT  &p_Pos2);
 GDPOINT operator + (GDPOINT  &p_Pos1, GDPOINT  &p_Pos2);
 GDPOINT operator * (GDPOINT  &p_Pos1, int &i_Lenght);
+
+extern void  SetScreenBuffer(DWORD* dw_ColorStream, int i_Width, int i_Height);
+extern void  GetCursorPosition();
 
 typedef class canvas {
 public:
@@ -155,33 +151,22 @@ public:
 	__STATUS __WAY Dispose();
 }GDCANVAS;
 
-
-typedef class codec : public GDCANVAS {
-public:
-	__STATUS __WAY SetPixel(GDPOINT * p_pPoint, GDCOLOR * c_pColor);
-	__STATUS __WAY DrawLine(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor);
-	__STATUS __WAY DrawRect(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor);
-	__STATUS __WAY DrawHLine(GDPOINT * p_pPoint, u_int  i_Length, GDCOLOR * c_pColor);
-	__STATUS __WAY DrawVLine(GDPOINT * p_pPoint, u_int  i_Length, GDCOLOR * c_pColor);
-	__STATUS __WAY DrawBitmap(DWORD * d_pBuffer, GDPOINT * p_pPos, u_int  i_Pixels[2]);
-}GDCODEC;
-
-// vmf 
-typedef class mapformat {
+typedef class filer {
 protected:
 	FILE * f_Stream;
 	__STATUS __WAY OpenStream(const char* c_StreamName);
 	__STATUS __WAY CloseStream();
 
-}GFMAPFORMAT;
+}GDFILER;
 
-typedef class vectormap : public GFMAPFORMAT {
+
+typedef class vectormap : public GDFILER {
 public:
 	GDPOINT p_Anchor;
 	GDPOINT * p_pPoint;
 	GDCOLOR * c_pColor;
 	GDLINE * l_pLines;
-	u_int i_Connections, i_Points,i_Colors;
+	u_int i_Connections, i_Points, i_Colors;
 private:
 	__STATUS __WAY ReadHeader();
 	__STATUS __WAY LoadFile();
@@ -192,7 +177,27 @@ public:
 	__STATUS __WAY Dispose();
 }GFVECTORMAP;
 
-typedef class bitmap : public GDCODEC {
+typedef class camera {
+public:
+	u_int i_Frustum[2];
+	u_int i_Dimensions[2];
+	u_int i_FOV;
+	u_int i_RDistance;
+}GDCAMERA;
 
-
-}GFBITMAP;
+typedef class codec {
+public:
+	codec(){}
+	codec(GDCANVAS * gd_pCanvas){
+		gd_Image = gd_pCanvas;
+	}
+	__STATUS __WAY SetPixel(GDPOINT * p_pPoint, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawLine(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawRect(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawHLine(GDPOINT * p_pPoint, u_int  i_Length, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawVLine(GDPOINT * p_pPoint, u_int  i_Length, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawCanvas(DWORD * d_pBuffer, GDPOINT * p_pPos, u_int  i_Pixels[2]);
+	__STATUS __WAY DrawVMap(GFVECTORMAP * gd_VecMap);
+private:
+	GDCANVAS * gd_Image;
+}GDCODEC;

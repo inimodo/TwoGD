@@ -21,6 +21,7 @@ DWORD __WAY wWinProcess(LPVOID lp_Void)
 	{
 
 	}
+	gdclose();
 
 	return 0; 
 }
@@ -46,8 +47,8 @@ int __WAY wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdS
 		TranslateMessage(&win::msg_WindowMessage);
 		DispatchMessage(&win::msg_WindowMessage);
 	}
-	CloseHandle(hwd_Thread);
-	gdclose();
+	printf("%d",CloseHandle(hwd_Thread));
+
 
 	ReleaseDC(NULL, win::hdc_WindowHdc);
 	return NULL;

@@ -6,7 +6,7 @@
 #define GD_VEC_LINE "l_%d_%d_%d\n"
 
 __STATUS __WAY
-mapformat::CloseStream() 
+filer::CloseStream() 
 {
 	if (this->f_Stream != NULL) 
 	{
@@ -15,7 +15,7 @@ mapformat::CloseStream()
 	return GD_TASK_OKAY;
 }
 __STATUS __WAY
-mapformat::OpenStream(const char* c_StreamName)
+filer::OpenStream(const char* c_StreamName)
 {
 	if (this->f_Stream == NULL) 
 	{
@@ -60,7 +60,7 @@ vectormap::LoadFile()
 	}
 	for (int i_Index = 0; i_Index < this->i_Colors; i_Index++)
 	{
-		if (fscanf(this->f_Stream, GD_VEC_COLORS, &this->c_pColor[i_Index].c_Color[0], &this->c_pColor[i_Index].c_Color[1], &this->c_pColor[i_Index].c_Color[2]) == NULL)
+		if (fscanf(this->f_Stream, GD_VEC_COLORS, &(this->c_pColor[i_Index].c_Color[0]), &(this->c_pColor[i_Index].c_Color[1]), &(this->c_pColor[i_Index].c_Color[2])) == NULL)
 		{
 			return GD_FILE_FAILED;
 		}
@@ -104,8 +104,9 @@ vectormap::Prepare()
 __STATUS __WAY 
 vectormap::Dispose() 
 {
-	free(this->p_pPoint);
+
 	free(this->c_pColor);
+	free(this->p_pPoint);
 	free(this->l_pLines);
 	return GD_TASK_OKAY;
 }
