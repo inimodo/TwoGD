@@ -13,8 +13,20 @@
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "Gdi32.lib")
 
-// TwoGD Socket for C++ 
-// Markus Kotar @ UCPSystems.com 2019/2020
+// TwoGD Win32Socket for C++ 
+// Markus Kotar @ www.ucpsystems.com 2019/2020
+
+
+/*
+ENTRYPOINT
+-> wWinMainCRTStartup
+
+FUNCTIONS
+unsigned char __WAY gdmain(win::GDWIN *) { return TRUE; } //Called once before Window Creation
+unsigned char __WAY gdupdate(win::GDWIN *) { return 1; } // Called every "WindowProc" Call
+void __WAY gdclose() { } // Gets Called before window closing
+*/
+
 
 #ifndef UNICODE
 #define UNICODE
@@ -34,27 +46,9 @@
 #endif
 
 
-extern HANDLE __WAY CreateExec(HINSTANCE h_Instance);
-extern long __WAY WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam);
-extern int __WAY wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow);
-
-/*
-	ENTRYPOINT MUST BE:
-	-> wWinMainCRTStartup
-
-	FUNCTIONS:
-	unsigned char __WAY win::main() { return 1; } //Gets Calledd once before Window Creation
-	unsigned char __WAY win::update() { return 1; } // Gets Called every "WindowProc" Call
-	void __WAY win::close() { } // Gets Called before window closing
-*/
-
-extern unsigned char __WAY gdmain();
-extern unsigned char __WAY gdupdate();
-extern void __WAY gdclose();
-
-typedef unsigned char uchar;
-typedef unsigned int u_int;
-#define __STATUS uchar
+typedef unsigned char UCHAR;
+typedef unsigned int UINT32;
+#define __STATUS UCHAR
 
 #define GD_ALLOC_FAILED 0x1F
 #define GD_TASK_OKAY 0x1A
@@ -68,6 +62,10 @@ typedef unsigned int u_int;
 
 #define _PTOP(POI) GDPOINT(((POINT)POI).x,((POINT)POI).y)
 
+extern HANDLE __WAY CreateExec(HINSTANCE h_Instance);
+extern long __WAY WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam);
+extern int __WAY wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow);
+
 namespace win {
 	const static DWORD dw_ExStyle = 0;
 	const static wchar_t* c_WinClassName = L"WINCLASSEWS";
@@ -79,17 +77,22 @@ namespace win {
 	const static HMENU h_Menu = NULL;
 	const static  LPVOID lp_Param = NULL;
 
-	extern int i_Width;
-	extern int i_Height;
+	typedef struct gd_win {
+		UINT32 i_Width, i_Height;
+		HINSTANCE h_Instance;
+		HWND hd_WindowHandle;
+		MSG msg_WindowMessage;
+		HDC hdc_WindowHdc;
+		WNDCLASS w_WndClass;
+		POINT p_CursorPos;
+		void(*v_pMouseDown)();
+	}GDWIN;
 
-	extern HINSTANCE h_Instance;
-	extern HWND hd_WindowHandle;
-	extern MSG msg_WindowMessage;
-	extern HDC hdc_WindowHdc;
-	extern WNDCLASS w_WndClass;
-	extern POINT p_CursorPos;
-	extern void(*v_pMouseDown)();
 }
+
+extern unsigned char __WAY gdmain(win::GDWIN *);
+extern unsigned char __WAY gdupdate(win::GDWIN *);
+extern void __WAY gdclose();
 
 typedef class gd_console {
 public:
@@ -106,8 +109,8 @@ private:
 }GDCONSOLE;
 
 typedef struct gd_color {
-	uchar c_Color[3];
-	gd_color(uchar c_R, uchar c_G, uchar c_B);
+	UCHAR c_Color[3];
+	gd_color(UCHAR c_R, UCHAR c_G, UCHAR c_B);
 	gd_color();
 	DWORD GetAsHex();
 } GDCOLOR;
@@ -141,9 +144,9 @@ extern void  GetCursorPosition();
 
 typedef class canvas {
 public:
-	u_int i_Pixels[2];
+	UINT32 i_Pixels[2];
 	DWORD * d_pOutputStream;
-	u_int i_OutputSize;
+	UINT32 i_OutputSize;
 
 	__STATUS __WAY CleanBuffer();
 
@@ -166,7 +169,7 @@ public:
 	GDPOINT * p_pPoint;
 	GDCOLOR * c_pColor;
 	GDLINE * l_pLines;
-	u_int i_Connections, i_Points, i_Colors;
+	UINT32 i_Connections, i_Points, i_Colors;
 private:
 	__STATUS __WAY ReadHeader();
 	__STATUS __WAY LoadFile();
@@ -179,10 +182,10 @@ public:
 
 typedef class camera {
 public:
-	u_int i_Frustum[2];
-	u_int i_Dimensions[2];
-	u_int i_FOV;
-	u_int i_RDistance;
+	UINT32 i_Frustum[2];
+	UINT32 i_Dimensions[2];
+	UINT32 i_FOV;
+	UINT32 i_RDistance;
 }GDCAMERA;
 
 typedef class codec {
@@ -194,9 +197,9 @@ public:
 	__STATUS __WAY SetPixel(GDPOINT * p_pPoint, GDCOLOR * c_pColor);
 	__STATUS __WAY DrawLine(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor);
 	__STATUS __WAY DrawRect(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor);
-	__STATUS __WAY DrawHLine(GDPOINT * p_pPoint, u_int  i_Length, GDCOLOR * c_pColor);
-	__STATUS __WAY DrawVLine(GDPOINT * p_pPoint, u_int  i_Length, GDCOLOR * c_pColor);
-	__STATUS __WAY DrawCanvas(DWORD * d_pBuffer, GDPOINT * p_pPos, u_int  i_Pixels[2]);
+	__STATUS __WAY DrawHLine(GDPOINT * p_pPoint, UINT32  i_Length, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawVLine(GDPOINT * p_pPoint, UINT32  i_Length, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawCanvas(DWORD * d_pBuffer, GDPOINT * p_pPos, UINT32  i_Pixels[2]);
 	__STATUS __WAY DrawVMap(GFVECTORMAP * gd_VecMap);
 private:
 	GDCANVAS * gd_Image;

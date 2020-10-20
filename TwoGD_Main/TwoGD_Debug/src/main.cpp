@@ -10,13 +10,14 @@ GDCANVAS gd_Img;
 GFVECTORMAP vmf_Map;
 
 
-unsigned char __WAY gdmain() 
+unsigned char __WAY gdmain(win::GDWIN * gd_win)
 {
-	win::i_Width =300;
-	win::i_Height = 200;
+	gd_win->i_Width =300;
+	gd_win->i_Height = 200;
+
 
 	gd_Console.Create();
-	gd_Img.Prepare(win::i_Width, win::i_Height);
+	gd_Img.Prepare(gd_win->i_Width, gd_win->i_Height);
 	gd_Codec = GDCODEC(&gd_Img);
 
 
@@ -24,7 +25,7 @@ unsigned char __WAY gdmain()
 	system("pause");
 	return TRUE;
 }
-unsigned char __WAY gdupdate() 
+unsigned char __WAY gdupdate(win::GDWIN * gd_win)
 {
 	auto a_TimeA = std::chrono::high_resolution_clock::now();
 
@@ -41,7 +42,7 @@ unsigned char __WAY gdupdate()
 	gd_Codec.DrawVMap(&vmf_Map);
 	}
 	
-	SetScreenBuffer(gd_Img.d_pOutputStream, win::i_Width, win::i_Height);
+	SetScreenBuffer(gd_Img.d_pOutputStream, gd_win->i_Width, gd_win->i_Height);
 
 
 
