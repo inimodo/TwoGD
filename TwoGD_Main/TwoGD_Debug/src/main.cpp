@@ -8,7 +8,7 @@ GDCANVAS gd_Img;
 
 
 GFVECTORMAP vmf_Map;
-
+GFOBJECT obj_Prefab;
 
 unsigned char __WAY gdmain(win::GDWIN * gd_win)
 {
@@ -21,7 +21,8 @@ unsigned char __WAY gdmain(win::GDWIN * gd_win)
 	gd_Codec = GDCODEC(&gd_Img);
 
 
-	printf("RES:: %X \n",vmf_Map.Read("src\\obj1.vmf"));
+	printf("RES:: %X \n", obj_Prefab.Read((const LPSTR)"src\\obj2.obj"));
+	printf("RES:: %X \n",vmf_Map.Read((const LPSTR)"src\\obj1.vmf"));
 	system("pause");
 	return TRUE;
 }

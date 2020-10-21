@@ -60,7 +60,7 @@ typedef unsigned int UINT32;
 #define _FROMCLIENTWIDTH(x) (x+16)
 #define _FROMCLIENTHEIGHT(x) (x+39)
 
-#define _PTOP(POI) GDPOINT(((POINT)POI).x,((POINT)POI).y)
+#define _PTOP(POI) GDVEC2(((POINT)POI).x,((POINT)POI).y)
 
 extern HANDLE __WAY CreateExec(HINSTANCE h_Instance);
 extern long __WAY WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam);
@@ -115,29 +115,52 @@ typedef struct gd_color {
 	DWORD GetAsHex();
 } GDCOLOR;
 
-typedef class gd_point {
+typedef class gd_vec2 {
 public:
 	float f_Pos[2];
 
-	void Delta(gd_point p_Pos);
-	double Distance(gd_point p_Pos);
+	void Delta(gd_vec2 p_Pos);
+	double Distance(gd_vec2 p_Pos);
 
-	gd_point();
-	gd_point(float f_X, float f_Y);
-	gd_point(float f_Pos[2]);
+	gd_vec2();
+	gd_vec2(float f_X, float f_Y);
+	gd_vec2(float f_Pos[2]);
 
-}GDPOINT;
+}GDVEC2;
+
+typedef class gd_vec3 {
+public:
+	float f_Pos[3];
+
+	void Delta(gd_vec3 p_Pos);
+	double Distance(gd_vec3 p_Pos);
+
+	gd_vec3();
+	gd_vec3(float f_X, float f_Y, float f_Z);
+	gd_vec3(float f_Pos[3]);
+
+}GDVEC3;
 
 typedef struct gd_line {
-	GDPOINT p_Point[2];
+	GDVEC2 p_Point[2];
 	GDCOLOR c_Color;
 }GDLINE;
 
-double Distance2(GDPOINT p_PosOne, GDPOINT p_PosTwo);
+typedef struct gd_face {
+	GDVEC3 p_Point[3];
+}GDFACE;
 
-GDPOINT operator - (GDPOINT  &p_Pos1, GDPOINT  &p_Pos2);
-GDPOINT operator + (GDPOINT  &p_Pos1, GDPOINT  &p_Pos2);
-GDPOINT operator * (GDPOINT  &p_Pos1, int &i_Lenght);
+double Distance2(GDVEC2 p_PosOne, GDVEC2 p_PosTwo);
+double Distance3(GDVEC3 p_PosOne, GDVEC3 p_PosTwo);
+
+GDVEC2 operator - (GDVEC2  &p_Pos1, GDVEC2  &p_Pos2);
+GDVEC2 operator + (GDVEC2  &p_Pos1, GDVEC2  &p_Pos2);
+GDVEC2 operator * (GDVEC2  &p_Pos1, int &i_Lenght);
+
+GDVEC3 operator - (GDVEC3  &p_Pos1, GDVEC3  &p_Pos2);
+GDVEC3 operator + (GDVEC3  &p_Pos1, GDVEC3  &p_Pos2);
+GDVEC3 operator * (GDVEC3  &p_Pos1, int &i_Lenght);
+
 
 extern void  SetScreenBuffer(DWORD* dw_ColorStream, int i_Width, int i_Height);
 extern void  GetCursorPosition();
@@ -157,26 +180,43 @@ public:
 typedef class filer {
 protected:
 	FILE * f_Stream;
-	__STATUS __WAY OpenStream(const char* c_StreamName);
+	__STATUS __WAY OpenStream(LPSTR c_StreamName);
 	__STATUS __WAY CloseStream();
 
 }GDFILER;
 
+typedef class object : public GDFILER {
+public:
+	GDVEC3 p_Anchor;
+	GDVEC3 * p_pPoint;
+	GDCOLOR c_pColor;
+	GDFACE * o_pFace;
+	UINT32 i_Faces, i_Points;
+private:
+	__STATUS __WAY ReadHeader();
+	__STATUS __WAY LoadFile();
+	__STATUS __WAY Prepare();
+public:
+	__STATUS __WAY Read(LPSTR c_StreamName);
+	__STATUS __WAY Dispose();
+}GFOBJECT;
+
+
+
 
 typedef class vectormap : public GDFILER {
 public:
-	GDPOINT p_Anchor;
-	GDPOINT * p_pPoint;
+	GDVEC2 p_Anchor;
+	GDVEC2 * p_pPoint;
 	GDCOLOR * c_pColor;
 	GDLINE * l_pLines;
 	UINT32 i_Connections, i_Points, i_Colors;
 private:
 	__STATUS __WAY ReadHeader();
 	__STATUS __WAY LoadFile();
-public:
-	__STATUS __WAY Read(const char* c_StreamName);
-
 	__STATUS __WAY Prepare();
+public:
+	__STATUS __WAY Read(LPSTR c_StreamName);
 	__STATUS __WAY Dispose();
 }GFVECTORMAP;
 
@@ -194,12 +234,12 @@ public:
 	codec(GDCANVAS * gd_pCanvas){
 		gd_Image = gd_pCanvas;
 	}
-	__STATUS __WAY SetPixel(GDPOINT * p_pPoint, GDCOLOR * c_pColor);
-	__STATUS __WAY DrawLine(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor);
-	__STATUS __WAY DrawRect(GDPOINT * p_pPointA, GDPOINT * p_pPointB, GDCOLOR * c_pColor);
-	__STATUS __WAY DrawHLine(GDPOINT * p_pPoint, UINT32  i_Length, GDCOLOR * c_pColor);
-	__STATUS __WAY DrawVLine(GDPOINT * p_pPoint, UINT32  i_Length, GDCOLOR * c_pColor);
-	__STATUS __WAY DrawCanvas(DWORD * d_pBuffer, GDPOINT * p_pPos, UINT32  i_Pixels[2]);
+	__STATUS __WAY SetPixel(GDVEC2 * p_pPoint, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawLine(GDVEC2 * p_pPointA, GDVEC2 * p_pPointB, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawRect(GDVEC2 * p_pPointA, GDVEC2 * p_pPointB, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawHLine(GDVEC2 * p_pPoint, UINT32  i_Length, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawVLine(GDVEC2 * p_pPoint, UINT32  i_Length, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawCanvas(DWORD * d_pBuffer, GDVEC2 * p_pPos, UINT32  i_Pixels[2]);
 	__STATUS __WAY DrawVMap(GFVECTORMAP * gd_VecMap);
 private:
 	GDCANVAS * gd_Image;
