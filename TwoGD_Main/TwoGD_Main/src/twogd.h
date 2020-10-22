@@ -134,6 +134,7 @@ public:
 
 	void Delta(gd_vec3 p_Pos);
 	double Distance(gd_vec3 p_Pos);
+	float Length();
 
 	gd_vec3();
 	gd_vec3(float f_X, float f_Y, float f_Z);
@@ -225,13 +226,15 @@ public:
 	UINT32 i_Frustum[2];
 	UINT32 i_Dimensions[2];
 	UINT32 i_FOV;
-	UINT32 i_RDistance;
+	GDVEC3 i_Position, i_Rotation;
+
+	__STATUS __WAY Translate(GDVEC3 * p_pPoint, GDVEC2 * p_pResult);
 }GDCAMERA;
 
-typedef class codec {
+typedef class codec2d {
 public:
-	codec(){}
-	codec(GDCANVAS * gd_pCanvas){
+	codec2d(){}
+	codec2d(GDCANVAS * gd_pCanvas){
 		gd_Image = gd_pCanvas;
 	}
 	__STATUS __WAY SetPixel(GDVEC2 * p_pPoint, GDCOLOR * c_pColor);
@@ -241,6 +244,23 @@ public:
 	__STATUS __WAY DrawVLine(GDVEC2 * p_pPoint, UINT32  i_Length, GDCOLOR * c_pColor);
 	__STATUS __WAY DrawCanvas(DWORD * d_pBuffer, GDVEC2 * p_pPos, UINT32  i_Pixels[2]);
 	__STATUS __WAY DrawVMap(GFVECTORMAP * gd_VecMap);
-private:
+protected:
 	GDCANVAS * gd_Image;
-}GDCODEC;
+}GD2DCODEC;
+
+typedef class codec3d : protected GD2DCODEC {
+public:
+	codec3d() {}
+	codec3d(GDCANVAS * gd_pCanvas, GDCAMERA * gd_pCamera) {
+		gd_Image = gd_pCanvas;
+		gd_Camera = gd_pCamera;
+	}
+	__STATUS __WAY SetVoxel(GDVEC3 * p_pPoint, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawObject(GDOBJ, GDCOLOR * c_pColor);
+
+
+private:
+	GDCAMERA * gd_Camera;
+}GD3DCODEC;
+
+

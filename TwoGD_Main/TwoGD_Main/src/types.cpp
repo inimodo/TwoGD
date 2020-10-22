@@ -32,10 +32,18 @@ void GDVEC3::Delta(GDVEC3 p_Pos)
 	f_Pos[0] = f_Pos[0] - p_Pos.f_Pos[0];
 	f_Pos[1] = f_Pos[1] - p_Pos.f_Pos[1];
 }
+
+float GDVEC3::Length()
+{
+
+	return sqrt(f_Pos[0] * f_Pos[0] + f_Pos[1] * f_Pos[1] + f_Pos[2] * f_Pos[2] );
+
+}
+
 double Distance3(GDVEC3 p_PosOne, GDVEC3 p_PosTwo)
 {
 	GDVEC3 p_Delta = p_PosOne - p_PosTwo;
-	return sqrt(p_Delta.f_Pos[0] * p_Delta.f_Pos[0] + p_Delta.f_Pos[1] * p_Delta.f_Pos[1]);
+	return sqrt(p_Delta.f_Pos[0] * p_Delta.f_Pos[0] + p_Delta.f_Pos[1] * p_Delta.f_Pos[1] + p_Delta.f_Pos[2] * p_Delta.f_Pos[2]);
 }
 double GDVEC3::Distance(GDVEC3 p_Pos)
 {
