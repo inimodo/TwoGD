@@ -248,7 +248,7 @@ protected:
 	GDCANVAS * gd_Image;
 }GD2DCODEC;
 
-typedef class codec3d : protected GD2DCODEC {
+typedef class codec3d : public GD2DCODEC {
 public:
 	codec3d() {}
 	codec3d(GDCANVAS * gd_pCanvas, GDCAMERA * gd_pCamera) {
@@ -256,7 +256,7 @@ public:
 		gd_Camera = gd_pCamera;
 	}
 	__STATUS __WAY SetVoxel(GDVEC3 * p_pPoint, GDCOLOR * c_pColor);
-	__STATUS __WAY DrawObject(GDOBJ, GDCOLOR * c_pColor);
+	__STATUS __WAY DrawObject(GFOBJECT * gd_Object, GDCOLOR * c_pColor);
 
 
 private:

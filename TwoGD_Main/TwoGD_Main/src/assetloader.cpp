@@ -167,7 +167,6 @@ __STATUS __WAY
 object::LoadFile()
 {
 	CHAR c_Buffer[256];
-	printf("%d %d\n",this->i_Faces,this->i_Points);
 		int i_VerticiesC = 0, i_FacesC = 0;
 	while (!feof(this->f_Stream))
 	{
@@ -179,9 +178,9 @@ object::LoadFile()
 			{
 				int i_Buffer = 0,i_A,i_B,i_C;
 				fscanf(this->f_Stream, "%d/%d/%d %d/%d/%d %d/%d/%d",&i_A,&i_Buffer,&i_Buffer,&i_B,&i_Buffer,&i_Buffer,&i_C,&i_Buffer,&i_Buffer);	
-				this->o_pFace[i_FacesC].p_Point[0] = this->p_pPoint[i_A];
-				this->o_pFace[i_FacesC].p_Point[1] = this->p_pPoint[i_B];
-				this->o_pFace[i_FacesC].p_Point[2] = this->p_pPoint[i_C];
+				this->o_pFace[i_FacesC].p_Point[0] = this->p_pPoint[i_A-1];
+				this->o_pFace[i_FacesC].p_Point[1] = this->p_pPoint[i_B-1];
+				this->o_pFace[i_FacesC].p_Point[2] = this->p_pPoint[i_C-1];
 				i_FacesC++;
 			}
 			if (c_Buffer[0] == 'v') 
