@@ -3,23 +3,20 @@
 
 win::GDWIN gd_win;
 
-HANDLE __WAY CreateExec(HINSTANCE h_Instance);
-long __WAY WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam);
+HANDLE  CreateExec(HINSTANCE h_Instance);
+long  WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam);
 
 
-DWORD __WAY wWinProcess(LPVOID lp_Void)
+DWORD  wWinProcess(LPVOID lp_Void)
 {
-	while (gdupdate(&gd_win) != NULL)
-	{
-
-	}
-	gdclose();
+	while (gdUpdate(&gd_win) != NULL){}
+	gdClose();
 
 	return 0; 
 }
-int __WAY wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow)
+int  wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow)
 {
-	if (gdmain(&gd_win) == NULL)
+	if (gdMain(&gd_win) == NULL)
 	{
 		return NULL;
 	}
@@ -32,33 +29,33 @@ int __WAY wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdS
 
 	gd_win.hdc_WindowHdc = GetDC(gd_win.hd_WindowHandle);
 
-	HANDLE hwd_Thread = CreateThread(0,0, wWinProcess,0,0,NULL);
+	HANDLE hwd_Thread = CreateThread(0,0, (LPTHREAD_START_ROUTINE)wWinProcess,0,0,NULL);
 
 	while ((GetMessage(&gd_win.msg_WindowMessage, NULL, 0, 0) > 0))
 	{
 		TranslateMessage(&gd_win.msg_WindowMessage);
 		DispatchMessage(&gd_win.msg_WindowMessage);
 	}
-	printf("%d",CloseHandle(hwd_Thread));
 
+	printf("%d",CloseHandle(hwd_Thread));
 
 	ReleaseDC(NULL, gd_win.hdc_WindowHdc);
 	return NULL;
 }
-HANDLE __WAY CreateExec(HINSTANCE h_Instance) {
+HANDLE  CreateExec(HINSTANCE h_Instance) {
 	gd_win.w_WndClass.hbrBackground = (HBRUSH)(2);
 	gd_win.w_WndClass = { 0 };
 	gd_win.w_WndClass.lpfnWndProc = (WNDPROC)WindowProc;
 	gd_win.w_WndClass.hInstance = h_Instance;
-	gd_win.w_WndClass.lpszClassName = (LPCSTR)win::c_WinClassName;
+	gd_win.w_WndClass.lpszClassName = (LPCWSTR)win::c_WinClassName;
 
 	RegisterClass(&gd_win.w_WndClass);
 
 	gd_win.h_Instance = h_Instance;
 	gd_win.hd_WindowHandle = CreateWindowEx(
 		win::dw_ExStyle,
-		(LPCSTR)win::c_WinClassName,
-		(LPCSTR)win::c_WinTitle,
+		(LPCWSTR)win::c_WinClassName,
+		(LPCWSTR)win::c_WinTitle,
 		win::dw_Style,
 		win::i_XPos,
 		win::i_YPos,
@@ -71,7 +68,7 @@ HANDLE __WAY CreateExec(HINSTANCE h_Instance) {
 	);
 	return gd_win.hd_WindowHandle;
 }
-long __WAY WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam)
+long  WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam)
 {
 	if (msg_Message == WM_LBUTTONDOWN) {
 		if (gd_win.v_pMouseDown != NULL) {

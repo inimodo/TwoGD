@@ -1,19 +1,19 @@
 #include "twogd.h"
-__STATUS __WAY
+UCHAR 
 canvas::Dispose()
 {
 	free(d_pOutputStream);
 	return GD_TASK_OKAY;
 
 }
-__STATUS __WAY
+UCHAR 
 canvas::CleanBuffer()
 {
 	memset((void *)d_pOutputStream, 0, i_OutputSize * sizeof(DWORD));
 	return GD_TASK_OKAY;
 
 }
-__STATUS
+UCHAR
 canvas::Prepare(int i_Width, int i_Height)
 {
 	i_OutputSize = i_Width * i_Height;
@@ -54,9 +54,9 @@ GDVEC3 operator - (GDVEC3  &p_Pos1, GDVEC3  &p_Pos2) {
 	return GDVEC3(p_Pos1.f_Pos[0] - p_Pos2.f_Pos[0], p_Pos1.f_Pos[1] - p_Pos2.f_Pos[1], p_Pos1.f_Pos[2] - p_Pos2.f_Pos[2]);
 }
 GDVEC3 operator + (GDVEC3  &p_Pos1, GDVEC3  &p_Pos2) {
-	return GDVEC3(p_Pos1.f_Pos[0] + p_Pos2.f_Pos[0], p_Pos1.f_Pos[1] + p_Pos2.f_Pos[1], p_Pos1.f_Pos[2] - p_Pos2.f_Pos[2]);
+	return GDVEC3(p_Pos1.f_Pos[0] + p_Pos2.f_Pos[0], p_Pos1.f_Pos[1] + p_Pos2.f_Pos[1], p_Pos1.f_Pos[2] + p_Pos2.f_Pos[2]);
 }
-GDVEC3 operator * (GDVEC3  &p_Pos1, int &i_Lenght) {
+GDVEC3 operator * (GDVEC3  &p_Pos1, float &i_Lenght) {
 	return GDVEC3(p_Pos1.f_Pos[0] * i_Lenght, p_Pos1.f_Pos[1] * i_Lenght, p_Pos1.f_Pos[2] * i_Lenght);
 }
 gd_vec3::gd_vec3()

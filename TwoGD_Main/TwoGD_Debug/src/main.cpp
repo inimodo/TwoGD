@@ -20,8 +20,9 @@ GDCOLOR gd_color2;
 int i_Ticks;
 float f_Buffered[BUFFERS];
 
-unsigned char __WAY gdmain(win::GDWIN * gd_win)
+unsigned char  gdMain(win::GDWIN * gd_win)
 {
+
 	gd_win->i_Width =16*50;
 	gd_win->i_Height = 9*50;
 
@@ -39,6 +40,13 @@ unsigned char __WAY gdmain(win::GDWIN * gd_win)
 	gd_color = GDCOLOR(255,255,255);
 	gd_color2 = GDCOLOR(0,0,255);
 
+	for (int i = 0; i <= 360; i+=15)
+	{
+
+		printf("%d %f %f\n",i,sin(i*0.0174533f),asin(sin(i*0.0174533f))* 57.2958);
+	}
+	system("pause");
+
 	printf("RES: %X \n", obj_Prefab.Read((const LPSTR)"src\\obj3.obj"));
 	obj_Prefab.p_Anchor.f_Pos[1] = 1;
 	printf("RES: %X \n", obj_Prefab2.Read((const LPSTR)"src\\obj4.obj"));
@@ -48,24 +56,27 @@ unsigned char __WAY gdmain(win::GDWIN * gd_win)
 	return TRUE;
 }
 #define TICKSPEED 0.05f
-unsigned char __WAY gdupdate(win::GDWIN * gd_win)
+unsigned char  gdUpdate(win::GDWIN * gd_win)
 {
 
 	auto a_TimeA = std::chrono::high_resolution_clock::now();
 
 
-	if (GetAsyncKeyState(VK_NUMPAD8) != 0)gd_camera.i_Position.f_Pos[2] += TICKSPEED;
-	if (GetAsyncKeyState(VK_NUMPAD2) != 0)gd_camera.i_Position.f_Pos[2] -= TICKSPEED;
+	if (GetAsyncKeyState(VK_NUMPAD2) != 0)gd_camera.i_Position.f_Pos[2] += TICKSPEED;
+	if (GetAsyncKeyState(VK_NUMPAD8) != 0)gd_camera.i_Position.f_Pos[2] -= TICKSPEED;
 
-	if (GetAsyncKeyState(VK_NUMPAD4) != 0)gd_camera.i_Position.f_Pos[0] -= TICKSPEED;
-	if (GetAsyncKeyState(VK_NUMPAD6) != 0)gd_camera.i_Position.f_Pos[0] += TICKSPEED;
+	if (GetAsyncKeyState(VK_NUMPAD6) != 0)gd_camera.i_Position.f_Pos[0] -= TICKSPEED;
+	if (GetAsyncKeyState(VK_NUMPAD4) != 0)gd_camera.i_Position.f_Pos[0] += TICKSPEED;
 
 	if (GetAsyncKeyState(VK_NUMPAD1) != 0)gd_camera.i_Position.f_Pos[1] += TICKSPEED;
 	if (GetAsyncKeyState(VK_NUMPAD0) != 0)gd_camera.i_Position.f_Pos[1] -= TICKSPEED;
 
 
 	if (GetAsyncKeyState(VK_NUMPAD9) != 0)gd_camera.i_Rotation.f_Pos[0] += TICKSPEED*0.1;
-	if (GetAsyncKeyState(VK_NUMPAD3) != 0)gd_camera.i_Rotation.f_Pos[0] -= TICKSPEED*0.1;
+	if (GetAsyncKeyState(VK_MULTIPLY) != 0)gd_camera.i_Rotation.f_Pos[0] -= TICKSPEED*0.1;
+
+	if (GetAsyncKeyState(VK_ADD) != 0)gd_camera.i_Rotation.f_Pos[1] += TICKSPEED * 0.1;
+	if (GetAsyncKeyState(VK_SUBTRACT) != 0)gd_camera.i_Rotation.f_Pos[1] -= TICKSPEED * 0.1;
 
 
 	gd_Img.CleanBuffer();
@@ -98,7 +109,7 @@ unsigned char __WAY gdupdate(win::GDWIN * gd_win)
 	return TRUE;
 
 }
-void __WAY gdclose() {
+void  gdClose() {
 	gd_Img.Dispose();
 	vmf_Map.Dispose();
 }

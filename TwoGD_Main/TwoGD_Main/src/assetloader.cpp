@@ -5,7 +5,7 @@
 #define GD_VEC_COLORS "c %d %d %d\n"
 #define GD_VEC_LINE "l %d %d %d\n"
 
-__STATUS __WAY
+UCHAR 
 filer::CloseStream() 
 {
 	if (this->f_Stream != NULL) 
@@ -14,7 +14,7 @@ filer::CloseStream()
 	}
 	return GD_TASK_OKAY;
 }
-__STATUS __WAY
+UCHAR 
 filer::OpenStream(LPSTR c_StreamName)
 {
 	if (this->f_Stream == NULL) 
@@ -28,7 +28,7 @@ filer::OpenStream(LPSTR c_StreamName)
 	}
 	return GD_FILE_FAILED;
 }
-__STATUS __WAY 
+UCHAR  
 vectormap::Read(LPSTR c_StreamName)
 {
 	if (this->OpenStream(c_StreamName) != GD_TASK_OKAY) {
@@ -48,7 +48,7 @@ vectormap::Read(LPSTR c_StreamName)
 	}
 	return GD_TASK_OKAY;
 }
-__STATUS __WAY
+UCHAR 
 vectormap::LoadFile()
 {
 	for (int i_Index = 0; i_Index < this->i_Points; i_Index++)
@@ -78,7 +78,7 @@ vectormap::LoadFile()
 	}
 	return GD_TASK_OKAY;
 }
-__STATUS __WAY
+UCHAR 
 vectormap::ReadHeader()
 {
 	if (fscanf(this->f_Stream, GD_VEC_HEADER, &this->i_Points, &this->i_Colors, &this->i_Connections) == NULL)
@@ -87,7 +87,7 @@ vectormap::ReadHeader()
 	}
 	return GD_TASK_OKAY;
 }
-__STATUS __WAY
+UCHAR 
 vectormap::Prepare()
 {
 	this->p_pPoint = (GDVEC2*)malloc(sizeof(GDVEC2)*this->i_Points);
@@ -101,7 +101,7 @@ vectormap::Prepare()
 	return GD_TASK_OKAY;
 }
 
-__STATUS __WAY 
+UCHAR  
 vectormap::Dispose() 
 {
 
@@ -112,7 +112,7 @@ vectormap::Dispose()
 }
 
 
-__STATUS __WAY
+UCHAR 
 object::Read(LPSTR c_StreamName) 
 {
 	if (this->OpenStream(c_StreamName) != GD_TASK_OKAY) {
@@ -133,7 +133,7 @@ object::Read(LPSTR c_StreamName)
 	return GD_TASK_OKAY;
 }
 
-__STATUS __WAY
+UCHAR 
 object::ReadHeader() 
 {
 	CHAR c_Buffer[256];
@@ -150,7 +150,7 @@ object::ReadHeader()
 	return GD_TASK_OKAY;
 }
 
-__STATUS __WAY
+UCHAR 
 object::Prepare()
 {
 	this->p_pPoint = (GDVEC3*)malloc(sizeof(GDVEC3)*this->i_Points);
@@ -163,7 +163,7 @@ object::Prepare()
 	return GD_TASK_OKAY;
 }
 
-__STATUS __WAY
+UCHAR 
 object::LoadFile()
 {
 	CHAR c_Buffer[256];
@@ -197,7 +197,7 @@ object::LoadFile()
 	return GD_TASK_OKAY;
 }
 
-__STATUS __WAY
+UCHAR 
 object::Dispose() 
 {
 	free(this->p_pPoint);
