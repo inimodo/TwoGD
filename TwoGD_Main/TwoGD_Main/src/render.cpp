@@ -1,9 +1,6 @@
 #include <iostream>
 #include "twogd.h"
 
-#define _TOINDEX(x,y) ((int)y * gd_Image->i_Pixels[0] + (int)x)
-#define _TOROW(y) ((int)y * gd_Image->i_Pixels[0])
-
 UCHAR 
 codec2d::SetPixel(GDVEC2 * p_pPoint, GDCOLOR * c_pColor)
 {

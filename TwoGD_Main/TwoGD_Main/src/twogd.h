@@ -46,7 +46,8 @@ void  gdclose() { } // Gets Called before window closing
 #define _TOCLIENTHEIGHT(x) (win::i_Height-39)
 #define _FROMCLIENTWIDTH(x) (x+16)
 #define _FROMCLIENTHEIGHT(x) (x+39)
-
+#define _TOINDEX(x,y) ((int)y * gd_Image->i_Pixels[0] + (int)x)
+#define _TOROW(y) ((int)y * gd_Image->i_Pixels[0])
 #define _PTOP(POI) GDVEC2(((POINT)POI).x,((POINT)POI).y)
 
 typedef unsigned char UCHAR;
