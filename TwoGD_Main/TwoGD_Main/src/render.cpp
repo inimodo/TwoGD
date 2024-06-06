@@ -81,22 +81,28 @@ codec2d::DrawVMap(GFVECTORMAP * gd_VecMap)
 UCHAR 
 camera::Translate(GDVEC3 * p_pPoint,GDVEC2 * p_pResult) 
 {
-	GDVEC3 o_Distance = this->i_Position - *p_pPoint;
-	float f_distance = o_Distance.Length();
-	float f_updown = asin(o_Distance.f_Pos[1] /f_distance ) + this->i_Rotation.f_Pos[1];
-	float f_leftright = asin(o_Distance.f_Pos[0] / o_Distance.f_Pos[2]) + this->i_Rotation.f_Pos[0];
+	GDVEC3 o_Delta = *p_pPoint- this->i_Position; 
+	float f_abs = o_Delta.Length();
 
-	if (f_distance > this->i_Frustum[1] || f_distance < this->i_Frustum[0])return GD_OUTOFBOUND;
-	if (o_Distance.f_Pos[2]<0)return GD_OUTOFBOUND;
+	o_Delta.f_Pos[1] = o_Delta.f_Pos[1] * cos(this->i_Rotation.f_Pos[1]) - o_Delta.f_Pos[2] * sin(this->i_Rotation.f_Pos[1]);
+	o_Delta.f_Pos[2] = o_Delta.f_Pos[1] * sin(this->i_Rotation.f_Pos[1]) + o_Delta.f_Pos[2] * cos(this->i_Rotation.f_Pos[1]);
+	o_Delta.f_Pos[0] = o_Delta.f_Pos[0] * cos(this->i_Rotation.f_Pos[0]) + o_Delta.f_Pos[2] * sin(this->i_Rotation.f_Pos[0]);
+	o_Delta.f_Pos[2] = -o_Delta.f_Pos[0] * sin(this->i_Rotation.f_Pos[0]) + o_Delta.f_Pos[2] * cos(this->i_Rotation.f_Pos[0]);
+
+	if (f_abs > this->i_Frustum[1] || f_abs < this->i_Frustum[0]) return GD_OUTOFBOUND;
+	if (o_Delta.f_Pos[2] < 0 ) return GD_OUTOFBOUND;
+
+	float f_updown = asin(o_Delta.f_Pos[1] / f_abs );
+	float f_leftright = asin(o_Delta.f_Pos[0] / f_abs); 
 
 	p_pResult->f_Pos[0] = tan(f_leftright)*this->i_Dimensions[0];
 	p_pResult->f_Pos[1] = (tan(f_updown) / cos(f_leftright))*this->i_Dimensions[0];
 
+	p_pResult->f_Pos[1] *= -1; // Flip because y=0 is on top
 	p_pResult->f_Pos[0] += this->i_Dimensions[0] / 2;
 	p_pResult->f_Pos[1] += this->i_Dimensions[1] / 2;	
 
 	return GD_TASK_OKAY;
-
 }
 
 

@@ -145,14 +145,6 @@
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="src\obj\obj1.vmf" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="src\obj\obj2.obj" />
-    <Object Include="src\obj\obj3.obj" />
-    <Object Include="src\obj\obj4.obj" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
