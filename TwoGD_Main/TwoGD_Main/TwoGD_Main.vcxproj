@@ -150,10 +150,13 @@
     <ClInclude Include="src\twogd.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\render_3d.cpp" />
+    <ClCompile Include="src\types_3d.cpp" />
     <ClCompile Include="src\assetloader.cpp" />
     <ClCompile Include="src\console.cpp" />
-    <ClCompile Include="src\render.cpp" />
-    <ClCompile Include="src\types.cpp" />
+    <ClCompile Include="src\render_2d.cpp" />
+    <ClCompile Include="src\types_2d.cpp" />
+    <ClCompile Include="src\types_other.cpp" />
     <ClCompile Include="src\windows.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

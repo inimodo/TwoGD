@@ -9,7 +9,23 @@ long  WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam)
 
 DWORD  wWinProcess(LPVOID lp_Void)
 {
-	while (gdUpdate(&gd_win) != NULL){}
+	DWORD* dw_pFrame = 0;
+	while(TRUE)
+	{
+		GetCursorPos(&gd_win.p_CursorPos);
+		ScreenToClient(gd_win.hd_WindowHandle, &gd_win.p_CursorPos);
+
+		dw_pFrame = gdUpdate(&gd_win);
+		if (dw_pFrame == NULL) break;
+
+		HBITMAP bmp_Bitmap = CreateBitmap(gd_win.i_Width, gd_win.i_Height, 1, 8 * 4, (const void *)dw_pFrame);
+		HDC hdc_TempHdc = CreateCompatibleDC(gd_win.hdc_WindowHdc);
+		SelectObject(hdc_TempHdc, bmp_Bitmap);
+		BitBlt(gd_win.hdc_WindowHdc, 0, 0, gd_win.i_Width, gd_win.i_Height, hdc_TempHdc, 0, 0, SRCCOPY);
+		DeleteObject(bmp_Bitmap);
+		DeleteDC(hdc_TempHdc);
+
+	}
 	gdClose();
 
 	return 0; 
@@ -88,16 +104,4 @@ long  WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam)
 	}
 
 	return DefWindowProcW(hd_Handle, msg_Message, wParam, lParam);
-}
-void  SetScreenBuffer(DWORD * dw_ColorStream, int i_dWidth, int di_Height) {
-	HBITMAP bmp_Bitmap = CreateBitmap(i_dWidth, di_Height, 1, 8 * 4, (const void *)dw_ColorStream);
-	HDC hdc_TempHdc = CreateCompatibleDC(gd_win.hdc_WindowHdc);
-	SelectObject(hdc_TempHdc, bmp_Bitmap);
-	BitBlt(gd_win.hdc_WindowHdc, 0, 0, i_dWidth, di_Height, hdc_TempHdc, 0, 0, SRCCOPY);
-	DeleteObject(bmp_Bitmap);
-	DeleteDC(hdc_TempHdc);
-}
-void GetCursorPosition() {
-	GetCursorPos(&gd_win.p_CursorPos);
-	ScreenToClient(gd_win.hd_WindowHandle, &gd_win.p_CursorPos);
 }

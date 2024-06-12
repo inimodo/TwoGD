@@ -22,31 +22,27 @@ GDCOLOR co_Pink = GDCOLOR(255, 0, 255);
 
 #define TICKSPEED 0.05f
 
-#define BUFFERS 50
-int i_Ticks;
-float f_Buffered[BUFFERS];
-
-
 void draw() 
 {
-	//obj_Monkey.p_Anchor.f_Pos[1] = 1;
-	//gd_World.DrawObject(&obj_Monkey, &co_White);
-
+	obj_Monkey.p_Anchor.f_Pos[1] = 1;
+	gd_World.DrawObject(&obj_Monkey, &co_White);
+	
 	gd_World.DrawObject(&obj_Plane, &co_Gray);
+
+	obj_Cube.p_Anchor.f_Pos[0] = 0;
+	obj_Cube.p_Anchor.f_Pos[2] = 7;
+	gd_World.DrawObject(&obj_Cube, &co_Blue);
+	
 
 	obj_Cube.p_Anchor.f_Pos[1] = 1;
 
 	obj_Cube.p_Anchor.f_Pos[0] = 7;
 	obj_Cube.p_Anchor.f_Pos[2] = 0;
-	gd_World.DrawObject(&obj_Cube, &co_Red);	
+	gd_World.DrawObject(&obj_Cube, &co_Red);
 
 	obj_Cube.p_Anchor.f_Pos[0] = -7;
 	obj_Cube.p_Anchor.f_Pos[2] = 0;
 	gd_World.DrawObject(&obj_Cube, &co_Green);
-
-	obj_Cube.p_Anchor.f_Pos[0] = 0;
-	obj_Cube.p_Anchor.f_Pos[2] = 7;
-	gd_World.DrawObject(&obj_Cube, &co_Blue);
 
 	obj_Cube.p_Anchor.f_Pos[0] = 0;
 	obj_Cube.p_Anchor.f_Pos[2] = -7;
@@ -67,20 +63,23 @@ void draw()
 
 void keyInput() 
 {
-	if (GetAsyncKeyState(VK_NUMPAD2) != 0)gd_camera.i_Position.f_Pos[2] -= TICKSPEED;
-	if (GetAsyncKeyState(VK_NUMPAD8) != 0)gd_camera.i_Position.f_Pos[2] += TICKSPEED;
+	if (GetAsyncKeyState('S') != 0)gd_camera.i_Position.f_Pos[2] -= TICKSPEED;
+	if (GetAsyncKeyState('W') != 0)gd_camera.i_Position.f_Pos[2] += TICKSPEED;
 
-	if (GetAsyncKeyState(VK_NUMPAD6) != 0)gd_camera.i_Position.f_Pos[0] += TICKSPEED;
-	if (GetAsyncKeyState(VK_NUMPAD4) != 0)gd_camera.i_Position.f_Pos[0] -= TICKSPEED;
+	if (GetAsyncKeyState('D') != 0)gd_camera.i_Position.f_Pos[0] += TICKSPEED;
+	if (GetAsyncKeyState('A') != 0)gd_camera.i_Position.f_Pos[0] -= TICKSPEED;
 
-	if (GetAsyncKeyState(VK_NUMPAD1) != 0)gd_camera.i_Position.f_Pos[1] += TICKSPEED;
-	if (GetAsyncKeyState(VK_NUMPAD0) != 0)gd_camera.i_Position.f_Pos[1] -= TICKSPEED;
+	if (GetAsyncKeyState(VK_SPACE) != 0)gd_camera.i_Position.f_Pos[1] += TICKSPEED;
+	if (GetAsyncKeyState(VK_LSHIFT) != 0)gd_camera.i_Position.f_Pos[1] -= TICKSPEED;
 
-	if (GetAsyncKeyState(VK_NUMPAD9) != 0)gd_camera.i_Rotation.f_Pos[0] += TICKSPEED * 0.3;
-	if (GetAsyncKeyState(VK_MULTIPLY) != 0)gd_camera.i_Rotation.f_Pos[0] -= TICKSPEED * 0.3;
+	if (GetAsyncKeyState(VK_LEFT) != 0)gd_camera.i_Rotation.f_Pos[0] += TICKSPEED * 0.3;
+	if (GetAsyncKeyState(VK_RIGHT) != 0)gd_camera.i_Rotation.f_Pos[0] -= TICKSPEED * 0.3;
 
-	if (GetAsyncKeyState(VK_ADD) != 0)gd_camera.i_Rotation.f_Pos[1] += TICKSPEED * 0.3;
-	if (GetAsyncKeyState(VK_SUBTRACT) != 0)gd_camera.i_Rotation.f_Pos[1] -= TICKSPEED * 0.3;
+	if (GetAsyncKeyState(VK_UP) != 0)gd_camera.i_Rotation.f_Pos[1] += TICKSPEED * 0.3;
+	if (GetAsyncKeyState(VK_DOWN) != 0)gd_camera.i_Rotation.f_Pos[1] -= TICKSPEED * 0.3;
+
+	if (GetAsyncKeyState(VK_ADD) != 0)gd_camera.f_FOV += 0.1;
+	if (GetAsyncKeyState(VK_SUBTRACT) != 0)gd_camera.f_FOV -= 0.1;
 }
 
 
@@ -95,14 +94,15 @@ void prefabLoader()
 unsigned char  gdMain(win::GDWIN * gd_win)
 {
 
-	gd_win->i_Width =16*50;
-	gd_win->i_Height = 9*50;
+	gd_win->i_Width =16*90;
+	gd_win->i_Height = 9*90;
 
 	gd_camera.i_Dimensions[0] = gd_win->i_Width;
 	gd_camera.i_Dimensions[1] = gd_win->i_Height;
 
-	gd_camera.i_Frustum[0] = 1;
-	gd_camera.i_Frustum[1] = 30;
+	gd_camera.f_Frustum[0] = 1;
+	gd_camera.f_Frustum[1] = 30;
+	gd_camera.f_FOV = 1;
 
 	gd_Console.Create();
 	gd_Img.Prepare(gd_win->i_Width, gd_win->i_Height);
@@ -115,39 +115,15 @@ unsigned char  gdMain(win::GDWIN * gd_win)
 
 	return TRUE;
 }
-unsigned char  gdUpdate(win::GDWIN * gd_win)
+
+DWORD*  gdUpdate(win::GDWIN * gd_win)
 {
-	auto a_TimeA = std::chrono::high_resolution_clock::now();
-
-	keyInput();
-
 	gd_Img.CleanBuffer();
 
+	keyInput();
 	draw();
 	
-	SetScreenBuffer(gd_Img.d_pOutputStream, gd_win->i_Width, gd_win->i_Height);
-
-	auto a_TimeB = std::chrono::high_resolution_clock::now();
-	auto a_Time = std::chrono::duration_cast<std::chrono::microseconds>(a_TimeB - a_TimeA).count();
-
-	system("cls");
-	printf("Viewport: \nFramerate %dfps ", (int)(1.f/(a_Time/100000.0f)));
-
-	if (i_Ticks >= BUFFERS)i_Ticks = 0;
-	f_Buffered[i_Ticks] = 1.f / (a_Time / 100000.0f);
-	i_Ticks++;
-	float i_Avrg = 0;
-	for (INT i = 0; i < BUFFERS; i++)
-	{
-		i_Avrg += f_Buffered[i];
-	}
-	printf("(Average %dfps) \n", (int)(i_Avrg / BUFFERS));
-
-	printf("\nCamera:\n");
-	printf("Postion %f %f %f\n", gd_camera.i_Position.f_Pos[0], gd_camera.i_Position.f_Pos[1], gd_camera.i_Position.f_Pos[2]);
-	printf("Angle   %f %f %f\n", gd_camera.i_Rotation.f_Pos[0], gd_camera.i_Rotation.f_Pos[1], gd_camera.i_Rotation.f_Pos[2]);
-	return TRUE;
-
+	return gd_Img.d_pOutputStream;
 }
 void  gdClose() {
 	gd_Img.Dispose();

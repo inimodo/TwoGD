@@ -25,7 +25,7 @@ void  gdclose() { } // Gets Called before window closing
 #else 
 #define __REGISTER 
 #endif
-
+#define _USE_MATH_DEFINES
 
 #include <iostream>
 #include <xmmintrin.h>
@@ -49,6 +49,8 @@ void  gdclose() { } // Gets Called before window closing
 #define _TOINDEX(x,y) ((int)y * gd_Image->i_Pixels[0] + (int)x)
 #define _TOROW(y) ((int)y * gd_Image->i_Pixels[0])
 #define _PTOP(POI) GDVEC2(((POINT)POI).x,((POINT)POI).y)
+#define DEGTORAD(X) (float)(X*2*M_PI/360.0)
+#define RADTODEG(X) (float)(X/(2*M_PI)*360.0)
 
 typedef unsigned char UCHAR;
 typedef unsigned int UINT32;
@@ -82,7 +84,7 @@ namespace win {
 }
 
 extern unsigned char  gdMain(win::GDWIN *);
-extern unsigned char  gdUpdate(win::GDWIN *);
+extern DWORD*  gdUpdate(win::GDWIN *);
 extern void  gdClose();
 
 typedef class gd_console {
@@ -123,9 +125,21 @@ typedef class gd_vec3 {
 public:
 	float f_Pos[3];
 
-	void Delta(gd_vec3 p_Pos);
-	double Distance(gd_vec3 p_Pos);
+	void NormalizeThis();
+	gd_vec3 NormalizeTo();
+	
+	void RotateThis(gd_vec3 p_Rot);
+	gd_vec3 RotateTo(gd_vec3 p_Rot);
+
+	void DeltaThis(gd_vec3 p_Pos);
+	gd_vec3 DeltaTo(gd_vec3 p_Pos);
+
+	gd_vec3 AngleTo(gd_vec3 p_Pos);
+	gd_vec3 Angle();
+
+	double DistanceTo(gd_vec3 p_Pos);
 	float Length();
+	float DotProduct(gd_vec3 p_Pos);
 
 	gd_vec3();
 	gd_vec3(float f_X, float f_Y, float f_Z);
@@ -152,10 +166,6 @@ GDVEC2 operator * (GDVEC2  &p_Pos1, int &i_Lenght);
 GDVEC3 operator - (GDVEC3  &p_Pos1, GDVEC3  &p_Pos2);
 GDVEC3 operator + (GDVEC3  &p_Pos1, GDVEC3  &p_Pos2);
 GDVEC3 operator * (GDVEC3  &p_Pos1, float &i_Lenght);
-
-
-extern void  SetScreenBuffer(DWORD* dw_ColorStream, int i_Width, int i_Height);
-extern void  GetCursorPosition();
 
 typedef class canvas {
 public:
@@ -214,9 +224,9 @@ public:
 
 typedef class camera {
 public:
-	UINT32 i_Frustum[2];
+	FLOAT f_Frustum[2];
 	UINT32 i_Dimensions[2];
-	UINT32 i_FOV;
+	FLOAT f_FOV;
 	GDVEC3 i_Position, i_Rotation;
 
 	UCHAR  Translate(GDVEC3 * p_pPoint, GDVEC2 * p_pResult);
