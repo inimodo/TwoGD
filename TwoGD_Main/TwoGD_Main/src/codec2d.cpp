@@ -31,7 +31,7 @@ codec2d::DrawRect(GDVEC2* p_pPointA, GDVEC2* p_pPointB, GDCOLOR* c_pColor)
 	GDVEC2 p_Temp(p_pPointA->f_Pos[0], p_pPointA->f_Pos[1]);
 	for (UINT32 i_Index = 0; i_Index < p_pPointB->f_Pos[1] - p_pPointA->f_Pos[1]; i_Index++)
 	{
-		p_Temp.f_Pos[1] = p_pPointA->f_Pos[1] + i_Index;
+		p_Temp.f_Pos[1] = p_pPointA->f_Pos[1] + (float)i_Index;
 		DrawHLine(&p_Temp, p_pPointB->f_Pos[0] - p_pPointA->f_Pos[0], c_pColor);
 	}
 	return GD_TASK_OKAY;

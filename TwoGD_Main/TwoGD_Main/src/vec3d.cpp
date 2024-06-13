@@ -22,24 +22,34 @@ float GDVEC3::DotProduct(GDVEC3 p_Pos)
 	return f_Pos[0] * p_Pos.f_Pos[0] + f_Pos[1] * p_Pos.f_Pos[1] + f_Pos[2] * p_Pos.f_Pos[2];
 }
 
+void gd_vec3::RotateAroundThis(gd_vec3 p_UnitV,float f_phi)
+{
+	*this = M3X3RotU(p_UnitV, f_phi) * *this;
+}
+
+GDVEC3 gd_vec3::RotateAroundTo(gd_vec3 p_UnitV, float f_phi)
+{
+	return M3X3RotU(p_UnitV, f_phi) * *this;
+}
+
+
+//GDVEC3 GDVEC3::RotateTo(GDVEC3 p_Rot)
+//{
+//	GDM3X3 m_X = M3X3RotX(p_Rot.f_Pos[1]);
+//	GDM3X3 m_Y = M3X3RotY(p_Rot.f_Pos[0]);
+//	GDM3X3 m_Z = M3X3RotZ(p_Rot.f_Pos[2]);
+//
+//	return (m_Z*m_Y*m_X) * *this;
+//}
+
 GDVEC3 GDVEC3::RotateTo(GDVEC3 p_Rot)
 {
-	GDVEC3 o_New = GDVEC3(this->f_Pos);
-	float f_temp_x, f_temp_y, f_temp_z;
+	GDM3X3 m_Y = M3X3RotY(p_Rot.f_Pos[0]);
+	GDM3X3 m_YY = M3X3RotY(-p_Rot.f_Pos[0]);
+	GDVEC3 p_UntX = m_YY*GDVEC3(1.0f, 0, 0);
+	GDM3X3 m_X = M3X3RotU(p_UntX,p_Rot.f_Pos[1]);
 
-	f_temp_y = o_New.f_Pos[1] * cos(p_Rot.f_Pos[1]) - o_New.f_Pos[2] * sin(p_Rot.f_Pos[1]);
-	f_temp_z = o_New.f_Pos[1] * sin(p_Rot.f_Pos[1]) + o_New.f_Pos[2] * cos(p_Rot.f_Pos[1]);
-
-	o_New.f_Pos[1] = f_temp_y;
-	o_New.f_Pos[2] = f_temp_z;
-
-	f_temp_x = o_New.f_Pos[0] * cos(p_Rot.f_Pos[0]) + o_New.f_Pos[2] * sin(p_Rot.f_Pos[0]);
-	f_temp_z = -o_New.f_Pos[0] * sin(p_Rot.f_Pos[0]) + o_New.f_Pos[2] * cos(p_Rot.f_Pos[0]);
-
-	o_New.f_Pos[0] = f_temp_x;
-	o_New.f_Pos[2] = f_temp_z;
-
-	return o_New;
+	return m_Y * (m_X * *this);
 }
 
 GDVEC3 GDVEC3::AngleTo(GDVEC3 p_Pos)
@@ -93,8 +103,14 @@ GDVEC3 operator - (GDVEC3  &p_Pos1, GDVEC3  &p_Pos2) {
 GDVEC3 operator + (GDVEC3  &p_Pos1, GDVEC3  &p_Pos2) {
 	return GDVEC3(p_Pos1.f_Pos[0] + p_Pos2.f_Pos[0], p_Pos1.f_Pos[1] + p_Pos2.f_Pos[1], p_Pos1.f_Pos[2] + p_Pos2.f_Pos[2]);
 }
-GDVEC3 operator * (GDVEC3  &p_Pos1, float &i_Lenght) {
-	return GDVEC3(p_Pos1.f_Pos[0] * i_Lenght, p_Pos1.f_Pos[1] * i_Lenght, p_Pos1.f_Pos[2] * i_Lenght);
+GDVEC3 operator * (GDVEC3  &p_Pos1, GDVEC3  &p_Pos2) {
+	return GDVEC3(p_Pos1.f_Pos[0] * p_Pos2.f_Pos[0], p_Pos1.f_Pos[1] * p_Pos2.f_Pos[1], p_Pos1.f_Pos[2] * p_Pos2.f_Pos[2]);
+}
+GDVEC3 operator * (GDVEC3  &p_Pos, float const&f_Lenght) {
+	return GDVEC3(p_Pos.f_Pos[0] * f_Lenght, p_Pos.f_Pos[1] * f_Lenght, p_Pos.f_Pos[2] * f_Lenght);
+}
+GDVEC3 operator * (GDVEC3  &p_Pos, float &f_Lenght) {
+	return GDVEC3(p_Pos.f_Pos[0] * f_Lenght, p_Pos.f_Pos[1] * f_Lenght, p_Pos.f_Pos[2] * f_Lenght);
 }
 
 

@@ -20,13 +20,26 @@ GDCOLOR co_Green = GDCOLOR(0, 255, 0);
 GDCOLOR co_Blue = GDCOLOR(255, 0, 0);
 GDCOLOR co_Pink = GDCOLOR(255, 0, 255);
 
-#define TICKSPEED 0.05f
+#define MSPEED 0.05f
+#define VSPEED 0.05f*0.3f
 
-void draw() 
+
+void Demo_DrawGrid() 
 {
-	obj_Monkey.p_Anchor.f_Pos[1] = 1;
-	gd_World.DrawObject(&obj_Monkey, &co_White);
-	
+
+	GDVEC3 vec_Null = GDVEC3(0.0f, 0.0f, 0.0f);
+	GDVEC3 vec_UnitvX = GDVEC3(1.0f, 0.0f, 0.0f);
+	GDVEC3 vec_UnitvY = GDVEC3(0.0f, 1.0f, 0.0f);
+	GDVEC3 vec_UnitvZ = GDVEC3(0.0f, 0.0f, 1.0f);
+
+	gd_World.DrawEdge(&vec_Null, &vec_UnitvX, &co_Red);
+	gd_World.DrawEdge(&vec_Null, &vec_UnitvY, &co_Green);
+	gd_World.DrawEdge(&vec_Null, &vec_UnitvZ, &co_Blue);
+}
+
+void Demo_DrawColoredCubes() 
+{
+
 	gd_World.DrawObject(&obj_Plane, &co_Gray);
 
 	obj_Cube.p_Anchor.f_Pos[0] = 0;
@@ -47,40 +60,26 @@ void draw()
 	obj_Cube.p_Anchor.f_Pos[0] = 0;
 	obj_Cube.p_Anchor.f_Pos[2] = -7;
 	gd_World.DrawObject(&obj_Cube, &co_Pink);
-	
-	GDVEC3 vec_Null = GDVEC3(0.0f,0.0f,0.0f);
-	GDVEC3 vec_Offset = GDVEC3(0.0f,0.0f,0.0f);
-	vec_Offset.f_Pos[0] = 1;
-	gd_World.DrawEdge(&vec_Null,&vec_Offset,&co_Red);
-	vec_Offset.f_Pos[0] = 0;
-	vec_Offset.f_Pos[1] = 1;
-	gd_World.DrawEdge(&vec_Null,&vec_Offset,&co_Green);
-	vec_Offset.f_Pos[0] = 0;
-	vec_Offset.f_Pos[1] = 0;
-	vec_Offset.f_Pos[2] = 1;
-	gd_World.DrawEdge(&vec_Null,&vec_Offset,&co_Blue);
+
 }
 
-void keyInput() 
+void Demo_CursorLaser(win::GDWIN* gd_win) 
 {
-	if (GetAsyncKeyState('S') != 0)gd_camera.i_Position.f_Pos[2] -= TICKSPEED;
-	if (GetAsyncKeyState('W') != 0)gd_camera.i_Position.f_Pos[2] += TICKSPEED;
+	GDVEC3 p_Angle;
+	gd_camera.Relate(&gd_win->p_CursorPos, &p_Angle);
+	GDVEC3 p_LaserStart = GDVEC3(0, 2, 0);
+	GDVEC3 p_LaserStop  = GDVEC3(0, 0, 50);
+	GDVEC3 p_Offset  = GDVEC3(0, 1, 0 );
+	p_LaserStart = p_LaserStart + gd_World.gd_Camera->i_Position;
+	p_LaserStop.RotateThis(p_Angle);
+	p_LaserStop.RotateThis(gd_World.gd_Camera->i_Rotation);
 
-	if (GetAsyncKeyState('D') != 0)gd_camera.i_Position.f_Pos[0] += TICKSPEED;
-	if (GetAsyncKeyState('A') != 0)gd_camera.i_Position.f_Pos[0] -= TICKSPEED;
-
-	if (GetAsyncKeyState(VK_SPACE) != 0)gd_camera.i_Position.f_Pos[1] += TICKSPEED;
-	if (GetAsyncKeyState(VK_LSHIFT) != 0)gd_camera.i_Position.f_Pos[1] -= TICKSPEED;
-
-	if (GetAsyncKeyState(VK_LEFT) != 0)gd_camera.i_Rotation.f_Pos[0] += TICKSPEED * 0.3;
-	if (GetAsyncKeyState(VK_RIGHT) != 0)gd_camera.i_Rotation.f_Pos[0] -= TICKSPEED * 0.3;
-
-	if (GetAsyncKeyState(VK_UP) != 0)gd_camera.i_Rotation.f_Pos[1] += TICKSPEED * 0.3;
-	if (GetAsyncKeyState(VK_DOWN) != 0)gd_camera.i_Rotation.f_Pos[1] -= TICKSPEED * 0.3;
-
-	if (GetAsyncKeyState(VK_ADD) != 0)gd_camera.f_FOV += 0.1;
-	if (GetAsyncKeyState(VK_SUBTRACT) != 0)gd_camera.f_FOV -= 0.1;
+	gd_World.DrawEdge(&p_LaserStart,&p_LaserStop,&co_Red);
+	
+	system("cls");
+	printf("%f %f\n",p_Angle.f_Pos[0], p_Angle.f_Pos[1]);
 }
+
 
 
 void prefabLoader() 
@@ -94,15 +93,15 @@ void prefabLoader()
 unsigned char  gdMain(win::GDWIN * gd_win)
 {
 
-	gd_win->i_Width =16*90;
-	gd_win->i_Height = 9*90;
+	gd_win->i_Width =16*60;
+	gd_win->i_Height = 9*60;
 
 	gd_camera.i_Dimensions[0] = gd_win->i_Width;
 	gd_camera.i_Dimensions[1] = gd_win->i_Height;
 
-	gd_camera.f_Frustum[0] = 1;
-	gd_camera.f_Frustum[1] = 30;
-	gd_camera.f_FOV = 1;
+	gd_camera.f_Frustum[0] = 0.1;
+	gd_camera.f_Frustum[1] = 100;
+	gd_camera.f_FOV = 2;
 
 	gd_Console.Create();
 	gd_Img.Prepare(gd_win->i_Width, gd_win->i_Height);
@@ -119,15 +118,37 @@ unsigned char  gdMain(win::GDWIN * gd_win)
 DWORD*  gdUpdate(win::GDWIN * gd_win)
 {
 	gd_Img.CleanBuffer();
+	BasicCameraController(&gd_camera,MSPEED,VSPEED);
 
-	keyInput();
-	draw();
-	
+	//system("cls");
+	//GDM3X3 m1 = GDM3X3(
+	//	GDVEC3(1,4,7),
+	//	GDVEC3(2,5,8),
+	//	GDVEC3(3,6,9)
+	//);
+	//GDM3X3 m2 = GDM3X3(
+	//	GDVEC3(3, 6, 9),
+	//	GDVEC3(2, 5, 8),
+	//	GDVEC3(1, 4, 7)
+	//);
+
+	//GDM3X3 res = m2 * m1;
+
+	//m1.print();
+	//m2.print();
+	//res.print();
+
+
+
+	Demo_DrawColoredCubes();
+	//Demo_CursorLaser(gd_win);
+	Demo_DrawGrid();
+
+	DrawCrosshair(&gd_World, co_White,10);
 	return gd_Img.d_pOutputStream;
 }
 void  gdClose() {
 	gd_Img.Dispose();
 	vmf_Map.Dispose();
 }
-
 

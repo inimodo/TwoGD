@@ -51,14 +51,14 @@ vectormap::Read(LPSTR c_StreamName)
 UCHAR 
 vectormap::LoadFile()
 {
-	for (int i_Index = 0; i_Index < this->i_Points; i_Index++)
+	for (UINT32 i_Index = 0; i_Index < this->i_Points; i_Index++)
 	{
 		if (fscanf(this->f_Stream, GD_VEC_POINTS, &this->p_pPoint[i_Index].f_Pos[0], &this->p_pPoint[i_Index].f_Pos[1]) == NULL)
 		{
 			return GD_FILE_FAILED;
 		}
 	}
-	for (int i_Index = 0; i_Index < this->i_Colors; i_Index++)
+	for (UINT32 i_Index = 0; i_Index < this->i_Colors; i_Index++)
 	{
 		if (fscanf(this->f_Stream, GD_VEC_COLORS, &(this->c_pColor[i_Index].c_Color[0]), &(this->c_pColor[i_Index].c_Color[1]), &(this->c_pColor[i_Index].c_Color[2])) == NULL)
 		{
@@ -66,7 +66,7 @@ vectormap::LoadFile()
 		}
 	}
 	int i_Lone, i_Ltwo, i_Lcolor;
-	for (int i_Index = 0; i_Index < this->i_Connections; i_Index++)
+	for (UINT32 i_Index = 0; i_Index < this->i_Connections; i_Index++)
 	{
 		if (fscanf(this->f_Stream, GD_VEC_LINE, &i_Lone, &i_Ltwo, &i_Lcolor) == NULL)
 		{

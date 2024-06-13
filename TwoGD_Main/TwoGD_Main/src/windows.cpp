@@ -12,8 +12,11 @@ DWORD  wWinProcess(LPVOID lp_Void)
 	DWORD* dw_pFrame = 0;
 	while(TRUE)
 	{
-		GetCursorPos(&gd_win.p_CursorPos);
-		ScreenToClient(gd_win.hd_WindowHandle, &gd_win.p_CursorPos);
+		POINT p_CursorP;
+		GetCursorPos(&p_CursorP);
+		ScreenToClient(gd_win.hd_WindowHandle, &p_CursorP);
+		gd_win.p_CursorPos.f_Pos[0] = p_CursorP.x;
+		gd_win.p_CursorPos.f_Pos[1] = p_CursorP.y;
 
 		dw_pFrame = gdUpdate(&gd_win);
 		if (dw_pFrame == NULL) break;
@@ -103,5 +106,5 @@ long  WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
-	return DefWindowProcW(hd_Handle, msg_Message, wParam, lParam);
+	return (long)DefWindowProcW(hd_Handle, msg_Message, wParam, lParam);
 }
