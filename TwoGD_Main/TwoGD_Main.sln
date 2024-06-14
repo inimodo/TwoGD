@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TwoGD_Main", "TwoGD_Main\TwoGD_Main.vcxproj", "{84A15BF5-1BAB-46BC-A646-481A65938FD7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TwoGD", "TwoGD_Main\TwoGD_Main.vcxproj", "{84A15BF5-1BAB-46BC-A646-481A65938FD7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TwoGD_Debug", "TwoGD_Debug\TwoGD_Debug.vcxproj", "{3A8B077F-00FB-41C9-854E-7E2CC8210BAC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Experimental", "TwoGD_Debug\TwoGD_Debug.vcxproj", "{3A8B077F-00FB-41C9-854E-7E2CC8210BAC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{7EA3141E-C461-48A6-B042-8FAEBAAA6FA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +36,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3A8B077F-00FB-41C9-854E-7E2CC8210BAC} = {7EA3141E-C461-48A6-B042-8FAEBAAA6FA4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9843BA3B-E1F6-49DC-9A03-F899FF5FB6CB}

@@ -12,11 +12,12 @@ DWORD  wWinProcess(LPVOID lp_Void)
 	DWORD* dw_pFrame = 0;
 	while(TRUE)
 	{
-		POINT p_CursorP;
-		GetCursorPos(&p_CursorP);
-		ScreenToClient(gd_win.hd_WindowHandle, &p_CursorP);
-		gd_win.p_CursorPos.f_Pos[0] = p_CursorP.x;
-		gd_win.p_CursorPos.f_Pos[1] = p_CursorP.y;
+		GetCursorPos(&gd_win.p_CursorPos);
+		ScreenToClient(gd_win.hd_WindowHandle, &gd_win.p_CursorPos);
+
+
+		HWND hd_Active = GetForegroundWindow();
+		gd_win.b_HasFocus = hd_Active == gd_win.hd_WindowHandle;
 
 		dw_pFrame = gdUpdate(&gd_win);
 		if (dw_pFrame == NULL) break;
@@ -89,6 +90,14 @@ HANDLE  CreateExec(HINSTANCE h_Instance) {
 }
 long  WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam)
 {
+
+	if (msg_Message == WM_SETCURSOR && LOWORD(lParam) == HTCLIENT && gd_win.b_HideCursor)
+	{
+		SetCursor(NULL);
+
+		return TRUE;
+	}
+
 	if (msg_Message == WM_LBUTTONDOWN) {
 		if (gd_win.v_pMouseDown != NULL) {
 			gd_win.v_pMouseDown();

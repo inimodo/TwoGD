@@ -6,6 +6,10 @@ codec2d::SetPixel(GDVEC2 * p_pPoint, GDCOLOR * c_pColor)
 {
 	if (p_pPoint->f_Pos[0] <= 0 || p_pPoint->f_Pos[0] >= this->gd_Image->i_Pixels[0])return GD_OUTOFBOUND;
 	if (p_pPoint->f_Pos[1] <= 0 || p_pPoint->f_Pos[1] >= this->gd_Image->i_Pixels[1])return GD_OUTOFBOUND;
+	if (gd_Image->d_pOutputStream[_TOINDEX(p_pPoint->f_Pos[0], p_pPoint->f_Pos[1])] != 0x0 &&
+		b_AllowPixelOverwrite == FALSE)return GD_OUTOFBOUND;
+
+
 	gd_Image->d_pOutputStream[_TOINDEX(p_pPoint->f_Pos[0], p_pPoint->f_Pos[1])] = c_pColor->GetAsHex();
 	return GD_TASK_OKAY;
 }
@@ -25,6 +29,7 @@ codec2d::DrawLine(GDVEC2 * p_pPointA, GDVEC2 * p_pPointB, GDCOLOR * c_pColor)
 	return GD_TASK_OKAY;
 
 }
+
 UCHAR 
 codec2d::DrawRect(GDVEC2* p_pPointA, GDVEC2* p_pPointB, GDCOLOR* c_pColor)
 {

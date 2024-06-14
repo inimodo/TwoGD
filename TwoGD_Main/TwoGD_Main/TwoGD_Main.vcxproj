@@ -23,6 +23,7 @@
     <ProjectGuid>{84A15BF5-1BAB-46BC-A646-481A65938FD7}</ProjectGuid>
     <RootNamespace>TwoGDMain</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <ProjectName>TwoGD</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

@@ -4,8 +4,7 @@
 #pragma once
 
 #define _ALLOW_REGISTER_USE
-#define _CRT_SECURE_NO_WARNINGS
-#define _USE_MATH_DEFINES
+//#define _ALLOW_PIXEL_OVERWRITE
 
 #ifndef UNICODE
 #define UNICODE
@@ -17,6 +16,8 @@
 #define __REGISTER 
 #endif
 
+#define _CRT_SECURE_NO_WARNINGS
+#define _USE_MATH_DEFINES
 #include <iostream>
 #include <xmmintrin.h>
 #include <malloc.h>
@@ -42,15 +43,67 @@
 #define DEGTORAD(X) (float)(X*2*M_PI/360.0)
 #define RADTODEG(X) (float)(X/(2*M_PI)*360.0)
 
+
+#ifdef X 
+#undef X
+#endif   
+
+#ifdef Y
+#undef Y
+#endif 
+
+#ifdef Z 
+#undef Z
+#endif 
+
+#define X 0
+#define Y 1
+#define Z 2
+
+namespace win {
+	const static DWORD dw_ExStyle = 0;
+	const static wchar_t* c_WinClassName = L"WINCLASSEWS";
+	const static wchar_t* c_WinTitle = L"";
+	const static DWORD  dw_Style = (WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX);
+	const static int i_XPos = CW_USEDEFAULT;
+	const static int i_YPos = CW_USEDEFAULT;
+	const static HWND hd_WndParent = NULL;
+	const static HMENU h_Menu = NULL;
+	const static  LPVOID lp_Param = NULL;
+
+	typedef struct gd_win {
+		UINT32 i_Width, i_Height;
+		HINSTANCE h_Instance;
+		HWND hd_WindowHandle;
+		MSG msg_WindowMessage;
+		HDC hdc_WindowHdc;
+		WNDCLASS w_WndClass;
+		POINT p_CursorPos;
+		void(*v_pMouseDown)();
+		BOOL b_HasFocus;
+		BOOL b_HideCursor = FALSE;
+	}GDWIN;
+
+}
+
+extern HANDLE  CreateExec(HINSTANCE h_Instance);
+extern long  WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam);
+extern int  wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow);
+
+extern unsigned char  gdMain(win::GDWIN *);
+extern DWORD*  gdUpdate(win::GDWIN *);
+extern void  gdClose();
+
 typedef unsigned char UCHAR;
 typedef unsigned int UINT32;
+
 
 #define VEC2D TRUE
 #ifdef VEC2D
 
 	typedef class gd_vec2 {
 	public:
-		float f_Pos[2];
+		float f_Pos[Z];
 
 		void Delta(gd_vec2 p_Pos);
 		double Distance(gd_vec2 p_Pos);
@@ -64,6 +117,7 @@ typedef unsigned int UINT32;
 	GDVEC2 operator - (GDVEC2  &p_Pos1, GDVEC2  &p_Pos2);
 	GDVEC2 operator + (GDVEC2  &p_Pos1, GDVEC2  &p_Pos2);
 	GDVEC2 operator * (GDVEC2  &p_Pos1, int &i_Lenght);
+	GDVEC2 operator * (GDVEC2  &p_Pos1, float &f_Lenght);
 
 #endif // VEC2D
 
@@ -79,6 +133,8 @@ typedef unsigned int UINT32;
 	
 		void RotateThis(gd_vec3 p_Rot);
 		gd_vec3 RotateTo(gd_vec3 p_Rot);
+		void CamRotateThis(gd_vec3 p_Rot);
+		gd_vec3 CamRotateTo(gd_vec3 p_Rot);
 		void RotateAroundThis(gd_vec3 p_UnitV, float f_phi);
 		gd_vec3 RotateAroundTo(gd_vec3 p_UnitV, float f_phi);
 
@@ -103,10 +159,14 @@ typedef unsigned int UINT32;
 	GDVEC3 operator-(GDVEC3  &p_Pos1, GDVEC3  &p_Pos2);
 	GDVEC3 operator+(GDVEC3  &p_Pos1, GDVEC3  &p_Pos2);
 	GDVEC3 operator*(GDVEC3  &p_Pos1, GDVEC3  &p_Pos2);
+	GDVEC3 operator*(GDVEC3  &p_Pos1, GDVEC3  const&p_Pos2);
 	GDVEC3 operator*(GDVEC3  &p_Pos, float const&f_Lenght);
 	GDVEC3 operator*(GDVEC3  &p_Pos, float &f_Lenght);
 
 #endif // VEC3D
+
+
+
 
 
 #define TYPES_OTHERS TRUE
@@ -194,7 +254,7 @@ typedef struct gd_face {
 
 	typedef class codec2d {
 	public:
-		codec2d(){}
+		codec2d() {}
 		codec2d(GDCANVAS * gd_pCanvas){
 			gd_Image = gd_pCanvas;
 		}
@@ -205,26 +265,42 @@ typedef struct gd_face {
 		UCHAR  DrawVLine(GDVEC2 * p_pPoint, UINT32  i_Length, GDCOLOR * c_pColor);
 		UCHAR  DrawCanvas(DWORD * d_pBuffer, GDVEC2 * p_pPos, UINT32  i_Pixels[2]);
 		UCHAR  DrawVMap(GFVECTORMAP * gd_VecMap);
+
+		BOOL b_AllowPixelOverwrite = FALSE;
 	protected:
 		GDCANVAS * gd_Image;
+
 	}GD2DCODEC;
 
 #endif // CODEC2D
-
 
 #define CODEC3D TRUE
 #ifdef CODEC3D
 
 	typedef class camera {
 	public:
+		camera();
+		camera(
+			FLOAT f_Frustum_Low,
+			FLOAT f_Frustum_Far,
+			UINT32 i_Dimensions_Width,
+			UINT32 i_Dimensions_Height,
+			FLOAT f_FOV,
+			GDVEC3 i_Position,
+			GDVEC3 i_Rotation
+		);
+
 		FLOAT f_Frustum[2];
 		UINT32 i_Dimensions[2];
 		FLOAT f_FOV;
-		GDVEC3 i_Position, i_Rotation;
+		GDVEC3 i_Position;
+		GDVEC3 i_Rotation;
+		FLOAT f_CutoffAngles[2];
 
-		UCHAR  Translate(GDVEC3 * p_pPoint, GDVEC2 * p_pResult);
+		BOOL b_UseCutoffAngles = TRUE;
+
+		inline UCHAR  Translate(GDVEC3 * p_pPoint, GDVEC2 * p_pResult);
 		UCHAR  Relate(GDVEC2 * p_pScreenPos, GDVEC3 * p_pAngle);
-
 	}GDCAMERA;
 
 
@@ -266,8 +342,11 @@ typedef struct gd_face {
 #define BASIC_ESSENTIALS TRUE
 #ifdef BASIC_ESSENTIALS
 
-	extern void BasicCameraController(GDCAMERA* gd_camera, float f_MoveSpeed, float f_ViewSpeed);
-	extern void DrawCrosshair(GD3DCODEC* o_pCodec, GDCOLOR c_Color, int i_size);
+	#define CHST_BASIC 0
+	#define CHST_AXIS  1
+	
+	extern void BasicCameraController(win::GDWIN *gd_win, GDCAMERA* gd_camera, float f_MoveSpeed, float f_ViewSpeed, BOOL b_MouseCtrl, float f_MouseSensitivity);
+	extern void DrawCrosshair(GD3DCODEC* o_pCodec, GDCOLOR c_Color, int i_Style , float f_size);
 
 #endif // BASIC_ESSENTIALS
 
@@ -303,38 +382,15 @@ typedef struct gd_face {
 #endif // MATRIX_OP
 
 
+static GDCOLOR co_Gray = GDCOLOR(55, 55, 55);
+static GDCOLOR co_White = GDCOLOR(255, 255, 255);
+static GDCOLOR co_Red = GDCOLOR(0, 0, 255);
+static GDCOLOR co_Green = GDCOLOR(0, 255, 0);
+static GDCOLOR co_Blue = GDCOLOR(255, 0, 0);
+static GDCOLOR co_Pink = GDCOLOR(255, 0, 255);
+
+
 double Distance2(GDVEC2 p_PosOne, GDVEC2 p_PosTwo);
 double Distance3(GDVEC3 p_PosOne, GDVEC3 p_PosTwo);
 
 
-extern HANDLE  CreateExec(HINSTANCE h_Instance);
-extern long  WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam);
-extern int  wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow);
-
-namespace win {
-	const static DWORD dw_ExStyle = 0;
-	const static wchar_t* c_WinClassName = L"WINCLASSEWS";
-	const static wchar_t* c_WinTitle = L"";
-	const static DWORD  dw_Style = (WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX);
-	const static int i_XPos = CW_USEDEFAULT;
-	const static int i_YPos = CW_USEDEFAULT;
-	const static HWND hd_WndParent = NULL;
-	const static HMENU h_Menu = NULL;
-	const static  LPVOID lp_Param = NULL;
-
-	typedef struct gd_win {
-		UINT32 i_Width, i_Height;
-		HINSTANCE h_Instance;
-		HWND hd_WindowHandle;
-		MSG msg_WindowMessage;
-		HDC hdc_WindowHdc;
-		WNDCLASS w_WndClass;
-		GDVEC2 p_CursorPos;
-		void(*v_pMouseDown)();
-	}GDWIN;
-
-}
-
-extern unsigned char  gdMain(win::GDWIN *);
-extern DWORD*  gdUpdate(win::GDWIN *);
-extern void  gdClose();

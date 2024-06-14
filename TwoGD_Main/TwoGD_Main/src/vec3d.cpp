@@ -42,7 +42,18 @@ GDVEC3 gd_vec3::RotateAroundTo(gd_vec3 p_UnitV, float f_phi)
 //	return (m_Z*m_Y*m_X) * *this;
 //}
 
+
 GDVEC3 GDVEC3::RotateTo(GDVEC3 p_Rot)
+{
+	GDM3X3 m_Y = M3X3RotY(-p_Rot.f_Pos[X]);
+	GDVEC3 p_UntX = m_Y * GDVEC3(-1.0f, 0, 0);
+	GDM3X3 m_X = M3X3RotU(p_UntX, p_Rot.f_Pos[Y]);
+
+	return m_X * m_Y * *this;
+
+}
+
+GDVEC3 GDVEC3::CamRotateTo(GDVEC3 p_Rot)
 {
 	GDM3X3 m_Y = M3X3RotY(p_Rot.f_Pos[0]);
 	GDM3X3 m_YY = M3X3RotY(-p_Rot.f_Pos[0]);
@@ -67,10 +78,16 @@ GDVEC3 GDVEC3::Angle()
 	return this->AngleTo(GDVEC3(0,0,0));
 }
 
-void GDVEC3::RotateThis(GDVEC3 p_Rot)
+void GDVEC3::CamRotateThis(GDVEC3 p_Rot)
 {   
+	*this = this->CamRotateTo(p_Rot);
+}
+
+void GDVEC3::RotateThis(GDVEC3 p_Rot)
+{
 	*this = this->RotateTo(p_Rot);
 }
+
 
 
 void GDVEC3::DeltaThis(GDVEC3 p_Pos)
@@ -101,6 +118,9 @@ GDVEC3 operator - (GDVEC3  &p_Pos1, GDVEC3  &p_Pos2) {
 	return GDVEC3(p_Pos1.f_Pos[0] - p_Pos2.f_Pos[0], p_Pos1.f_Pos[1] - p_Pos2.f_Pos[1], p_Pos1.f_Pos[2] - p_Pos2.f_Pos[2]);
 }
 GDVEC3 operator + (GDVEC3  &p_Pos1, GDVEC3  &p_Pos2) {
+	return GDVEC3(p_Pos1.f_Pos[0] + p_Pos2.f_Pos[0], p_Pos1.f_Pos[1] + p_Pos2.f_Pos[1], p_Pos1.f_Pos[2] + p_Pos2.f_Pos[2]);
+}
+GDVEC3 operator + (GDVEC3  &p_Pos1, GDVEC3  const&p_Pos2) {
 	return GDVEC3(p_Pos1.f_Pos[0] + p_Pos2.f_Pos[0], p_Pos1.f_Pos[1] + p_Pos2.f_Pos[1], p_Pos1.f_Pos[2] + p_Pos2.f_Pos[2]);
 }
 GDVEC3 operator * (GDVEC3  &p_Pos1, GDVEC3  &p_Pos2) {

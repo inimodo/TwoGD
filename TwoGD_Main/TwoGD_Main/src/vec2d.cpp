@@ -24,6 +24,9 @@ GDVEC2 operator + (GDVEC2  &p_Pos1, GDVEC2  &p_Pos2) {
 GDVEC2 operator * (GDVEC2  &p_Pos1, int &i_Lenght) {
 	return GDVEC2(p_Pos1.f_Pos[0] * i_Lenght, p_Pos1.f_Pos[1] * i_Lenght);
 }
+GDVEC2 operator * (GDVEC2  &p_Pos1, float &f_Lenght) {
+	return GDVEC2(p_Pos1.f_Pos[0] * f_Lenght, p_Pos1.f_Pos[1] * f_Lenght);
+}
 gd_vec2::gd_vec2()
 {
 	f_Pos[0] = 0;
