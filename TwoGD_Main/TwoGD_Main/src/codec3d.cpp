@@ -76,7 +76,7 @@ camera::Relate(V2 * v_pScreenPos, V3 * v_pAngle)
 
 
 UCHAR
-codec3d::DrawObject(OBJ3D * o_Object, COLOR * c_pColor)
+codec3d::DrawObject(OBJ3D * o_Object, COLOR * c_pColor, UCHAR i_PixelFlag)
 {
 	for (UINT32 i_Vertex = 0; i_Vertex < o_Object->i_Faces; i_Vertex++)
 	{
@@ -88,7 +88,7 @@ codec3d::DrawObject(OBJ3D * o_Object, COLOR * c_pColor)
 			if (this->o_Camera->Translate(&v_Coord, &v_PointA) == GD_OUTOFBOUND)continue;
 			v_Coord = o_Object->o_pFace[i_Vertex].v_Point[(i_Index + 1) % 3] + o_Object->v_Anchor;
 			if (this->o_Camera->Translate(&v_Coord, &v_PointB) == GD_OUTOFBOUND)continue;
-			this->DrawLine(&v_PointA, &v_PointB, c_pColor);
+			this->DrawLine(&v_PointA, &v_PointB, c_pColor, i_PixelFlag);
 		}
 	}
 	return GD_TASK_OKAY;
@@ -97,12 +97,12 @@ codec3d::DrawObject(OBJ3D * o_Object, COLOR * c_pColor)
 
 
 UCHAR
-codec3d::DrawEdge(V3 * v_pVertexA, V3 * v_pVertexB, COLOR * c_pColor)
+codec3d::DrawEdge(V3 * v_pVertexA, V3 * v_pVertexB, COLOR * c_pColor, UCHAR i_PixelFlag)
 {
 	V2 v_PointA, v_PointB;
 	if (this->o_Camera->Translate(v_pVertexA, &v_PointA) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
 	if (this->o_Camera->Translate(v_pVertexB, &v_PointB) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
-	return this->DrawLine(&v_PointA, &v_PointB, c_pColor);
+	return this->DrawLine(&v_PointA, &v_PointB, c_pColor, i_PixelFlag);
 	return 0;
 }
 

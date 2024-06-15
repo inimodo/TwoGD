@@ -35,7 +35,8 @@ canvas::Prepare(int i_Width, int i_Height)
 {
 	i_OutputSize = i_Width * i_Height;
 	d_pOutputStream = (DWORD *)malloc(sizeof(DWORD)*i_OutputSize);
-	if (d_pOutputStream == NULL) {
+	d_pFlags = (UCHAR *)malloc(sizeof(UCHAR)*i_OutputSize);
+	if (d_pOutputStream == NULL || d_pFlags == NULL) {
 		return GD_ALLOC_FAILED;
 	}
 	i_Pixels[1] = i_Height;

@@ -4,10 +4,6 @@
 #define GD_VEC_POINTS "p %f %f\n"
 #define GD_VEC_COLORS "c %c %c %c\n"
 #define GD_VEC_LINE "l %d %d %d\n"
-//#define GD_VEC_HEADER "v %d %d %d\n"
-//#define GD_VEC_POINTS "p %f %f\n"
-//#define GD_VEC_COLORS "c %d %d %d\n"
-//#define GD_VEC_LINE "l %d %d %d\n"
 
 UCHAR 
 filer::CloseStream() 

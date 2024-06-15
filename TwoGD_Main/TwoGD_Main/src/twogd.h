@@ -167,10 +167,14 @@ typedef unsigned int UINT32;
 #define TYPES_OTHERS TRUE
 #ifdef TYPES_OTHERS
 
+	#define CF_OVERWRITE_ALLOWED 0x1
+	#define CF_OVERWRITE_FORBIDDEN 0x2
+
 	typedef class canvas {
 	public:
 		UINT32 i_Pixels[2];
 		DWORD * d_pOutputStream;
+		UCHAR * d_pFlags;
 		UINT32 i_OutputSize;
 
 		UCHAR  CleanBuffer();
@@ -185,6 +189,13 @@ typedef unsigned int UINT32;
 		o_color();
 		DWORD GetAsHex();
 	} COLOR;
+
+	static COLOR co_Gray = COLOR(55, 55, 55);
+	static COLOR co_White = COLOR(255, 255, 255);
+	static COLOR co_Red = COLOR(0, 0, 255);
+	static COLOR co_Green = COLOR(0, 255, 0);
+	static COLOR co_Blue = COLOR(255, 0, 0);
+	static COLOR co_Pink = COLOR(255, 0, 255);
 
 #endif // TYPES_OTHERS
 
@@ -252,15 +263,15 @@ typedef struct o_face {
 		codec2d(CANVAS * o_pCanvas){
 			o_Image = o_pCanvas;
 		}
-		UCHAR  SetPixel(V2 * v_pPoint, COLOR * c_pColor);
-		UCHAR  DrawLine(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor);
-		UCHAR  DrawRect(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor);
-		UCHAR  DrawHLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor);
-		UCHAR  DrawVLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor);
-		UCHAR  DrawCanvas(DWORD * d_pBuffer, V2 * v_pPos, UINT32  i_Pixels[2]);
-		UCHAR  DrawVMap(VMAP * o_VecMap);
+		UCHAR  SetPixel(V2 * v_pPoint, COLOR * c_pColor,UCHAR i_PixelFlag = CF_OVERWRITE_ALLOWED);
+		UCHAR  DrawLine(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, UCHAR i_PixelFlag = CF_OVERWRITE_ALLOWED);
+		UCHAR  DrawRect(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, UCHAR i_PixelFlag = CF_OVERWRITE_ALLOWED);
+		UCHAR  DrawHLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag = CF_OVERWRITE_ALLOWED);
+		UCHAR  DrawVLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag = CF_OVERWRITE_ALLOWED);
+		UCHAR  DrawCanvas(DWORD * d_pBuffer, V2 * v_pPos, UINT32  i_Pixels[2], UCHAR i_PixelFlag = CF_OVERWRITE_ALLOWED);
+		UCHAR  DrawVMap(VMAP * o_VecMap, UCHAR i_PixelFlag = CF_OVERWRITE_ALLOWED);
 
-		BOOL b_AllowPixelOverwrite = FALSE;
+		BOOL b_AllowPixelOverwrite = TRUE;
 	protected:
 		CANVAS * o_Image;
 
@@ -305,8 +316,8 @@ typedef struct o_face {
 			o_Image = o_pCanvas;
 			o_Camera = o_pCamera;
 		}
-		UCHAR  DrawObject(OBJ3D * o_Object, COLOR * c_pColor);
-		UCHAR  DrawEdge(V3 * v_pVertexA, V3 * v_pVertexB, COLOR * c_pColor);
+		UCHAR  DrawObject(OBJ3D * o_Object, COLOR * c_pColor, UCHAR i_PixelFlag=CF_OVERWRITE_ALLOWED);
+		UCHAR  DrawEdge(V3 * v_pVertexA, V3 * v_pVertexB, COLOR * c_pColor, UCHAR i_PixelFlag= CF_OVERWRITE_ALLOWED);
 
 		CAM3D * o_Camera;
 	}CODEC3D;
@@ -340,14 +351,28 @@ typedef struct o_face {
 	#define CHST_AXIS  1
 	
 	typedef class o_camctrlr {
-		o_camctrlr() {}
-		o_camctrlr(win::GDWIN *o_win, CAM3D* o_camera, CODEC3D* o_pCodec);
+	public:
+		o_camctrlr();
+		o_camctrlr( CAM3D* o_camera, CODEC3D* o_pCodec);
+		CAM3D* o_camera;
+		CODEC3D* o_pCodec;
+
+		BOOL b_MouseCtrl = TRUE;
+		float f_MoveSpeed = 0.1f;
+		float f_ViewSpeed = 0.05f;
+		float f_MouseSensitivity = 2.0f;
+
+		BOOL b_ShowCH = TRUE;
+		COLOR c_CHColor = co_White;
+		int i_CHStyle = CHST_AXIS;
+		float f_CHSize = 0.2f;
 
 
+		void UpdateCamCtrlr(win::GDWIN *o_win);
+		void DrawCrosshair();
 	}CAMCTRLR;
 
-	extern void BasicCameraController(win::GDWIN *o_win, CAM3D* o_camera, float f_MoveSpeed, float f_ViewSpeed, BOOL b_MouseCtrl, float f_MouseSensitivity);
-	extern void DrawCrosshair(CODEC3D* o_pCodec, COLOR c_Color, int i_Style , float f_size);
+
 
 #endif // BASIC_ESSENTIALS
 
@@ -383,12 +408,7 @@ typedef struct o_face {
 #endif // MATRIX_OP
 
 
-static COLOR co_Gray = COLOR(55, 55, 55);
-static COLOR co_White = COLOR(255, 255, 255);
-static COLOR co_Red = COLOR(0, 0, 255);
-static COLOR co_Green = COLOR(0, 255, 0);
-static COLOR co_Blue = COLOR(255, 0, 0);
-static COLOR co_Pink = COLOR(255, 0, 255);
+
 
 
 double Distance2(V2 v_PosOne, V2 v_PosTwo);

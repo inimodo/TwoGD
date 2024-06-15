@@ -1,18 +1,18 @@
 #include"twogd.h"
 #include <chrono>
 
+CODEC3D o_3DCodec;
+CODEC2D o_2DCodec;
 CONSOLE o_Console;
-CODEC2D o_Codec;
 CANVAS o_Img;
 
-CODEC3D o_World;
+CAM3D o_Cam;
+CAMCTRLR o_CamCtrlr;
 
 VMAP vmf_Map;
 OBJ3D obj_Monkey;
 OBJ3D obj_Cube;
 OBJ3D obj_Plane;
-CAM3D o_camera;
-
 
 #define MSPEED 0.1f
 #define VSPEED 0.05f
@@ -22,18 +22,8 @@ CAM3D o_camera;
 #define GRID_SPACING 1
 #define GRID_SIZE 15
 
-
 void Demo_DrawGrid() 
 {
-	V3 vec_Null = V3(0.0f, 0.0f, 0.0f);
-	V3 vec_UnitvX = V3(1.0f, 0.0f, 0.0f);
-	V3 vec_UnitvY = V3(0.0f, 1.0f, 0.0f);
-	V3 vec_UnitvZ = V3(0.0f, 0.0f, 1.0f);
-
-	o_World.DrawEdge(&vec_Null, &vec_UnitvX, &co_Red);
-	o_World.DrawEdge(&vec_Null, &vec_UnitvY, &co_Green);
-	o_World.DrawEdge(&vec_Null, &vec_UnitvZ, &co_Blue);
-
 	V3 v_PointA = V3(0,0,0),v_PointB= V3(0,0,0);
 	float f_TempX= -GRID_SIZE, f_TempY= -GRID_SIZE;
 	for (int i_X = -GRID_SIZE; i_X < GRID_SIZE; i_X++)
@@ -44,10 +34,10 @@ void Demo_DrawGrid()
 			v_PointA.f_Pos[Z] = i_Y+1;
 			v_PointB.f_Pos[X] = i_X;
 			v_PointB.f_Pos[Z] = i_Y;
-			o_World.DrawEdge(&v_PointA, &v_PointB, &co_Gray);
+			o_3DCodec.DrawEdge(&v_PointA, &v_PointB, &co_Gray);
 			v_PointB.f_Pos[X]++;
 			v_PointB.f_Pos[Z]++;
-			o_World.DrawEdge(&v_PointA, &v_PointB, &co_Gray);
+			o_3DCodec.DrawEdge(&v_PointA, &v_PointB, &co_Gray);
 		}
 	}
 	v_PointA = V3(0,0, -(GRID_SIZE));
@@ -57,7 +47,7 @@ void Demo_DrawGrid()
 	{
 		v_PointA.f_Pos[X] = i_X;
 		v_PointB.f_Pos[X] = i_X+1;
-		o_World.DrawEdge(&v_PointA, &v_PointB, &co_Gray);
+		o_3DCodec.DrawEdge(&v_PointA, &v_PointB, &co_Gray);
 	}
 	v_PointA = V3((GRID_SIZE), 0, 0);
 	v_PointB = V3((GRID_SIZE), 0, 0);
@@ -65,50 +55,57 @@ void Demo_DrawGrid()
 	{
 		v_PointA.f_Pos[Z] = i_X;
 		v_PointB.f_Pos[Z] = i_X + 1;
-		o_World.DrawEdge(&v_PointA, &v_PointB, &co_Gray);
+		o_3DCodec.DrawEdge(&v_PointA, &v_PointB, &co_Gray);
 	}
+
+	V3 vec_Null = V3(0.0f, 0.0f, 0.0f);
+	V3 vec_UnitvX = V3(1.0f, 0.0f, 0.0f);
+	V3 vec_UnitvY = V3(0.0f, 1.0f, 0.0f);
+	V3 vec_UnitvZ = V3(0.0f, 0.0f, 1.0f);
+
+	o_3DCodec.DrawEdge(&vec_Null, &vec_UnitvX, &co_Red);
+	o_3DCodec.DrawEdge(&vec_Null, &vec_UnitvY, &co_Green);
+	o_3DCodec.DrawEdge(&vec_Null, &vec_UnitvZ, &co_Blue);
 }
 
 void Demo_DrawColoredCubes() 
 {
 	obj_Cube.v_Anchor.f_Pos[X] = 0;
 	obj_Cube.v_Anchor.f_Pos[Z] = 7;
-	o_World.DrawObject(&obj_Cube, &co_Blue);
+	o_3DCodec.DrawObject(&obj_Cube, &co_Blue);
 	
 	obj_Cube.v_Anchor.f_Pos[1] = 1;
 
 	obj_Cube.v_Anchor.f_Pos[X] = 7;
 	obj_Cube.v_Anchor.f_Pos[Z] = 0;
-	o_World.DrawObject(&obj_Cube, &co_Red);
+	o_3DCodec.DrawObject(&obj_Cube, &co_Red);
 
 	obj_Cube.v_Anchor.f_Pos[X] = -7;
 	obj_Cube.v_Anchor.f_Pos[Z] = 0;
-	o_World.DrawObject(&obj_Cube, &co_Green);
+	o_3DCodec.DrawObject(&obj_Cube, &co_Green);
 
 	obj_Cube.v_Anchor.f_Pos[X] = 0;
 	obj_Cube.v_Anchor.f_Pos[Z] = -7;
-	o_World.DrawObject(&obj_Cube, &co_Pink);
+	o_3DCodec.DrawObject(&obj_Cube, &co_Pink);
 }
 
 void Demo_CursorLaser(win::GDWIN* o_win) 
 {
 	V3 v_Angle;
 	V2 v_Cpos = _PTOP(o_win->v_CursorPos);
-	o_camera.Relate(&v_Cpos, &v_Angle);
+	o_Cam.Relate(&v_Cpos, &v_Angle);
 	V3 v_LaserStart = V3(0, 2, 0);
 	V3 v_LaserStop  = V3(0, 0, 50);
 	V3 v_Offset  = V3(0, 1, 0 );
-	v_LaserStart = v_LaserStart + o_World.o_Camera->i_Position;
+	v_LaserStart = v_LaserStart + o_3DCodec.o_Camera->i_Position;
 	v_LaserStop.RotateThis(v_Angle);
-	v_LaserStop.RotateThis(o_World.o_Camera->i_Rotation);
+	v_LaserStop.RotateThis(o_3DCodec.o_Camera->i_Rotation);
 
-	o_World.DrawEdge(&v_LaserStart,&v_LaserStop,&co_Red);
+	o_3DCodec.DrawEdge(&v_LaserStart,&v_LaserStop,&co_Red);
 	
 	system("cls");
 	printf("%f %f\n",v_Angle.f_Pos[X], v_Angle.f_Pos[1]);
 }
-
-
 
 void prefabLoader() 
 {
@@ -117,6 +114,7 @@ void prefabLoader()
 	printf("RES: %X \n", obj_Plane.Read((const LPSTR)"src\\obj\\obj4.obj"));
 	printf("RES: %X \n", vmf_Map.Read((const LPSTR)"src\\obj\\obj1.vmf"));
 }
+
 unsigned char  gdMain(win::GDWIN * o_win)
 {
 	o_Console.Create();
@@ -124,7 +122,7 @@ unsigned char  gdMain(win::GDWIN * o_win)
 	o_win->i_Width = WINDOW_WIDTH * WINDOW_SIZE;
 	o_win->i_Height = WINDOW_HEIGHT * WINDOW_SIZE;
 
-	o_camera = CAM3D(
+	o_Cam = CAM3D(
 		(FLOAT)0.1, 
 		(FLOAT)100.0 , 
 		(UINT32)o_win->i_Width ,
@@ -133,11 +131,15 @@ unsigned char  gdMain(win::GDWIN * o_win)
 		V3(0, 0, 0), 
 		V3(0, 0, 0)
 	);
+	o_CamCtrlr = CAMCTRLR(
+		&o_Cam,
+		&o_3DCodec
+	);
 
 	o_Img.Prepare(o_win->i_Width, o_win->i_Height);
 
-	o_Codec = CODEC2D(&o_Img);
-	o_World = CODEC3D(&o_Img,&o_camera);
+	o_2DCodec = CODEC2D(&o_Img);
+	o_3DCodec = CODEC3D(&o_Img,&o_Cam);
 
 	prefabLoader();
 
@@ -153,13 +155,13 @@ DWORD*  gdUpdate(win::GDWIN * o_win)
 	//BEGIN RENDER
 
 	o_Img.CleanBuffer();
-	BasicCameraController(o_win, &o_camera, MSPEED, VSPEED, TRUE, 2.0);
+	o_CamCtrlr.UpdateCamCtrlr(o_win);
+	o_CamCtrlr.DrawCrosshair();
 
-	Demo_DrawColoredCubes();
 	//Demo_CursorLaser(o_win);
 	Demo_DrawGrid();
+	Demo_DrawColoredCubes();
 
-	DrawCrosshair(&o_World, co_White, CHST_AXIS,0.2f);
 
 	//END RENDER
 	auto a_TimeB = std::chrono::high_resolution_clock::now();
