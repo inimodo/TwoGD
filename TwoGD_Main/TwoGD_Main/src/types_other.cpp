@@ -1,15 +1,15 @@
 #include "twogd.h"
-gd_color::gd_color()
+o_color::o_color()
 {
 	c_Color[0] = 0;
 	c_Color[1] = 0;
 	c_Color[2] = 0;
 }
-DWORD gd_color::GetAsHex()
+DWORD o_color::GetAsHex()
 {
 	return RGB(c_Color[0], c_Color[1], c_Color[2]);
 }
-gd_color::gd_color(UCHAR c_R, UCHAR c_G, UCHAR c_B)
+o_color::o_color(UCHAR c_R, UCHAR c_G, UCHAR c_B)
 {
 	c_Color[0] = c_R;
 	c_Color[1] = c_G;

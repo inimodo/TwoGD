@@ -2,81 +2,81 @@
 #include "twogd.h"
 
 UCHAR 
-codec2d::SetPixel(GDVEC2 * p_pPoint, GDCOLOR * c_pColor)
+codec2d::SetPixel(V2 * v_pPoint, COLOR * c_pColor)
 {
-	if (p_pPoint->f_Pos[0] <= 0 || p_pPoint->f_Pos[0] >= this->gd_Image->i_Pixels[0])return GD_OUTOFBOUND;
-	if (p_pPoint->f_Pos[1] <= 0 || p_pPoint->f_Pos[1] >= this->gd_Image->i_Pixels[1])return GD_OUTOFBOUND;
-	if (gd_Image->d_pOutputStream[_TOINDEX(p_pPoint->f_Pos[0], p_pPoint->f_Pos[1])] != 0x0 &&
+	if (v_pPoint->f_Pos[0] <= 0 || v_pPoint->f_Pos[0] >= this->o_Image->i_Pixels[0])return GD_OUTOFBOUND;
+	if (v_pPoint->f_Pos[1] <= 0 || v_pPoint->f_Pos[1] >= this->o_Image->i_Pixels[1])return GD_OUTOFBOUND;
+	if (o_Image->d_pOutputStream[_TOINDEX(v_pPoint->f_Pos[0], v_pPoint->f_Pos[1])] != 0x0 &&
 		b_AllowPixelOverwrite == FALSE)return GD_OUTOFBOUND;
 
 
-	gd_Image->d_pOutputStream[_TOINDEX(p_pPoint->f_Pos[0], p_pPoint->f_Pos[1])] = c_pColor->GetAsHex();
+	o_Image->d_pOutputStream[_TOINDEX(v_pPoint->f_Pos[0], v_pPoint->f_Pos[1])] = c_pColor->GetAsHex();
 	return GD_TASK_OKAY;
 }
 UCHAR 
-codec2d::DrawLine(GDVEC2 * p_pPointA, GDVEC2 * p_pPointB, GDCOLOR * c_pColor)
+codec2d::DrawLine(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor)
 {
-	GDVEC2 p_Delta = (*p_pPointA) - (*p_pPointB), p_Temp;
-	__REGISTER float f_Idi, f_Max = sqrt(p_Delta.f_Pos[0] * p_Delta.f_Pos[0] + p_Delta.f_Pos[1] * p_Delta.f_Pos[1]);
-	if (f_Max > this->gd_Image->i_Pixels[0] + this->gd_Image->i_Pixels[1])return GD_OUTOFBOUND;
+	V2 v_Delta = (*v_pPointA) - (*v_pPointB), v_Temp;
+	__REGISTER float f_Idi, f_Max = sqrt(v_Delta.f_Pos[0] * v_Delta.f_Pos[0] + v_Delta.f_Pos[1] * v_Delta.f_Pos[1]);
+	if (f_Max > this->o_Image->i_Pixels[0] + this->o_Image->i_Pixels[1])return GD_OUTOFBOUND;
 
 	for (f_Idi = 0; f_Idi < f_Max; f_Idi++)
 	{
-		p_Temp.f_Pos[0] = (f_Idi / f_Max) * p_Delta.f_Pos[0] + p_pPointB->f_Pos[0];
-		p_Temp.f_Pos[1] = (f_Idi / f_Max) * p_Delta.f_Pos[1] + p_pPointB->f_Pos[1];
-		SetPixel(&p_Temp, c_pColor);
+		v_Temp.f_Pos[0] = (f_Idi / f_Max) * v_Delta.f_Pos[0] + v_pPointB->f_Pos[0];
+		v_Temp.f_Pos[1] = (f_Idi / f_Max) * v_Delta.f_Pos[1] + v_pPointB->f_Pos[1];
+		SetPixel(&v_Temp, c_pColor);
 	}
 	return GD_TASK_OKAY;
 
 }
 
 UCHAR 
-codec2d::DrawRect(GDVEC2* p_pPointA, GDVEC2* p_pPointB, GDCOLOR* c_pColor)
+codec2d::DrawRect(V2* v_pPointA, V2* v_pPointB, COLOR* c_pColor)
 {
-	GDVEC2 p_Temp(p_pPointA->f_Pos[0], p_pPointA->f_Pos[1]);
-	for (UINT32 i_Index = 0; i_Index < p_pPointB->f_Pos[1] - p_pPointA->f_Pos[1]; i_Index++)
+	V2 v_Temp(v_pPointA->f_Pos[0], v_pPointA->f_Pos[1]);
+	for (UINT32 i_Index = 0; i_Index < v_pPointB->f_Pos[1] - v_pPointA->f_Pos[1]; i_Index++)
 	{
-		p_Temp.f_Pos[1] = p_pPointA->f_Pos[1] + (float)i_Index;
-		DrawHLine(&p_Temp, p_pPointB->f_Pos[0] - p_pPointA->f_Pos[0], c_pColor);
+		v_Temp.f_Pos[1] = v_pPointA->f_Pos[1] + (float)i_Index;
+		DrawHLine(&v_Temp,(UINT32)( v_pPointB->f_Pos[0] - v_pPointA->f_Pos[0]), c_pColor);
 	}
 	return GD_TASK_OKAY;
 }
 UCHAR 
-codec2d::DrawHLine(GDVEC2* p_pPoint, UINT32  i_Length, GDCOLOR* c_pColor)
+codec2d::DrawHLine(V2* v_pPoint, UINT32  i_Length, COLOR* c_pColor)
 {
-	__REGISTER int i_rIndex = _TOINDEX(p_pPoint->f_Pos[0], p_pPoint->f_Pos[1]);
+	__REGISTER int i_rIndex = _TOINDEX(v_pPoint->f_Pos[0], v_pPoint->f_Pos[1]);
 	for (UINT32 i_Index = 0; i_Index < i_Length; i_Index++)
 	{
-		gd_Image->d_pOutputStream[i_Index + i_rIndex] = c_pColor->GetAsHex();
+		o_Image->d_pOutputStream[i_Index + i_rIndex] = c_pColor->GetAsHex();
 	}
 	return GD_TASK_OKAY;
 }
 UCHAR 
-codec2d::DrawVLine(GDVEC2* p_pPoint, UINT32  i_Length, GDCOLOR* c_pColor)
+codec2d::DrawVLine(V2* v_pPoint, UINT32  i_Length, COLOR* c_pColor)
 {
-	__REGISTER int i_rIndex = _TOINDEX(p_pPoint->f_Pos[0], p_pPoint->f_Pos[1]);
+	__REGISTER int i_rIndex = _TOINDEX(v_pPoint->f_Pos[0], v_pPoint->f_Pos[1]);
 	for (UINT32 i_Index = 0; i_Index < i_Length; i_Index++)
 	{
-		gd_Image->d_pOutputStream[gd_Image->i_Pixels[0] * i_Index + i_rIndex] = c_pColor->GetAsHex();
+		o_Image->d_pOutputStream[o_Image->i_Pixels[0] * i_Index + i_rIndex] = c_pColor->GetAsHex();
 	}
 	return GD_TASK_OKAY;
 }
 UCHAR 
-codec2d::DrawCanvas(DWORD * d_pBuffer, GDVEC2 * p_pPos, UINT32  i_Pixel[2])
+codec2d::DrawCanvas(DWORD * d_pBuffer, V2 * v_pPos, UINT32  i_Pixel[2])
 {
-	__REGISTER int i_rIndex = _TOINDEX(p_pPos->f_Pos[0], p_pPos->f_Pos[1]);
+	__REGISTER int i_rIndex = _TOINDEX(v_pPos->f_Pos[0], v_pPos->f_Pos[1]);
 	for (UINT32 i_Row = 0; i_Row < i_Pixel[1]; i_Row++)
 	{
-		memmove((void*)(gd_Image->d_pOutputStream+ (i_rIndex + (i_Row*gd_Image->i_Pixels[0]))), (void*)(d_pBuffer+ i_Row * i_Pixel[0]), i_Pixel[0]* sizeof(DWORD));
+		memmove((void*)(o_Image->d_pOutputStream+ (i_rIndex + (i_Row*o_Image->i_Pixels[0]))), (void*)(d_pBuffer+ i_Row * i_Pixel[0]), i_Pixel[0]* sizeof(DWORD));
 	}
 	return GD_TASK_OKAY;
 }
 UCHAR 
-codec2d::DrawVMap(GFVECTORMAP * gd_VecMap)
+codec2d::DrawVMap(VMAP * o_VecMap)
 {
-	for (UINT32 i_Index = 0; i_Index < gd_VecMap->i_Connections; i_Index++)
+	for (UINT32 i_Index = 0; i_Index < o_VecMap->i_Connections; i_Index++)
 	{
-		DrawLine(&gd_VecMap->l_pLines[i_Index].p_Point[0], &gd_VecMap->l_pLines[i_Index].p_Point[1], &gd_VecMap->l_pLines[i_Index].c_Color);
+		DrawLine(&o_VecMap->l_pLines[i_Index].v_Point[0], &o_VecMap->l_pLines[i_Index].v_Point[1], &o_VecMap->l_pLines[i_Index].c_Color);
 	}
 	return GD_TASK_OKAY;
 }

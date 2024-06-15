@@ -37,9 +37,9 @@
 #define _TOCLIENTHEIGHT(x) (win::i_Height-39)
 #define _FROMCLIENTWIDTH(x) (x+16)
 #define _FROMCLIENTHEIGHT(x) (x+39)
-#define _TOINDEX(x,y) ((int)y * gd_Image->i_Pixels[0] + (int)x)
-#define _TOROW(y) ((int)y * gd_Image->i_Pixels[0])
-#define _PTOP(POI) GDVEC2(((POINT)POI).x,((POINT)POI).y)
+#define _TOINDEX(x,y) ((int)y * o_Image->i_Pixels[0] + (int)x)
+#define _TOROW(y) ((int)y * o_Image->i_Pixels[0])
+#define _PTOP(POI) V2((float)((POINT)POI).x,(float)((POINT)POI).y)
 #define DEGTORAD(X) (float)(X*2*M_PI/360.0)
 #define RADTODEG(X) (float)(X/(2*M_PI)*360.0)
 
@@ -69,16 +69,16 @@ namespace win {
 	const static int i_YPos = CW_USEDEFAULT;
 	const static HWND hd_WndParent = NULL;
 	const static HMENU h_Menu = NULL;
-	const static  LPVOID lp_Param = NULL;
+	const static  LPVOID lv_Param = NULL;
 
-	typedef struct gd_win {
+	typedef struct o_win {
 		UINT32 i_Width, i_Height;
 		HINSTANCE h_Instance;
 		HWND hd_WindowHandle;
 		MSG msg_WindowMessage;
 		HDC hdc_WindowHdc;
 		WNDCLASS w_WndClass;
-		POINT p_CursorPos;
+		POINT v_CursorPos;
 		void(*v_pMouseDown)();
 		BOOL b_HasFocus;
 		BOOL b_HideCursor = FALSE;
@@ -101,72 +101,67 @@ typedef unsigned int UINT32;
 #define VEC2D TRUE
 #ifdef VEC2D
 
-	typedef class gd_vec2 {
+	typedef class o_vec2 {
 	public:
 		float f_Pos[Z];
 
-		void Delta(gd_vec2 p_Pos);
-		double Distance(gd_vec2 p_Pos);
+		void Delta(o_vec2 v_Pos);
+		double Distance(o_vec2 v_Pos);
 
-		gd_vec2();
-		gd_vec2(float f_X, float f_Y);
-		gd_vec2(float f_Pos[2]);
+		o_vec2();
+		o_vec2(float f_X, float f_Y);
+		o_vec2(float f_Pos[2]);
 
-	}GDVEC2;
+	}V2;
 
-	GDVEC2 operator - (GDVEC2  &p_Pos1, GDVEC2  &p_Pos2);
-	GDVEC2 operator + (GDVEC2  &p_Pos1, GDVEC2  &p_Pos2);
-	GDVEC2 operator * (GDVEC2  &p_Pos1, int &i_Lenght);
-	GDVEC2 operator * (GDVEC2  &p_Pos1, float &f_Lenght);
+	V2 operator - (V2  &v_Pos1, V2  &v_Pos2);
+	V2 operator + (V2  &v_Pos1, V2  &v_Pos2);
+	V2 operator * (V2  &v_Pos1, int &i_Lenght);
+	V2 operator * (V2  &v_Pos1, float &f_Lenght);
 
 #endif // VEC2D
 
 #define VEC3D TRUE
 #ifdef VEC3D
 
-	typedef class gd_vec3 {
+	typedef class o_vec3 {
 	public:
 		float f_Pos[3];
 
 		void NormalizeThis();
-		gd_vec3 NormalizeTo();
+		o_vec3 NormalizeTo();
 	
-		void RotateThis(gd_vec3 p_Rot);
-		gd_vec3 RotateTo(gd_vec3 p_Rot);
-		void CamRotateThis(gd_vec3 p_Rot);
-		gd_vec3 CamRotateTo(gd_vec3 p_Rot);
-		void RotateAroundThis(gd_vec3 p_UnitV, float f_phi);
-		gd_vec3 RotateAroundTo(gd_vec3 p_UnitV, float f_phi);
+		void RotateThis(o_vec3 v_Rot);
+		o_vec3 RotateTo(o_vec3 v_Rot);
+		void CamRotateThis(o_vec3 v_Rot);
+		o_vec3 CamRotateTo(o_vec3 v_Rot);
+		void RotateAroundThis(o_vec3 v_UnitV, float f_phi);
+		o_vec3 RotateAroundTo(o_vec3 v_UnitV, float f_phi);
 
-		void DeltaThis(gd_vec3 p_Pos);
-		gd_vec3 DeltaTo(gd_vec3 p_Pos);
+		void DeltaThis(o_vec3 v_Pos);
+		o_vec3 DeltaTo(o_vec3 v_Pos);
 
-		gd_vec3 AngleTo(gd_vec3 p_Pos);
-		gd_vec3 Angle();
+		o_vec3 AngleTo(o_vec3 v_Pos);
+		o_vec3 Angle();
 
-		double DistanceTo(gd_vec3 p_Pos);
+		double DistanceTo(o_vec3 v_Pos);
 		float Length();
-		float DotProduct(gd_vec3 p_Pos);
+		float DotProduct(o_vec3 v_Pos);
 
-		gd_vec3();
-		gd_vec3(float f_X, float f_Y, float f_Z);
-		gd_vec3(float f_Pos[3]);
+		o_vec3();
+		o_vec3(float f_X, float f_Y, float f_Z);
+		o_vec3(float f_Pos[3]);
 
+	}V3;
 
-
-	}GDVEC3;
-
-	GDVEC3 operator-(GDVEC3  &p_Pos1, GDVEC3  &p_Pos2);
-	GDVEC3 operator+(GDVEC3  &p_Pos1, GDVEC3  &p_Pos2);
-	GDVEC3 operator*(GDVEC3  &p_Pos1, GDVEC3  &p_Pos2);
-	GDVEC3 operator*(GDVEC3  &p_Pos1, GDVEC3  const&p_Pos2);
-	GDVEC3 operator*(GDVEC3  &p_Pos, float const&f_Lenght);
-	GDVEC3 operator*(GDVEC3  &p_Pos, float &f_Lenght);
+	V3 operator-(V3  &v_Pos1, V3  &v_Pos2);
+	V3 operator+(V3  &v_Pos1, V3  &v_Pos2);
+	V3 operator*(V3  &v_Pos1, V3  &v_Pos2);
+	V3 operator*(V3  &v_Pos1, V3  const&v_Pos2);
+	V3 operator*(V3  &v_Pos, float const&f_Lenght);
+	V3 operator*(V3  &v_Pos, float &f_Lenght);
 
 #endif // VEC3D
-
-
-
 
 
 #define TYPES_OTHERS TRUE
@@ -182,25 +177,25 @@ typedef unsigned int UINT32;
 
 		UCHAR  Prepare(int i_Width, int i_Height);
 		UCHAR  Dispose();
-	}GDCANVAS;
+	}CANVAS;
 
-	typedef struct gd_color {
+	typedef struct o_color {
 		UCHAR c_Color[3];
-		gd_color(UCHAR c_R, UCHAR c_G, UCHAR c_B);
-		gd_color();
+		o_color(UCHAR c_R, UCHAR c_G, UCHAR c_B);
+		o_color();
 		DWORD GetAsHex();
-	} GDCOLOR;
+	} COLOR;
 
 #endif // TYPES_OTHERS
 
-typedef struct gd_line {
-	GDVEC2 p_Point[2];
-	GDCOLOR c_Color;
-}GDLINE;
+typedef struct o_line {
+	V2 v_Point[2];
+	COLOR c_Color;
+}LINE;
 
-typedef struct gd_face {
-	GDVEC3 p_Point[3];
-}GDFACE;
+typedef struct o_face {
+	V3 v_Point[3];
+}FACE;
 
 #define FILE_HANDLER TRUE
 #ifdef FILE_HANDLER
@@ -210,16 +205,15 @@ typedef struct gd_face {
 		FILE * f_Stream;
 		UCHAR  OpenStream(LPSTR c_StreamName);
 		UCHAR  CloseStream();
+	}FILER;
 
-	}GDFILER;
 
-
-	typedef class object : public GDFILER {
+	typedef class object : public FILER {
 	public:
-		GDVEC3 p_Anchor;
-		GDVEC3 * p_pPoint;
-		GDCOLOR c_pColor;
-		GDFACE * o_pFace;
+		V3 v_Anchor;
+		V3 * v_pPoint;
+		COLOR c_pColor;
+		FACE * o_pFace;
 		UINT32 i_Faces, i_Points;
 	private:
 		UCHAR  ReadHeader();
@@ -228,15 +222,15 @@ typedef struct gd_face {
 	public:
 		UCHAR  Read(LPSTR c_StreamName);
 		UCHAR  Dispose();
-	}GFOBJECT;
+	}OBJ3D;
 
 
-	typedef class vectormap : public GDFILER {
+	typedef class vectormap : public FILER {
 	public:
-		GDVEC2 p_Anchor;
-		GDVEC2 * p_pPoint;
-		GDCOLOR * c_pColor;
-		GDLINE * l_pLines;
+		V2 v_Anchor;
+		V2 * v_pPoint;
+		COLOR * c_pColor;
+		LINE * l_pLines;
 		UINT32 i_Connections, i_Points, i_Colors;
 	private:
 		UCHAR  ReadHeader();
@@ -245,37 +239,37 @@ typedef struct gd_face {
 	public:
 		UCHAR  Read(LPSTR c_StreamName);
 		UCHAR  Dispose();
-	}GFVECTORMAP;
+	}VMAP;
 
 #endif // FILE_HANDLER
 
-#define CODEC2D TRUE
-#ifdef CODEC2D
+#define CODEC_2D TRUE
+#ifdef CODEC_2D
 
 	typedef class codec2d {
 	public:
 		codec2d() {}
-		codec2d(GDCANVAS * gd_pCanvas){
-			gd_Image = gd_pCanvas;
+		codec2d(CANVAS * o_pCanvas){
+			o_Image = o_pCanvas;
 		}
-		UCHAR  SetPixel(GDVEC2 * p_pPoint, GDCOLOR * c_pColor);
-		UCHAR  DrawLine(GDVEC2 * p_pPointA, GDVEC2 * p_pPointB, GDCOLOR * c_pColor);
-		UCHAR  DrawRect(GDVEC2 * p_pPointA, GDVEC2 * p_pPointB, GDCOLOR * c_pColor);
-		UCHAR  DrawHLine(GDVEC2 * p_pPoint, UINT32  i_Length, GDCOLOR * c_pColor);
-		UCHAR  DrawVLine(GDVEC2 * p_pPoint, UINT32  i_Length, GDCOLOR * c_pColor);
-		UCHAR  DrawCanvas(DWORD * d_pBuffer, GDVEC2 * p_pPos, UINT32  i_Pixels[2]);
-		UCHAR  DrawVMap(GFVECTORMAP * gd_VecMap);
+		UCHAR  SetPixel(V2 * v_pPoint, COLOR * c_pColor);
+		UCHAR  DrawLine(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor);
+		UCHAR  DrawRect(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor);
+		UCHAR  DrawHLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor);
+		UCHAR  DrawVLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor);
+		UCHAR  DrawCanvas(DWORD * d_pBuffer, V2 * v_pPos, UINT32  i_Pixels[2]);
+		UCHAR  DrawVMap(VMAP * o_VecMap);
 
 		BOOL b_AllowPixelOverwrite = FALSE;
 	protected:
-		GDCANVAS * gd_Image;
+		CANVAS * o_Image;
 
-	}GD2DCODEC;
+	}CODEC2D;
 
-#endif // CODEC2D
+#endif // CODEC_2D
 
-#define CODEC3D TRUE
-#ifdef CODEC3D
+#define CODEC_3D TRUE
+#ifdef CODEC_3D
 
 	typedef class camera {
 	public:
@@ -286,36 +280,36 @@ typedef struct gd_face {
 			UINT32 i_Dimensions_Width,
 			UINT32 i_Dimensions_Height,
 			FLOAT f_FOV,
-			GDVEC3 i_Position,
-			GDVEC3 i_Rotation
+			V3 i_Position,
+			V3 i_Rotation
 		);
 
 		FLOAT f_Frustum[2];
 		UINT32 i_Dimensions[2];
 		FLOAT f_FOV;
-		GDVEC3 i_Position;
-		GDVEC3 i_Rotation;
+		V3 i_Position;
+		V3 i_Rotation;
 		FLOAT f_CutoffAngles[2];
 
 		BOOL b_UseCutoffAngles = TRUE;
 
-		inline UCHAR  Translate(GDVEC3 * p_pPoint, GDVEC2 * p_pResult);
-		UCHAR  Relate(GDVEC2 * p_pScreenPos, GDVEC3 * p_pAngle);
-	}GDCAMERA;
+		inline UCHAR  Translate(V3 * v_pPoint, V2 * v_pResult);
+		UCHAR  Relate(V2 * v_pScreenPos, V3 * v_pAngle);
+	}CAM3D;
 
 
-	typedef class codec3d : public GD2DCODEC {
+	typedef class codec3d : public CODEC2D {
 	public:
 		codec3d() {}
-		codec3d(GDCANVAS * gd_pCanvas, GDCAMERA * gd_pCamera) {
-			gd_Image = gd_pCanvas;
-			gd_Camera = gd_pCamera;
+		codec3d(CANVAS * o_pCanvas, CAM3D * o_pCamera) {
+			o_Image = o_pCanvas;
+			o_Camera = o_pCamera;
 		}
-		UCHAR  DrawObject(GFOBJECT * gd_Object, GDCOLOR * c_pColor);
-		UCHAR  DrawEdge(GDVEC3 * p_pVertexA, GDVEC3 * p_pVertexB, GDCOLOR * c_pColor);
+		UCHAR  DrawObject(OBJ3D * o_Object, COLOR * c_pColor);
+		UCHAR  DrawEdge(V3 * v_pVertexA, V3 * v_pVertexB, COLOR * c_pColor);
 
-		GDCAMERA * gd_Camera;
-	}GD3DCODEC;
+		CAM3D * o_Camera;
+	}CODEC3D;
 
 #endif
 
@@ -323,7 +317,7 @@ typedef struct gd_face {
 #define CONSOLE_HANDLER TRUE
 #ifdef CONSOLE_HANDLER
 
-	typedef class gd_console {
+	typedef class o_console {
 	public:
 		FILE *  Create(const wchar_t* c_ConsoleTitle);
 		FILE*  Create();
@@ -335,7 +329,7 @@ typedef struct gd_face {
 		void  SetColor(const int i_HexColor);
 	private:
 		FILE *  AllocC();
-	}GDCONSOLE;
+	}CONSOLE;
 
 #endif // CONSOLE_HANDLER
 
@@ -345,52 +339,59 @@ typedef struct gd_face {
 	#define CHST_BASIC 0
 	#define CHST_AXIS  1
 	
-	extern void BasicCameraController(win::GDWIN *gd_win, GDCAMERA* gd_camera, float f_MoveSpeed, float f_ViewSpeed, BOOL b_MouseCtrl, float f_MouseSensitivity);
-	extern void DrawCrosshair(GD3DCODEC* o_pCodec, GDCOLOR c_Color, int i_Style , float f_size);
+	typedef class o_camctrlr {
+		o_camctrlr() {}
+		o_camctrlr(win::GDWIN *o_win, CAM3D* o_camera, CODEC3D* o_pCodec);
+
+
+	}CAMCTRLR;
+
+	extern void BasicCameraController(win::GDWIN *o_win, CAM3D* o_camera, float f_MoveSpeed, float f_ViewSpeed, BOOL b_MouseCtrl, float f_MouseSensitivity);
+	extern void DrawCrosshair(CODEC3D* o_pCodec, COLOR c_Color, int i_Style , float f_size);
 
 #endif // BASIC_ESSENTIALS
 
 #define MATRIX_OP
 #ifdef MATRIX_OP
 
-	typedef struct gd_m3x3 {
+	typedef struct o_m3x3 {
 	public:
-		gd_m3x3();
-		gd_m3x3(GDVEC3 p_v1, GDVEC3 p_v2, GDVEC3 p_v3);
-		gd_m3x3(float f_UnitValue);
+		o_m3x3();
+		o_m3x3(V3 v_v1, V3 v_v2, V3 v_v3);
+		o_m3x3(float f_UnitValue);
 
-		GDVEC3 p_v1, p_v2, p_v3;
+		V3 v_v1, v_v2, v_v3;
 
 		void print();
-	} GDM3X3;
+	} M3X3;
 
-	GDM3X3 M3X3RotX(float f_phi);
-	GDM3X3 M3X3RotY(float f_phi);
-	GDM3X3 M3X3RotZ(float f_phi);
-	GDM3X3 M3X3RotU(GDVEC3 p_UnitV,float f_phi);
+	M3X3 M3X3RotX(float f_phi);
+	M3X3 M3X3RotY(float f_phi);
+	M3X3 M3X3RotZ(float f_phi);
+	M3X3 M3X3RotU(V3 v_UnitV,float f_phi);
 
-	GDM3X3 operator * (GDM3X3  &m_M, float &f_S);
-	GDM3X3 operator * (GDM3X3  &m_M1, GDM3X3 &m_M2);
-	GDM3X3 operator + (GDM3X3  &m_M1, GDM3X3 &m_M2);
-	GDVEC3 operator * (GDM3X3  &m_M, GDVEC3 &p_V);
+	M3X3 operator * (M3X3  &m_M, float &f_S);
+	M3X3 operator * (M3X3  &m_M1, M3X3 &m_M2);
+	M3X3 operator + (M3X3  &m_M1, M3X3 &m_M2);
+	V3 operator * (M3X3  &m_M, V3 &v_V);
 
-	GDM3X3 operator * (GDM3X3  const&m_M, float const&f_S);
-	GDM3X3 operator * (GDM3X3  const&m_M1, GDM3X3 const&m_M2);
-	GDM3X3 operator + (GDM3X3  const&m_M1, GDM3X3 const&m_M2);
-	GDVEC3 operator * (GDM3X3  const&m_M, GDVEC3 const&p_V);
+	M3X3 operator * (M3X3  const&m_M, float const&f_S);
+	M3X3 operator * (M3X3  const&m_M1, M3X3 const&m_M2);
+	M3X3 operator + (M3X3  const&m_M1, M3X3 const&m_M2);
+	V3 operator * (M3X3  const&m_M, V3 const&v_V);
 
 #endif // MATRIX_OP
 
 
-static GDCOLOR co_Gray = GDCOLOR(55, 55, 55);
-static GDCOLOR co_White = GDCOLOR(255, 255, 255);
-static GDCOLOR co_Red = GDCOLOR(0, 0, 255);
-static GDCOLOR co_Green = GDCOLOR(0, 255, 0);
-static GDCOLOR co_Blue = GDCOLOR(255, 0, 0);
-static GDCOLOR co_Pink = GDCOLOR(255, 0, 255);
+static COLOR co_Gray = COLOR(55, 55, 55);
+static COLOR co_White = COLOR(255, 255, 255);
+static COLOR co_Red = COLOR(0, 0, 255);
+static COLOR co_Green = COLOR(0, 255, 0);
+static COLOR co_Blue = COLOR(255, 0, 0);
+static COLOR co_Pink = COLOR(255, 0, 255);
 
 
-double Distance2(GDVEC2 p_PosOne, GDVEC2 p_PosTwo);
-double Distance3(GDVEC3 p_PosOne, GDVEC3 p_PosTwo);
+double Distance2(V2 v_PosOne, V2 v_PosTwo);
+double Distance3(V3 v_PosOne, V3 v_PosTwo);
 
 
