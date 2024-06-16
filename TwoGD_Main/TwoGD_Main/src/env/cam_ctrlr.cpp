@@ -1,4 +1,4 @@
-#include"twogd.h"
+#include "..\twogd.h"
 
 o_camctrlr::o_camctrlr() {}
 o_camctrlr::o_camctrlr(CAM3D* o_camera_, CODEC3D* o_pCodec_) 

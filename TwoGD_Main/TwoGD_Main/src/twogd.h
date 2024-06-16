@@ -164,8 +164,8 @@ typedef unsigned int UINT32;
 #endif // VEC3D
 
 
-#define TYPES_OTHERS TRUE
-#ifdef TYPES_OTHERS
+#define DRAWING TRUE
+#ifdef DRAWING
 
 	#define CF_OVERWRITE_ALLOWED 0x1
 	#define CF_OVERWRITE_FORBIDDEN 0x2
@@ -197,7 +197,7 @@ typedef unsigned int UINT32;
 	static COLOR co_Blue = COLOR(255, 0, 0);
 	static COLOR co_Pink = COLOR(255, 0, 255);
 
-#endif // TYPES_OTHERS
+#endif // DRAWING
 
 typedef struct o_line {
 	V2 v_Point[2];
@@ -294,6 +294,7 @@ typedef struct o_face {
 			V3 i_Position,
 			V3 i_Rotation
 		);
+		UCHAR(*s_Shader)(camera *o_Cam, V3 *v_Vertex, V2 *v_Point, COLOR *c_Color)= NULL;
 
 		FLOAT f_Frustum[2];
 		UINT32 i_Dimensions[2];
@@ -344,8 +345,8 @@ typedef struct o_face {
 
 #endif // CONSOLE_HANDLER
 
-#define BASIC_ESSENTIALS TRUE
-#ifdef BASIC_ESSENTIALS
+#define CAM_CTRLR TRUE
+#ifdef CAM_CTRLR
 
 	#define CHST_BASIC 0
 	#define CHST_AXIS  1
@@ -374,7 +375,7 @@ typedef struct o_face {
 
 
 
-#endif // BASIC_ESSENTIALS
+#endif // CAM_CTRLR
 
 #define MATRIX_OP
 #ifdef MATRIX_OP
@@ -407,6 +408,23 @@ typedef struct o_face {
 
 #endif // MATRIX_OP
 
+#define WORLD_CTRLR
+#ifdef WORLD_CTRLR
+
+
+#endif // WOLRD_CTRLR
+
+typedef class o_world {
+	int i_Length;
+public:
+	int Length() const { return i_Length; }
+	OBJ3D * o_Collection;
+
+	UCHAR AppendObj(LPSTR c_StreamName);
+	UCHAR  Dispose();
+
+	o_world();
+}WORLD;
 
 
 

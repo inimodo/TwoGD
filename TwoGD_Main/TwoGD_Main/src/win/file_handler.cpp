@@ -1,4 +1,4 @@
-#include "twogd.h"
+#include "..\twogd.h"
 
 #define GD_VEC_HEADER "v %d %d %d\n"
 #define GD_VEC_POINTS "p %f %f\n"

@@ -22,6 +22,11 @@ OBJ3D obj_Plane;
 #define GRID_SPACING 1
 #define GRID_SIZE 15
 
+// GRID_SIZE=150:
+// Ohne ComRotate 5000ms Nicht Ausmultipliziert
+// Mit ComRotate 60000ms Nicht Ausmultipliziert
+// Mit ComRotate 30000ms Ausmultipliziert
+
 void Demo_DrawGrid() 
 {
 	V3 v_PointA = V3(0,0,0),v_PointB= V3(0,0,0);
@@ -115,6 +120,28 @@ void prefabLoader()
 	printf("RES: %X \n", vmf_Map.Read((const LPSTR)"src\\obj\\obj1.vmf"));
 }
 
+UCHAR DemoVignetteShader(camera *o_Cam, V3 *v_Vertex, V2 *v_Point, COLOR *c_Color)
+{
+	float f_Dis = v_Point->Distance(V2(o_Cam->i_Dimensions[0] / 2, o_Cam->i_Dimensions[1] / 2));
+	float f_Max = sqrt(
+		(o_Cam->i_Dimensions[0] / 2.0f)*(o_Cam->i_Dimensions[0] / 2.0f)+
+		(o_Cam->i_Dimensions[1] / 2.0f)*(o_Cam->i_Dimensions[1] / 2.0f));
+	float f_scale = ((f_Dis*0.5f) / f_Max);
+
+	c_Color->c_Color[0] = (UCHAR)((float)c_Color->c_Color[0] * (1.0f - f_scale));
+	c_Color->c_Color[1] = (UCHAR)((float)c_Color->c_Color[1] * (1.0f - f_scale));
+	c_Color->c_Color[2] = (UCHAR)((float)c_Color->c_Color[2] * (1.0f - f_scale));
+
+	if (f_scale > 1.0f)
+	{
+		c_Color->c_Color[0] = 0;
+		c_Color->c_Color[1] = 0;
+		c_Color->c_Color[2] = 0;
+	}
+	return GD_TASK_OKAY;
+}
+
+
 unsigned char  gdMain(win::GDWIN * o_win)
 {
 	o_Console.Create();
@@ -131,6 +158,8 @@ unsigned char  gdMain(win::GDWIN * o_win)
 		V3(0, 0, 0), 
 		V3(0, 0, 0)
 	);
+	//o_Cam.s_Shader = DemoVignetteShader;
+
 	o_CamCtrlr = CAMCTRLR(
 		&o_Cam,
 		&o_3DCodec

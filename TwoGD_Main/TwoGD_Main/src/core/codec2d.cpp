@@ -1,5 +1,4 @@
-#include <iostream>
-#include "twogd.h"
+#include "..\twogd.h"
 
 UCHAR 
 codec2d::SetPixel(V2 * v_pPoint, COLOR * c_pColor, UCHAR i_PixelFlag)
@@ -29,7 +28,6 @@ codec2d::DrawLine(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, UCHAR i_Pixe
 		SetPixel(&v_Temp, c_pColor,i_PixelFlag);
 	}
 	return GD_TASK_OKAY;
-
 }
 
 UCHAR 

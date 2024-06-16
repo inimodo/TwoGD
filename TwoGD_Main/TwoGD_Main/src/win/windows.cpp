@@ -1,5 +1,4 @@
-#include "twogd.h"
-
+#include "..\twogd.h"
 
 win::GDWIN o_win;
 
@@ -15,7 +14,6 @@ DWORD  wWinProcess(LPVOID lv_Void)
 		GetCursorPos(&o_win.v_CursorPos);
 		ScreenToClient(o_win.hd_WindowHandle, &o_win.v_CursorPos);
 
-
 		HWND hd_Active = GetForegroundWindow();
 		o_win.b_HasFocus = hd_Active == o_win.hd_WindowHandle;
 
@@ -28,7 +26,6 @@ DWORD  wWinProcess(LPVOID lv_Void)
 		BitBlt(o_win.hdc_WindowHdc, 0, 0, o_win.i_Width, o_win.i_Height, hdc_TempHdc, 0, 0, SRCCOPY);
 		DeleteObject(bmv_Bitmap);
 		DeleteDC(hdc_TempHdc);
-
 	}
 	gdClose();
 
@@ -90,7 +87,6 @@ HANDLE  CreateExec(HINSTANCE h_Instance) {
 }
 long  WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam)
 {
-
 	if (msg_Message == WM_SETCURSOR && LOWORD(lParam) == HTCLIENT && o_win.b_HideCursor)
 	{
 		SetCursor(NULL);

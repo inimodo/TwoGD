@@ -1,5 +1,4 @@
-#include "twogd.h"
-
+#include "..\twogd.h"
 camera::camera() 
 {
 	f_FOV = 2;
@@ -27,7 +26,7 @@ camera::camera(FLOAT f_Frustum_Low_, FLOAT f_Frustum_Far_, UINT32 i_Dimensions_W
 	V2 v_ScreenPos = V2((float)i_Dimensions[0], (float)i_Dimensions[1]);
 	V3 v_Angles = V3(0, 0, 0);
 	Relate(&v_ScreenPos,&v_Angles);
-	f_CutoffAngles[0] = v_Angles.f_Pos[X] + DEGTORAD(5);
+	f_CutoffAngles[0] = v_Angles.f_Pos[X] + DEGTORAD(10);
 	f_CutoffAngles[1] = v_Angles.f_Pos[Y] + DEGTORAD(10);
 }
 
@@ -74,65 +73,44 @@ camera::Relate(V2 * v_pScreenPos, V3 * v_pAngle)
 	return GD_TASK_OKAY;
 }
 
-
 UCHAR
 codec3d::DrawObject(OBJ3D * o_Object, COLOR * c_pColor, UCHAR i_PixelFlag)
 {
+	V2 v_PointA, v_PointB;
+	V3 v_pVertexA, v_pVertexB;
+	COLOR c_Color;
 	for (UINT32 i_Vertex = 0; i_Vertex < o_Object->i_Faces; i_Vertex++)
 	{
-		V2 v_PointA, v_PointB;
-		V3 v_Coord;
 		for (INT i_Index = 0; i_Index < 3; i_Index++)
 		{
-			v_Coord = o_Object->o_pFace[i_Vertex].v_Point[i_Index] + o_Object->v_Anchor;
-			if (this->o_Camera->Translate(&v_Coord, &v_PointA) == GD_OUTOFBOUND)continue;
-			v_Coord = o_Object->o_pFace[i_Vertex].v_Point[(i_Index + 1) % 3] + o_Object->v_Anchor;
-			if (this->o_Camera->Translate(&v_Coord, &v_PointB) == GD_OUTOFBOUND)continue;
-			this->DrawLine(&v_PointA, &v_PointB, c_pColor, i_PixelFlag);
+			c_Color = *c_pColor;
+			v_pVertexA = o_Object->o_pFace[i_Vertex].v_Point[i_Index] + o_Object->v_Anchor;
+			if (this->o_Camera->Translate(&v_pVertexA, &v_PointA) == GD_OUTOFBOUND)continue;
+			v_pVertexB = o_Object->o_pFace[i_Vertex].v_Point[(i_Index + 1) % 3] + o_Object->v_Anchor;
+			if (this->o_Camera->Translate(&v_pVertexB, &v_PointB) == GD_OUTOFBOUND)continue;
+
+			if (this->o_Camera->s_Shader != NULL)
+			{
+				if (this->o_Camera->s_Shader(this->o_Camera, &v_pVertexA, &v_PointA, &c_Color) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
+				if (this->o_Camera->s_Shader(this->o_Camera, &v_pVertexB, &v_PointB, &c_Color) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
+			}
+			this->DrawLine(&v_PointA, &v_PointB, &c_Color, i_PixelFlag);
 		}
 	}
 	return GD_TASK_OKAY;
 }
 
-
-
 UCHAR
 codec3d::DrawEdge(V3 * v_pVertexA, V3 * v_pVertexB, COLOR * c_pColor, UCHAR i_PixelFlag)
 {
 	V2 v_PointA, v_PointB;
+	COLOR c_Color = *c_pColor;
 	if (this->o_Camera->Translate(v_pVertexA, &v_PointA) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
 	if (this->o_Camera->Translate(v_pVertexB, &v_PointB) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
-	return this->DrawLine(&v_PointA, &v_PointB, c_pColor, i_PixelFlag);
-	return 0;
+	if (this->o_Camera->s_Shader != NULL)
+	{
+		if(this->o_Camera->s_Shader(this->o_Camera, v_pVertexA,&v_PointA,&c_Color) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
+		if(this->o_Camera->s_Shader(this->o_Camera, v_pVertexB,&v_PointB,&c_Color) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
+	}
+	return this->DrawLine(&v_PointA, &v_PointB, &c_Color, i_PixelFlag);
 }
-
-//UCHAR
-//codec3d::DrawObject(OBJ3D * o_Object, COLOR * c_pColor)
-//{
-//	for (INT i_Vertex = 0; i_Vertex < o_Object->i_Faces; i_Vertex++)
-//	{
-//		V2 v_PointA, v_PointB;
-//		V3 v_Coord;
-//		for (INT i_Index = 0; i_Index < 3; i_Index++)
-//		{
-//			COLOR col = *c_pColor;
-//			v_Coord = o_Object->o_pFace[i_Vertex].v_Point[i_Index] + o_Object->v_Anchor;
-//			if (this->o_Camera->Translate(&v_Coord, &v_PointA) == 1)col = COLOR(255, 255, 255);
-//			v_Coord = o_Object->o_pFace[i_Vertex].v_Point[(i_Index + 1) % 3] + o_Object->v_Anchor;
-//			if (this->o_Camera->Translate(&v_Coord, &v_PointB) == 1)col = COLOR(255, 255, 255);
-//			this->DrawLine(&v_PointA, &v_PointB, &col);
-//		}
-//	}
-//	return GD_TASK_OKAY;
-//}
-//UCHAR
-
-//codec3d::DrawEdge(V3 * v_pVertexA, V3 * v_pVertexB, COLOR * c_pColor)
-//{
-//	V2 v_PointA, v_PointB;
-//	COLOR col = *c_pColor;
-//
-//	if (this->o_Camera->Translate(v_pVertexA, &v_PointA) == 1)col = COLOR(255, 255, 255);
-//	if (this->o_Camera->Translate(v_pVertexB, &v_PointB) == 1)col = COLOR(255, 255, 255);
-//	return this->DrawLine(&v_PointA, &v_PointB, &col);
-//}

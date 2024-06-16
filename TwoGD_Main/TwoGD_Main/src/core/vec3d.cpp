@@ -1,4 +1,4 @@
-#include "twogd.h"
+#include "..\twogd.h"
 
 void V3::NormalizeThis()
 {
@@ -38,7 +38,6 @@ V3 V3::RotateTo(V3 v_Rot)
 	M3X3 m_X = M3X3RotU(v_UntX, v_Rot.f_Pos[Y]);
 
 	return m_X * m_Y * *this;
-
 }
 
 V3 V3::CamRotateTo(V3 v_Rot)

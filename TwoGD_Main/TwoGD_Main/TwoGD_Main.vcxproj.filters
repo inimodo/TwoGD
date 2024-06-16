@@ -15,34 +15,37 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\windows.cpp">
+    <ClCompile Include="src\core\codec2d.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\types_other.cpp">
+    <ClCompile Include="src\core\codec3d.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\basic_essentials.cpp">
+    <ClCompile Include="src\core\vec3d.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\console_handler.cpp">
+    <ClCompile Include="src\core\vec2d.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\file_handler.cpp">
+    <ClCompile Include="src\core\matrix3x3.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\vec2d.cpp">
+    <ClCompile Include="src\core\drawing.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\vec3d.cpp">
+    <ClCompile Include="src\win\windows.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\codec2d.cpp">
+    <ClCompile Include="src\win\console_handler.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\codec3d.cpp">
+    <ClCompile Include="src\win\file_handler.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\matrix3x3.cpp">
+    <ClCompile Include="src\env\cam_ctrlr.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\env\world_ctrlr.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

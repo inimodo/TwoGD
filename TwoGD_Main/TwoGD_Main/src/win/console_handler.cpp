@@ -1,4 +1,4 @@
-#include "twogd.h"
+#include "..\twogd.h"
 
 
 FILE*  o_console::Create()

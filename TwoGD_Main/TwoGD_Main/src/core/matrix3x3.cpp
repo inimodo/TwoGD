@@ -1,4 +1,4 @@
-#include"twogd.h"
+#include "..\twogd.h"
 
 o_m3x3::o_m3x3(V3 v_v1, V3 v_v2, V3 v_v3)
 {
@@ -60,14 +60,23 @@ V3 MMultV(M3X3 m_M, V3 v_V)
 M3X3 M3X3RotU(V3 v_UnitV, float f_phi)
 {
 	//Rodrigues' Rotation Formula
-	M3X3 I = M3X3(1.0f);
-	M3X3 w = M3X3(
-		V3(0, v_UnitV.f_Pos[2], -v_UnitV.f_Pos[1]),
-		V3(-v_UnitV.f_Pos[2], 0, v_UnitV.f_Pos[0]),
-		V3(v_UnitV.f_Pos[1], -v_UnitV.f_Pos[0], 0)
+	return M3X3(
+		V3(
+			cos(f_phi) + v_UnitV.f_Pos[X]* v_UnitV.f_Pos[X]*(1.0f-cos(f_phi)),
+			v_UnitV.f_Pos[Z]*sin(f_phi)+ v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Y]*(1.0f-cos(f_phi)),
+			-v_UnitV.f_Pos[Y]*sin(f_phi)+ v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Z]*(1.0f-cos(f_phi))
+		),
+		V3(
+			v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Y]*(1.0f-cos(f_phi))- v_UnitV.f_Pos[Z]*sin(f_phi),
+			cos(f_phi)+ v_UnitV.f_Pos[Y]* v_UnitV.f_Pos[Y]*(1.0f-cos(f_phi)),
+			v_UnitV.f_Pos[X]*sin(f_phi)+ v_UnitV.f_Pos[Y]* v_UnitV.f_Pos[Z]*(1.0f-cos(f_phi))
+		),
+		V3(
+			v_UnitV.f_Pos[Y]*sin(f_phi)+ v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Z]*(1.0f-cos(f_phi)),
+			-v_UnitV.f_Pos[X]*sin(f_phi)+ v_UnitV.f_Pos[Y]* v_UnitV.f_Pos[Z]*(1.0f-cos(f_phi)),
+			cos(f_phi)+ v_UnitV.f_Pos[Z]* v_UnitV.f_Pos[Z]*(1.0f-cos(f_phi))
+		)
 	);
-
-	return I + (w * sin(f_phi)) + ((w*w)*(1.0f - cos(f_phi)));
 }
 
 M3X3 operator*(M3X3 & m_M, float & f_S)

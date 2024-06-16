@@ -1,4 +1,4 @@
-#include "twogd.h"
+#include "..\twogd.h"
 
 void V2::Delta(V2 v_Pos)
 {

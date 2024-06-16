@@ -1,4 +1,4 @@
-#include "twogd.h"
+#include "..\twogd.h"
 o_color::o_color()
 {
 	c_Color[0] = 0;
