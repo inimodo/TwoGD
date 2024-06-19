@@ -59,22 +59,24 @@ V3 MMultV(M3X3 m_M, V3 v_V)
 
 M3X3 M3X3RotU(V3 v_UnitV, float f_phi)
 {
+	float f_sin = sin(f_phi);
+	float f_cos = cos(f_phi);
 	//Rodrigues' Rotation Formula
 	return M3X3(
 		V3(
-			cos(f_phi) + v_UnitV.f_Pos[X]* v_UnitV.f_Pos[X]*(1.0f-cos(f_phi)),
-			v_UnitV.f_Pos[Z]*sin(f_phi)+ v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Y]*(1.0f-cos(f_phi)),
-			-v_UnitV.f_Pos[Y]*sin(f_phi)+ v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Z]*(1.0f-cos(f_phi))
+			f_cos + v_UnitV.f_Pos[X]* v_UnitV.f_Pos[X]*(1.0f- f_cos),
+			v_UnitV.f_Pos[Z]* f_sin + v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Y]*(1.0f- f_cos),
+			-v_UnitV.f_Pos[Y]* f_sin + v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Z]*(1.0f- f_cos)
 		),
 		V3(
-			v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Y]*(1.0f-cos(f_phi))- v_UnitV.f_Pos[Z]*sin(f_phi),
-			cos(f_phi)+ v_UnitV.f_Pos[Y]* v_UnitV.f_Pos[Y]*(1.0f-cos(f_phi)),
-			v_UnitV.f_Pos[X]*sin(f_phi)+ v_UnitV.f_Pos[Y]* v_UnitV.f_Pos[Z]*(1.0f-cos(f_phi))
+			v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Y]*(1.0f- f_cos)- v_UnitV.f_Pos[Z]* f_sin,
+			f_cos + v_UnitV.f_Pos[Y]* v_UnitV.f_Pos[Y]*(1.0f- f_cos),
+			v_UnitV.f_Pos[X]* f_sin + v_UnitV.f_Pos[Y]* v_UnitV.f_Pos[Z]*(1.0f- f_cos)
 		),
 		V3(
-			v_UnitV.f_Pos[Y]*sin(f_phi)+ v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Z]*(1.0f-cos(f_phi)),
-			-v_UnitV.f_Pos[X]*sin(f_phi)+ v_UnitV.f_Pos[Y]* v_UnitV.f_Pos[Z]*(1.0f-cos(f_phi)),
-			cos(f_phi)+ v_UnitV.f_Pos[Z]* v_UnitV.f_Pos[Z]*(1.0f-cos(f_phi))
+			v_UnitV.f_Pos[Y]* f_sin + v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Z]*(1.0f- f_cos),
+			-v_UnitV.f_Pos[X]* f_sin + v_UnitV.f_Pos[Y]* v_UnitV.f_Pos[Z]*(1.0f- f_cos),
+			f_cos + v_UnitV.f_Pos[Z]* v_UnitV.f_Pos[Z]*(1.0f- f_cos)
 		)
 	);
 }

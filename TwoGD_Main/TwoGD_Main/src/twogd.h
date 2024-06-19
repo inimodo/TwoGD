@@ -31,7 +31,7 @@
 #define GD_ALLOC_FAILED 0x1F
 #define GD_TASK_OKAY 0x1A
 #define GD_FILE_FAILED 0x2F
-#define GD_OUTOFBOUND 0x2F
+#define GD_OUTOFBOUND 0x2E
 
 #define _TOCLIENTWIDTH(x) (win::i_Width-16)
 #define _TOCLIENTHEIGHT(x) (win::i_Height-39)
@@ -167,15 +167,18 @@ typedef unsigned int UINT32;
 #define DRAWING TRUE
 #ifdef DRAWING
 
-	#define CF_OVERWRITE_ALLOWED 0x1
-	#define CF_OVERWRITE_FORBIDDEN 0x2
+	#define PF_OVERWRITE_ALLOWED   0xA
+	#define PF_OVERWRITE_FORBIDDEN 0xF
 
 	typedef class canvas {
 	public:
 		UINT32 i_Pixels[2];
-		DWORD * d_pOutputStream;
-		UCHAR * d_pFlags;
+
 		UINT32 i_OutputSize;
+		DWORD * d_pOutputStream;
+		UCHAR * d_pPixelFlags;
+		UCHAR * d_pPrioFlags;
+
 
 		UCHAR  CleanBuffer();
 
@@ -190,12 +193,13 @@ typedef unsigned int UINT32;
 		DWORD GetAsHex();
 	} COLOR;
 
-	static COLOR co_Gray = COLOR(55, 55, 55);
-	static COLOR co_White = COLOR(255, 255, 255);
-	static COLOR co_Red = COLOR(0, 0, 255);
-	static COLOR co_Green = COLOR(0, 255, 0);
-	static COLOR co_Blue = COLOR(255, 0, 0);
-	static COLOR co_Pink = COLOR(255, 0, 255);
+	static const COLOR co_Gray = COLOR(55, 55, 55);
+	static const COLOR co_White = COLOR(255, 255, 255);
+	static const COLOR co_Red = COLOR(0, 0, 255);
+	static const COLOR co_Green = COLOR(0, 255, 0);
+	static const COLOR co_Blue = COLOR(255, 0, 0);
+	static const COLOR co_Pink = COLOR(255, 0, 255);
+
 
 #endif // DRAWING
 
@@ -213,19 +217,24 @@ typedef struct o_face {
 
 	typedef class filer {
 	protected:
-		FILE * f_Stream;
+		FILE * f_Stream = NULL;
 		UCHAR  OpenStream(LPSTR c_StreamName);
 		UCHAR  CloseStream();
+
 	}FILER;
 
 
 	typedef class object : public FILER {
 	public:
+		object();
+		object(LPSTR c_StreamName);
+
 		V3 v_Anchor;
 		V3 * v_pPoint;
 		COLOR c_pColor;
 		FACE * o_pFace;
 		UINT32 i_Faces, i_Points;
+
 	private:
 		UCHAR  ReadHeader();
 		UCHAR  LoadFile();
@@ -243,6 +252,8 @@ typedef struct o_face {
 		COLOR * c_pColor;
 		LINE * l_pLines;
 		UINT32 i_Connections, i_Points, i_Colors;
+
+		vectormap();
 	private:
 		UCHAR  ReadHeader();
 		UCHAR  LoadFile();
@@ -251,6 +262,20 @@ typedef struct o_face {
 		UCHAR  Read(LPSTR c_StreamName);
 		UCHAR  Dispose();
 	}VMAP;
+
+	typedef class layer {
+	public:
+		layer();
+		layer(LPSTR c_StreamName, COLOR c_Color);
+
+		UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED;
+		UINT32 i_PrioFlag =0;
+		OBJ3D o_Obj;
+
+
+		COLOR c_Color;
+		BOOL b_Enabled = TRUE;
+	}LAYER;
 
 #endif // FILE_HANDLER
 
@@ -263,13 +288,13 @@ typedef struct o_face {
 		codec2d(CANVAS * o_pCanvas){
 			o_Image = o_pCanvas;
 		}
-		UCHAR  SetPixel(V2 * v_pPoint, COLOR * c_pColor,UCHAR i_PixelFlag = CF_OVERWRITE_ALLOWED);
-		UCHAR  DrawLine(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, UCHAR i_PixelFlag = CF_OVERWRITE_ALLOWED);
-		UCHAR  DrawRect(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, UCHAR i_PixelFlag = CF_OVERWRITE_ALLOWED);
-		UCHAR  DrawHLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag = CF_OVERWRITE_ALLOWED);
-		UCHAR  DrawVLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag = CF_OVERWRITE_ALLOWED);
-		UCHAR  DrawCanvas(DWORD * d_pBuffer, V2 * v_pPos, UINT32  i_Pixels[2], UCHAR i_PixelFlag = CF_OVERWRITE_ALLOWED);
-		UCHAR  DrawVMap(VMAP * o_VecMap, UCHAR i_PixelFlag = CF_OVERWRITE_ALLOWED);
+		UCHAR  SetPixel(V2 * v_pPoint, COLOR * c_pColor,UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
+		UCHAR  DrawLine(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
+		UCHAR  DrawRect(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
+		UCHAR  DrawHLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
+		UCHAR  DrawVLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
+		UCHAR  DrawCanvas(DWORD * d_pBuffer, V2 * v_pPos, UINT32  i_Pixels[2], UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
+		UCHAR  DrawVMap(VMAP * o_VecMap, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
 
 		BOOL b_AllowPixelOverwrite = TRUE;
 	protected:
@@ -317,8 +342,8 @@ typedef struct o_face {
 			o_Image = o_pCanvas;
 			o_Camera = o_pCamera;
 		}
-		UCHAR  DrawObject(OBJ3D * o_Object, COLOR * c_pColor, UCHAR i_PixelFlag=CF_OVERWRITE_ALLOWED);
-		UCHAR  DrawEdge(V3 * v_pVertexA, V3 * v_pVertexB, COLOR * c_pColor, UCHAR i_PixelFlag= CF_OVERWRITE_ALLOWED);
+		UCHAR  DrawObject(OBJ3D * o_Object, COLOR * c_pColor, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED,UCHAR i_PrioFlag = 0);
+		UCHAR  DrawEdge(V3 * v_pVertexA, V3 * v_pVertexB, COLOR * c_pColor, UCHAR i_PixelFlag= PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
 
 		CAM3D * o_Camera;
 	}CODEC3D;
@@ -348,8 +373,8 @@ typedef struct o_face {
 #define CAM_CTRLR TRUE
 #ifdef CAM_CTRLR
 
-	#define CHST_BASIC 0
-	#define CHST_AXIS  1
+	#define CHST_BASIC 0xA
+	#define CHST_AXIS  0xB
 	
 	typedef class o_camctrlr {
 	public:
@@ -411,25 +436,24 @@ typedef struct o_face {
 #define WORLD_CTRLR
 #ifdef WORLD_CTRLR
 
+	typedef class o_world {
+		UINT32 i_Length;
+	public:
+		UINT32 Length() const { return i_Length; }
+		LAYER * o_Layers = NULL;
+		CODEC3D * o_Codec = NULL;
+
+		UINT32 AppendLayer(LPSTR c_StreamName, COLOR c_Color);
+		UCHAR RayTrace(CAM3D *o_pCam, UINT32 * i_pLayer);
+		UCHAR Render();
+		UCHAR  Dispose();
+
+		o_world();
+		o_world(CODEC3D * o_Codec);
+	}WORLD;
 
 #endif // WOLRD_CTRLR
-
-typedef class o_world {
-	int i_Length;
-public:
-	int Length() const { return i_Length; }
-	OBJ3D * o_Collection;
-
-	UCHAR AppendObj(LPSTR c_StreamName);
-	UCHAR  Dispose();
-
-	o_world();
-}WORLD;
-
-
 
 
 double Distance2(V2 v_PosOne, V2 v_PosTwo);
 double Distance3(V3 v_PosOne, V3 v_PosTwo);
-
-

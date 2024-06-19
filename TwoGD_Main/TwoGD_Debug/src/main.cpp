@@ -1,6 +1,14 @@
 #include"twogd.h"
 #include <chrono>
 
+#define MSPEED 0.1f
+#define VSPEED 0.05f
+#define WINDOW_SIZE 90
+#define WINDOW_WIDTH 16
+#define WINDOW_HEIGHT 9
+#define GRID_SPACING 1
+#define GRID_SIZE 30
+
 CODEC3D o_3DCodec;
 CODEC2D o_2DCodec;
 CONSOLE o_Console;
@@ -9,23 +17,10 @@ CANVAS o_Img;
 CAM3D o_Cam;
 CAMCTRLR o_CamCtrlr;
 
-VMAP vmf_Map;
-OBJ3D obj_Monkey;
-OBJ3D obj_Cube;
-OBJ3D obj_Plane;
+WORLD o_Wrld;
 
-#define MSPEED 0.1f
-#define VSPEED 0.05f
-#define WINDOW_SIZE 90
-#define WINDOW_WIDTH 16
-#define WINDOW_HEIGHT 9
-#define GRID_SPACING 1
-#define GRID_SIZE 15
+//12400ms Alte Linedraw  GRIDSIZE=300
 
-// GRID_SIZE=150:
-// Ohne ComRotate 5000ms Nicht Ausmultipliziert
-// Mit ComRotate 60000ms Nicht Ausmultipliziert
-// Mit ComRotate 30000ms Ausmultipliziert
 
 void Demo_DrawGrid() 
 {
@@ -39,10 +34,10 @@ void Demo_DrawGrid()
 			v_PointA.f_Pos[Z] = i_Y+1;
 			v_PointB.f_Pos[X] = i_X;
 			v_PointB.f_Pos[Z] = i_Y;
-			o_3DCodec.DrawEdge(&v_PointA, &v_PointB, &co_Gray);
+			o_3DCodec.DrawEdge(&v_PointA, &v_PointB, (COLOR*)&co_Gray,PF_OVERWRITE_ALLOWED,100);
 			v_PointB.f_Pos[X]++;
 			v_PointB.f_Pos[Z]++;
-			o_3DCodec.DrawEdge(&v_PointA, &v_PointB, &co_Gray);
+			o_3DCodec.DrawEdge(&v_PointA, &v_PointB, (COLOR*)&co_Gray, PF_OVERWRITE_ALLOWED, 100);
 		}
 	}
 	v_PointA = V3(0,0, -(GRID_SIZE));
@@ -52,7 +47,7 @@ void Demo_DrawGrid()
 	{
 		v_PointA.f_Pos[X] = i_X;
 		v_PointB.f_Pos[X] = i_X+1;
-		o_3DCodec.DrawEdge(&v_PointA, &v_PointB, &co_Gray);
+		o_3DCodec.DrawEdge(&v_PointA, &v_PointB, (COLOR*)&co_Gray, PF_OVERWRITE_ALLOWED, 100);
 	}
 	v_PointA = V3((GRID_SIZE), 0, 0);
 	v_PointB = V3((GRID_SIZE), 0, 0);
@@ -60,7 +55,7 @@ void Demo_DrawGrid()
 	{
 		v_PointA.f_Pos[Z] = i_X;
 		v_PointB.f_Pos[Z] = i_X + 1;
-		o_3DCodec.DrawEdge(&v_PointA, &v_PointB, &co_Gray);
+		o_3DCodec.DrawEdge(&v_PointA, &v_PointB, (COLOR*)&co_Gray, PF_OVERWRITE_ALLOWED, 100);
 	}
 
 	V3 vec_Null = V3(0.0f, 0.0f, 0.0f);
@@ -68,30 +63,9 @@ void Demo_DrawGrid()
 	V3 vec_UnitvY = V3(0.0f, 1.0f, 0.0f);
 	V3 vec_UnitvZ = V3(0.0f, 0.0f, 1.0f);
 
-	o_3DCodec.DrawEdge(&vec_Null, &vec_UnitvX, &co_Red);
-	o_3DCodec.DrawEdge(&vec_Null, &vec_UnitvY, &co_Green);
-	o_3DCodec.DrawEdge(&vec_Null, &vec_UnitvZ, &co_Blue);
-}
-
-void Demo_DrawColoredCubes() 
-{
-	obj_Cube.v_Anchor.f_Pos[X] = 0;
-	obj_Cube.v_Anchor.f_Pos[Z] = 7;
-	o_3DCodec.DrawObject(&obj_Cube, &co_Blue);
-	
-	obj_Cube.v_Anchor.f_Pos[1] = 1;
-
-	obj_Cube.v_Anchor.f_Pos[X] = 7;
-	obj_Cube.v_Anchor.f_Pos[Z] = 0;
-	o_3DCodec.DrawObject(&obj_Cube, &co_Red);
-
-	obj_Cube.v_Anchor.f_Pos[X] = -7;
-	obj_Cube.v_Anchor.f_Pos[Z] = 0;
-	o_3DCodec.DrawObject(&obj_Cube, &co_Green);
-
-	obj_Cube.v_Anchor.f_Pos[X] = 0;
-	obj_Cube.v_Anchor.f_Pos[Z] = -7;
-	o_3DCodec.DrawObject(&obj_Cube, &co_Pink);
+	o_3DCodec.DrawEdge(&vec_Null, &vec_UnitvX, (COLOR*)&co_Red,PF_OVERWRITE_ALLOWED,99);
+	o_3DCodec.DrawEdge(&vec_Null, &vec_UnitvY, (COLOR*)&co_Green, PF_OVERWRITE_ALLOWED, 99);
+	o_3DCodec.DrawEdge(&vec_Null, &vec_UnitvZ, (COLOR*)&co_Blue, PF_OVERWRITE_ALLOWED, 99);
 }
 
 void Demo_CursorLaser(win::GDWIN* o_win) 
@@ -106,19 +80,12 @@ void Demo_CursorLaser(win::GDWIN* o_win)
 	v_LaserStop.RotateThis(v_Angle);
 	v_LaserStop.RotateThis(o_3DCodec.o_Camera->i_Rotation);
 
-	o_3DCodec.DrawEdge(&v_LaserStart,&v_LaserStop,&co_Red);
+	o_3DCodec.DrawEdge(&v_LaserStart,&v_LaserStop, (COLOR*)&co_Red);
 	
 	system("cls");
 	printf("%f %f\n",v_Angle.f_Pos[X], v_Angle.f_Pos[1]);
 }
 
-void prefabLoader() 
-{
-	printf("RES: %X \n", obj_Cube.Read((const LPSTR)"src\\obj\\obj2.obj"));
-	printf("RES: %X \n", obj_Monkey.Read((const LPSTR)"src\\obj\\obj3.obj"));
-	printf("RES: %X \n", obj_Plane.Read((const LPSTR)"src\\obj\\obj4.obj"));
-	printf("RES: %X \n", vmf_Map.Read((const LPSTR)"src\\obj\\obj1.vmf"));
-}
 
 UCHAR DemoVignetteShader(camera *o_Cam, V3 *v_Vertex, V2 *v_Point, COLOR *c_Color)
 {
@@ -150,12 +117,12 @@ unsigned char  gdMain(win::GDWIN * o_win)
 	o_win->i_Height = WINDOW_HEIGHT * WINDOW_SIZE;
 
 	o_Cam = CAM3D(
-		(FLOAT)0.1, 
-		(FLOAT)100.0 , 
-		(UINT32)o_win->i_Width ,
-		(UINT32)o_win->i_Height , 
-		(FLOAT)2.0f, 
-		V3(0, 0, 0), 
+		(FLOAT)0.1,
+		(FLOAT)150.0,
+		(UINT32)o_win->i_Width,
+		(UINT32)o_win->i_Height,
+		(FLOAT)2.0f,
+		V3(0, 2, 0),
 		V3(0, 0, 0)
 	);
 	//o_Cam.s_Shader = DemoVignetteShader;
@@ -168,9 +135,20 @@ unsigned char  gdMain(win::GDWIN * o_win)
 	o_Img.Prepare(o_win->i_Width, o_win->i_Height);
 
 	o_2DCodec = CODEC2D(&o_Img);
-	o_3DCodec = CODEC3D(&o_Img,&o_Cam);
+	o_3DCodec = CODEC3D(&o_Img, &o_Cam);
 
-	prefabLoader();
+	o_Wrld = WORLD(&o_3DCodec);
+	o_Wrld.AppendLayer((const LPSTR)"src\\obj\\obj2.obj", co_Red);
+	o_Wrld.o_Layers[0].o_Obj.v_Anchor = V3(7, 1, 0);
+
+	o_Wrld.AppendLayer((const LPSTR)"src\\obj\\obj2.obj", co_Blue);
+	o_Wrld.o_Layers[1].o_Obj.v_Anchor = V3(-7, 1, 0);
+
+	o_Wrld.AppendLayer((const LPSTR)"src\\obj\\obj2.obj", co_Green);
+	o_Wrld.o_Layers[2].o_Obj.v_Anchor = V3(0, 1, 7);
+
+	o_Wrld.AppendLayer((const LPSTR)"src\\obj\\obj2.obj", co_Pink);
+	o_Wrld.o_Layers[3].o_Obj.v_Anchor = V3(0, 1, -7);
 
 	return TRUE;
 }
@@ -179,7 +157,7 @@ DWORD*  gdUpdate(win::GDWIN * o_win)
 {
 	static int i_Counter = 0;
 	i_Counter++;
-	i_Counter %= 10;
+	i_Counter %= 2;
 	auto a_TimeA = std::chrono::high_resolution_clock::now();
 	//BEGIN RENDER
 
@@ -189,8 +167,8 @@ DWORD*  gdUpdate(win::GDWIN * o_win)
 
 	//Demo_CursorLaser(o_win);
 	Demo_DrawGrid();
-	Demo_DrawColoredCubes();
 
+	o_Wrld.Render();
 
 	//END RENDER
 	auto a_TimeB = std::chrono::high_resolution_clock::now();
@@ -204,6 +182,5 @@ DWORD*  gdUpdate(win::GDWIN * o_win)
 }
 void  gdClose() {
 	o_Img.Dispose();
-	vmf_Map.Dispose();
 }
 

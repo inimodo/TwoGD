@@ -20,6 +20,7 @@ filer::OpenStream(LPSTR c_StreamName)
 	if (this->f_Stream == NULL) 
 	{
 		this->f_Stream = fopen(c_StreamName, "r");
+
 		if (this->f_Stream == NULL)
 		{
 			return GD_FILE_FAILED;
@@ -28,6 +29,13 @@ filer::OpenStream(LPSTR c_StreamName)
 	}
 	return GD_FILE_FAILED;
 }
+
+vectormap::vectormap()
+{
+	this->f_Stream = NULL;
+	this->v_Anchor = V2();
+}
+
 UCHAR  
 vectormap::Read(LPSTR c_StreamName)
 {
@@ -78,7 +86,7 @@ vectormap::LoadFile()
 	}
 	return GD_TASK_OKAY;
 }
-UCHAR 
+UCHAR
 vectormap::ReadHeader()
 {
 	if (fscanf(this->f_Stream, GD_VEC_HEADER, &this->i_Points, &this->i_Colors, &this->i_Connections) == NULL)
@@ -104,36 +112,56 @@ vectormap::Prepare()
 UCHAR  
 vectormap::Dispose() 
 {
-
 	free(this->c_pColor);
 	free(this->v_pPoint);
 	free(this->l_pLines);
 	return GD_TASK_OKAY;
 }
 
+object::object()
+{
+	this->f_Stream = NULL;
+	this->i_Faces = 0;
+	this->i_Points = 0;
+	this->v_Anchor = V3();
+}
+
+object::object(LPSTR c_StreamName)
+{
+	this->f_Stream = NULL;
+	this->i_Faces = 0;
+	this->i_Points = 0;
+	this->v_Anchor = V3();
+	this->Read(c_StreamName);
+}
 
 UCHAR 
 object::Read(LPSTR c_StreamName) 
 {
-	if (this->OpenStream(c_StreamName) != GD_TASK_OKAY) {
+	if (this->OpenStream(c_StreamName) != GD_TASK_OKAY) 
+	{
 		return GD_FILE_FAILED;
 	}
 
-	if (this->ReadHeader() != GD_TASK_OKAY) {
+	if (this->ReadHeader() != GD_TASK_OKAY) 
+	{
 		return GD_FILE_FAILED;
 	}
 
-	if (this->Prepare() != GD_TASK_OKAY) {
+	if (this->Prepare() != GD_TASK_OKAY) 
+	{
 		return GD_ALLOC_FAILED;
 	}
 
 	if (this->LoadFile() != GD_TASK_OKAY) {
+
 		return GD_FILE_FAILED;
 	}
 	return GD_TASK_OKAY;
 }
 
-UCHAR 
+
+UCHAR
 object::ReadHeader() 
 {
 	CHAR c_Buffer[256];
@@ -202,6 +230,18 @@ object::Dispose()
 {
 	free(this->v_pPoint);
 	free(this->o_pFace);
+	fclose(this->f_Stream);
 	return GD_TASK_OKAY;
 
+}
+
+layer::layer()
+{
+	this->o_Obj = OBJ3D();
+}
+
+layer::layer(LPSTR c_StreamName, COLOR c_Color_)
+{
+	this->c_Color = c_Color_;
+	this->o_Obj = OBJ3D(c_StreamName);
 }

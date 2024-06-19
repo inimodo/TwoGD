@@ -40,14 +40,23 @@ V3 V3::RotateTo(V3 v_Rot)
 	return m_X * m_Y * *this;
 }
 
-V3 V3::CamRotateTo(V3 v_Rot)
+V3 V3::CamRotateTo(V3 v_Rot)// NEED HEAVY OPT.
 {
-	M3X3 m_Y = M3X3RotY(v_Rot.f_Pos[0]);
-	M3X3 m_YY = M3X3RotY(-v_Rot.f_Pos[0]);
-	V3 v_UntX = m_YY*V3(1.0f, 0, 0);
-	M3X3 m_X = M3X3RotU(v_UntX,v_Rot.f_Pos[1]);
+	M3X3 m_Y = M3X3(
+		V3(cos(v_Rot.f_Pos[0]), 0, -sin(v_Rot.f_Pos[0])),
+		V3(0, 1.0, 0),
+		V3(sin(v_Rot.f_Pos[0]), 0, cos(v_Rot.f_Pos[0]))
+	);
 
-	return m_Y * (m_X * *this);
+	V3 v_UnitV = V3(
+		cos(-v_Rot.f_Pos[0]),
+		0,
+		-sin(-v_Rot.f_Pos[0])
+	);
+
+	M3X3 m_X = M3X3RotU(v_UnitV,v_Rot.f_Pos[1]);
+
+	return m_Y *( m_X * *this);
 }
 
 V3 V3::AngleTo(V3 v_Pos)

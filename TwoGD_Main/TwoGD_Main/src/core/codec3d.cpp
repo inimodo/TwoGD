@@ -35,11 +35,12 @@ camera::Translate(V3 * v_pPoint, V2 * v_pResult)
 {
 	V3 o_Delta = *v_pPoint - this->i_Position;
 	float f_abs = o_Delta.Length();
+	
+	if (f_abs > this->f_Frustum[1] || f_abs < this->f_Frustum[0]) return GD_OUTOFBOUND;
 
-	o_Delta.CamRotateThis(this->i_Rotation);
+	o_Delta.CamRotateThis(this->i_Rotation);//<-REDUCTION OF SPEED BY 10x
 	
 	if (o_Delta.f_Pos[2] < 0) return GD_OUTOFBOUND;
-	if (f_abs > this->f_Frustum[1] || f_abs < this->f_Frustum[0]) return GD_OUTOFBOUND;
 
 	float f_leftright = asin(o_Delta.f_Pos[0] / f_abs);
 	float f_updown = asin(o_Delta.f_Pos[1] / f_abs);
@@ -74,7 +75,7 @@ camera::Relate(V2 * v_pScreenPos, V3 * v_pAngle)
 }
 
 UCHAR
-codec3d::DrawObject(OBJ3D * o_Object, COLOR * c_pColor, UCHAR i_PixelFlag)
+codec3d::DrawObject(OBJ3D * o_Object, COLOR * c_pColor, UCHAR i_PixelFlag,UCHAR i_PrioFlag)
 {
 	V2 v_PointA, v_PointB;
 	V3 v_pVertexA, v_pVertexB;
@@ -101,7 +102,7 @@ codec3d::DrawObject(OBJ3D * o_Object, COLOR * c_pColor, UCHAR i_PixelFlag)
 }
 
 UCHAR
-codec3d::DrawEdge(V3 * v_pVertexA, V3 * v_pVertexB, COLOR * c_pColor, UCHAR i_PixelFlag)
+codec3d::DrawEdge(V3 * v_pVertexA, V3 * v_pVertexB, COLOR * c_pColor, UCHAR i_PixelFlag, UCHAR i_PrioFlag)
 {
 	V2 v_PointA, v_PointB;
 	COLOR c_Color = *c_pColor;
@@ -112,5 +113,5 @@ codec3d::DrawEdge(V3 * v_pVertexA, V3 * v_pVertexB, COLOR * c_pColor, UCHAR i_Pi
 		if(this->o_Camera->s_Shader(this->o_Camera, v_pVertexA,&v_PointA,&c_Color) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
 		if(this->o_Camera->s_Shader(this->o_Camera, v_pVertexB,&v_PointB,&c_Color) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
 	}
-	return this->DrawLine(&v_PointA, &v_PointB, &c_Color, i_PixelFlag);
+	return this->DrawLine(&v_PointA, &v_PointB, &c_Color, i_PixelFlag, i_PrioFlag);
 }

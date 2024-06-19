@@ -78,8 +78,8 @@ void o_camctrlr::DrawCrosshair()
 	switch (i_CHStyle)
 	{
 	case CHST_BASIC:
-		o_pCodec->DrawHLine(&v_X, (UINT32)(f_CHSize * 2.0f), &c_CHColor, CF_OVERWRITE_FORBIDDEN);
-		o_pCodec->DrawVLine(&v_Y, (UINT32)(f_CHSize * 2.0f), &c_CHColor, CF_OVERWRITE_FORBIDDEN);
+		o_pCodec->DrawHLine(&v_X, (UINT32)(f_CHSize * 2.0f), &c_CHColor, PF_OVERWRITE_FORBIDDEN);
+		o_pCodec->DrawVLine(&v_Y, (UINT32)(f_CHSize * 2.0f), &c_CHColor, PF_OVERWRITE_FORBIDDEN);
 
 		break;
 	case CHST_AXIS:
@@ -91,9 +91,9 @@ void o_camctrlr::DrawCrosshair()
 		v_UnitY = v_UnitY + v_Anchor;
 		v_UnitZ = v_UnitZ + v_Anchor;
 
-		o_pCodec->DrawEdge(&v_Anchor, &v_UnitX, &co_Red,CF_OVERWRITE_FORBIDDEN);
-		o_pCodec->DrawEdge(&v_Anchor, &v_UnitY, &co_Green, CF_OVERWRITE_FORBIDDEN);
-		o_pCodec->DrawEdge(&v_Anchor, &v_UnitZ, &co_Blue, CF_OVERWRITE_FORBIDDEN);
+		o_pCodec->DrawEdge(&v_Anchor, &v_UnitX, (COLOR*)&co_Red,PF_OVERWRITE_FORBIDDEN);
+		o_pCodec->DrawEdge(&v_Anchor, &v_UnitY, (COLOR*)&co_Green, PF_OVERWRITE_FORBIDDEN);
+		o_pCodec->DrawEdge(&v_Anchor, &v_UnitZ, (COLOR*)&co_Blue, PF_OVERWRITE_FORBIDDEN);
 		break;
 	}
 }

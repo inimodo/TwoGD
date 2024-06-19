@@ -20,6 +20,8 @@ UCHAR
 canvas::Dispose()
 {
 	free(d_pOutputStream);
+	free(d_pPixelFlags);
+	free(d_pPrioFlags);
 	return GD_TASK_OKAY;
 
 }
@@ -27,6 +29,8 @@ UCHAR
 canvas::CleanBuffer()
 {
 	memset((void *)d_pOutputStream, 0, i_OutputSize * sizeof(DWORD));
+	memset((void *)d_pPixelFlags, PF_OVERWRITE_ALLOWED , i_OutputSize * sizeof(UCHAR));
+	memset((void *)d_pPrioFlags, 255, i_OutputSize * sizeof(UCHAR));
 	return GD_TASK_OKAY;
 
 }
@@ -35,12 +39,19 @@ canvas::Prepare(int i_Width, int i_Height)
 {
 	i_OutputSize = i_Width * i_Height;
 	d_pOutputStream = (DWORD *)malloc(sizeof(DWORD)*i_OutputSize);
-	d_pFlags = (UCHAR *)malloc(sizeof(UCHAR)*i_OutputSize);
-	if (d_pOutputStream == NULL || d_pFlags == NULL) {
+	d_pPixelFlags = (UCHAR *)malloc(sizeof(UCHAR)*i_OutputSize);
+	d_pPrioFlags = (UCHAR *)malloc(sizeof(UCHAR)*i_OutputSize);
+	
+	if (d_pOutputStream == NULL || d_pPixelFlags == NULL || d_pPrioFlags == NULL) 
+	{
+		if (d_pOutputStream != NULL) free(d_pOutputStream);
+		if (d_pPixelFlags != NULL) free(d_pPixelFlags);
+		if (d_pPrioFlags != NULL) free(d_pPrioFlags);
 		return GD_ALLOC_FAILED;
 	}
 	i_Pixels[1] = i_Height;
 	i_Pixels[0] = i_Width;
-	return GD_TASK_OKAY;
+
+	return this->CleanBuffer();
 }
 
