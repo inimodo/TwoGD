@@ -108,6 +108,14 @@ UCHAR DemoVignetteShader(camera *o_Cam, V3 *v_Vertex, V2 *v_Point, COLOR *c_Colo
 	return GD_TASK_OKAY;
 }
 
+void MouseDown() 
+{
+	UINT32 i_Layer;
+	o_Wrld.RayTrace(&o_Cam, 40 ,&i_Layer);
+	if (i_Layer == o_Wrld.Length() + 1)return;
+	o_Wrld.o_Layers[i_Layer].o_Obj.v_Anchor.f_Pos[Y]+=0.5;
+	printf("Layer = %d\n", i_Layer);
+}
 
 unsigned char  gdMain(win::GDWIN * o_win)
 {
@@ -115,6 +123,7 @@ unsigned char  gdMain(win::GDWIN * o_win)
 
 	o_win->i_Width = WINDOW_WIDTH * WINDOW_SIZE;
 	o_win->i_Height = WINDOW_HEIGHT * WINDOW_SIZE;
+	o_win->v_pMouseDown = MouseDown;
 
 	o_Cam = CAM3D(
 		(FLOAT)0.1,
@@ -157,9 +166,11 @@ DWORD*  gdUpdate(win::GDWIN * o_win)
 {
 	static int i_Counter = 0;
 	i_Counter++;
-	i_Counter %= 2;
+	i_Counter %= 100;
 	auto a_TimeA = std::chrono::high_resolution_clock::now();
+	
 	//BEGIN RENDER
+
 
 	o_Img.CleanBuffer();
 	o_CamCtrlr.UpdateCamCtrlr(o_win);
@@ -176,7 +187,7 @@ DWORD*  gdUpdate(win::GDWIN * o_win)
 
 	if (i_Counter == 1)
 	{
-		printf("%dll ms Aktive:%d\n", i_Time,o_win->b_HasFocus);
+		//printf("%dll ms Aktive:%d\n", i_Time,o_win->b_HasFocus);
 	}
 	return o_Img.d_pOutputStream;
 }

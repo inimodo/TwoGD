@@ -444,7 +444,7 @@ typedef struct o_face {
 		CODEC3D * o_Codec = NULL;
 
 		UINT32 AppendLayer(LPSTR c_StreamName, COLOR c_Color);
-		UCHAR RayTrace(CAM3D *o_pCam, UINT32 * i_pLayer);
+		UCHAR RayTrace(CAM3D * o_pCam, FLOAT f_CutoffAngleInRad, UINT32 * i_pLayer);
 		UCHAR Render();
 		UCHAR  Dispose();
 

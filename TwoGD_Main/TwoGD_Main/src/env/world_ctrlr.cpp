@@ -43,13 +43,22 @@ UCHAR o_world::Render()
 	return GD_TASK_OKAY;
 }
 
-UCHAR o_world::RayTrace(CAM3D * o_pCam, UINT32 * i_pLayer)
+UCHAR o_world::RayTrace(CAM3D * o_pCam, FLOAT f_CutoffRadius, UINT32 * i_pLayer)
 {
-	V3 v_UnitZ = V3(0,0,1);
-	v_UnitZ.RotateThis(o_pCam->i_Rotation);
+	for (UINT32 i_Layer = 0; i_Layer < this->i_Length; i_Layer++)
+	{
+		V2 v_ScreenPos;
+		if (this->o_Codec->o_Camera->Translate(&this->o_Layers[i_Layer].o_Obj.v_Anchor,&v_ScreenPos) != GD_TASK_OKAY) continue;
 
-
-	return GD_TASK_OKAY;
+		FLOAT f_Dist = v_ScreenPos.Distance(V2(this->o_Codec->o_Camera->i_Dimensions[0]/2.0, this->o_Codec->o_Camera->i_Dimensions[1] / 2.0));
+		if(f_Dist < f_CutoffRadius)
+		{
+			*i_pLayer = i_Layer;
+			return GD_TASK_OKAY;
+		}
+	}
+	*i_pLayer = this->i_Length+1;
+	return GD_OUTOFBOUND;
 }
 
 UCHAR o_world::Dispose()
