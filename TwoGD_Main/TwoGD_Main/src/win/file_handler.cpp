@@ -2,7 +2,7 @@
 
 #define GD_VEC_HEADER "v %d %d %d\n"
 #define GD_VEC_POINTS "p %f %f\n"
-#define GD_VEC_COLORS "c %c %c %c\n"
+#define GD_VEC_COLORS "c %d %d %d\n"
 #define GD_VEC_LINE "l %d %d %d\n"
 
 UCHAR 
@@ -34,6 +34,7 @@ vectormap::vectormap()
 {
 	this->f_Stream = NULL;
 	this->v_Anchor = V2();
+	this->f_Scale = 1.0f;
 }
 
 UCHAR  
@@ -42,7 +43,7 @@ vectormap::Read(LPSTR c_StreamName)
 	if (this->OpenStream(c_StreamName) != GD_TASK_OKAY) {
 		return GD_FILE_FAILED;
 	}
-	
+
 	if (this->ReadHeader() != GD_TASK_OKAY) {
 		return GD_FILE_FAILED;
 	}
@@ -54,6 +55,7 @@ vectormap::Read(LPSTR c_StreamName)
 	if (this->LoadFile() != GD_TASK_OKAY) {
 		return GD_FILE_FAILED;
 	}
+
 	return GD_TASK_OKAY;
 }
 UCHAR 
@@ -68,7 +70,10 @@ vectormap::LoadFile()
 	}
 	for (UINT32 i_Index = 0; i_Index < this->i_Colors; i_Index++)
 	{
-		if (fscanf(this->f_Stream, GD_VEC_COLORS, &(this->c_pColor[i_Index].c_Color[0]), &(this->c_pColor[i_Index].c_Color[1]), &(this->c_pColor[i_Index].c_Color[2])) == NULL)
+		if (fscanf(this->f_Stream, GD_VEC_COLORS, 
+			(int*)&(this->c_pColor[i_Index].c_Color[0]), 
+			(int*)&(this->c_pColor[i_Index].c_Color[1]),
+			(int*)&(this->c_pColor[i_Index].c_Color[2])) == NULL)
 		{
 			return GD_FILE_FAILED;
 		}
@@ -80,6 +85,7 @@ vectormap::LoadFile()
 		{
 			return GD_FILE_FAILED;
 		}
+		
 		this->l_pLines[i_Index].c_Color = this->c_pColor[i_Lcolor];
 		this->l_pLines[i_Index].v_Point[0] = this->v_pPoint[i_Lone];
 		this->l_pLines[i_Index].v_Point[1] = this->v_pPoint[i_Ltwo];

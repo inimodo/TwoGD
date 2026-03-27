@@ -3,11 +3,10 @@
 
 #define MSPEED 0.1f
 #define VSPEED 0.05f
-#define WINDOW_SIZE 90
+#define WINDOW_SIZE 100
 #define WINDOW_WIDTH 16
 #define WINDOW_HEIGHT 9
-#define GRID_SPACING 1
-#define GRID_SIZE 30
+#define GRID_SIZE 50
 
 CODEC3D o_3DCodec;
 CODEC2D o_2DCodec;
@@ -16,10 +15,9 @@ CANVAS o_Img;
 
 CAM3D o_Cam;
 CAMCTRLR o_CamCtrlr;
+VMAP v_Vmap;
 
 WORLD o_Wrld;
-
-//12400ms Alte Linedraw  GRIDSIZE=300
 
 
 void Demo_DrawGrid() 
@@ -68,25 +66,6 @@ void Demo_DrawGrid()
 	o_3DCodec.DrawEdge(&vec_Null, &vec_UnitvZ, (COLOR*)&co_Blue, PF_OVERWRITE_ALLOWED, 99);
 }
 
-void Demo_CursorLaser(win::GDWIN* o_win) 
-{
-	V3 v_Angle;
-	V2 v_Cpos = _PTOP(o_win->v_CursorPos);
-	o_Cam.Relate(&v_Cpos, &v_Angle);
-	V3 v_LaserStart = V3(0, 2, 0);
-	V3 v_LaserStop  = V3(0, 0, 50);
-	V3 v_Offset  = V3(0, 1, 0 );
-	v_LaserStart = v_LaserStart + o_3DCodec.o_Camera->i_Position;
-	v_LaserStop.RotateThis(v_Angle);
-	v_LaserStop.RotateThis(o_3DCodec.o_Camera->i_Rotation);
-
-	o_3DCodec.DrawEdge(&v_LaserStart,&v_LaserStop, (COLOR*)&co_Red);
-	
-	system("cls");
-	printf("%f %f\n",v_Angle.f_Pos[X], v_Angle.f_Pos[1]);
-}
-
-
 UCHAR DemoVignetteShader(camera *o_Cam, V3 *v_Vertex, V2 *v_Point, COLOR *c_Color)
 {
 	float f_Dis = v_Point->Distance(V2(o_Cam->i_Dimensions[0] / 2, o_Cam->i_Dimensions[1] / 2));
@@ -108,14 +87,31 @@ UCHAR DemoVignetteShader(camera *o_Cam, V3 *v_Vertex, V2 *v_Point, COLOR *c_Colo
 	return GD_TASK_OKAY;
 }
 
-void MouseDown() 
+
+void MouseScroll(BOOL b_Up,POINT v_ScrollPoint) 
 {
-	UINT32 i_Layer;
-	o_Wrld.RayTrace(&o_Cam, 40 ,&i_Layer);
-	if (i_Layer == o_Wrld.Length() + 1)return;
-	o_Wrld.o_Layers[i_Layer].o_Obj.v_Anchor.f_Pos[Y]+=0.5;
-	printf("Layer = %d\n", i_Layer);
+	printf("%d %d %d\n",v_ScrollPoint.x, v_ScrollPoint.y,b_Up);
 }
+
+void LeftMouseDown(POINT v_ClickPoint)
+{
+	printf("%d %d\n", v_ClickPoint.x, v_ClickPoint.y);
+}
+
+void LeftMouseUp(POINT v_ClickPoint)
+{
+	printf("%d %d\n", v_ClickPoint.x, v_ClickPoint.y);
+}
+void RightMouseDown(POINT v_ClickPoint)
+{
+	printf("%d %d\n", v_ClickPoint.x, v_ClickPoint.y);
+}
+
+void RightMouseUp(POINT v_ClickPoint)
+{
+	printf("%d %d\n", v_ClickPoint.x, v_ClickPoint.y);
+}
+
 
 unsigned char  gdMain(win::GDWIN * o_win)
 {
@@ -123,7 +119,12 @@ unsigned char  gdMain(win::GDWIN * o_win)
 
 	o_win->i_Width = WINDOW_WIDTH * WINDOW_SIZE;
 	o_win->i_Height = WINDOW_HEIGHT * WINDOW_SIZE;
-	o_win->v_pMouseDown = MouseDown;
+	o_win->v_pLeftMouseDown = LeftMouseDown;
+	o_win->v_pLeftMouseUp = LeftMouseUp;
+	o_win->v_pRightMouseDown = RightMouseDown;
+	o_win->v_pRightMouseUp = RightMouseUp;
+	o_win->v_pMouseScroll = MouseScroll;
+	o_win->c_WinTitle = (wchar_t*)L"DEMOAPP";
 
 	o_Cam = CAM3D(
 		(FLOAT)0.1,
@@ -159,6 +160,9 @@ unsigned char  gdMain(win::GDWIN * o_win)
 	o_Wrld.AppendLayer((const LPSTR)"src\\obj\\obj2.obj", co_Pink);
 	o_Wrld.o_Layers[3].o_Obj.v_Anchor = V3(0, 1, -7);
 
+	v_Vmap.Read((const LPSTR)"font\\H.vmf");
+	v_Vmap.f_Scale = 10;
+
 	return TRUE;
 }
 
@@ -166,20 +170,19 @@ DWORD*  gdUpdate(win::GDWIN * o_win)
 {
 	static int i_Counter = 0;
 	i_Counter++;
-	i_Counter %= 100;
+	i_Counter %= 10;
 	auto a_TimeA = std::chrono::high_resolution_clock::now();
 	
 	//BEGIN RENDER
-
 
 	o_Img.CleanBuffer();
 	o_CamCtrlr.UpdateCamCtrlr(o_win);
 	o_CamCtrlr.DrawCrosshair();
 
-	//Demo_CursorLaser(o_win);
 	Demo_DrawGrid();
 
 	o_Wrld.Render();
+	o_3DCodec.DrawVMap(&v_Vmap);
 
 	//END RENDER
 	auto a_TimeB = std::chrono::high_resolution_clock::now();
@@ -187,11 +190,11 @@ DWORD*  gdUpdate(win::GDWIN * o_win)
 
 	if (i_Counter == 1)
 	{
-		//printf("%dll ms Aktive:%d\n", i_Time,o_win->b_HasFocus);
+		//printf("%d ms Aktive:%d\n", i_Time,o_win->b_HasFocus);
 	}
 	return o_Img.d_pOutputStream;
 }
+
 void  gdClose() {
 	o_Img.Dispose();
 }
-

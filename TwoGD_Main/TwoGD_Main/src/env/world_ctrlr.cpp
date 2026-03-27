@@ -43,14 +43,14 @@ UCHAR o_world::Render()
 	return GD_TASK_OKAY;
 }
 
-UCHAR o_world::RayTrace(CAM3D * o_pCam, FLOAT f_CutoffRadius, UINT32 * i_pLayer)
+UCHAR o_world::GetObjInCrosshair(CAM3D * o_pCam, FLOAT f_CutoffRadius, UINT32 * i_pLayer)
 {
 	for (UINT32 i_Layer = 0; i_Layer < this->i_Length; i_Layer++)
 	{
 		V2 v_ScreenPos;
 		if (this->o_Codec->o_Camera->Translate(&this->o_Layers[i_Layer].o_Obj.v_Anchor,&v_ScreenPos) != GD_TASK_OKAY) continue;
 
-		FLOAT f_Dist = v_ScreenPos.Distance(V2(this->o_Codec->o_Camera->i_Dimensions[0]/2.0, this->o_Codec->o_Camera->i_Dimensions[1] / 2.0));
+		FLOAT f_Dist = (FLOAT)v_ScreenPos.Distance(V2(this->o_Codec->o_Camera->i_Dimensions[0]/2.0f, this->o_Codec->o_Camera->i_Dimensions[1] / 2.0f));
 		if(f_Dist < f_CutoffRadius)
 		{
 			*i_pLayer = i_Layer;

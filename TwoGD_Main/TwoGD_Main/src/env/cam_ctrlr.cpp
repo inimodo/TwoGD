@@ -20,7 +20,7 @@ void o_camctrlr::UpdateCamCtrlr(win::GDWIN * o_win)
 		ClientToScreen(o_win->hd_WindowHandle, &v_Point);
 		SetCursorPos(v_Point.x, v_Point.y);
 
-		V2 v_Delta = _PTOP(o_win->v_CursorPos);
+		V2 v_Delta = PTOV2(o_win->v_CursorPos);
 		float f_Ampl = 1.0f / (float)v_Delta.Distance(v_Middle);
 		v_Delta = v_Delta - v_Middle;
 

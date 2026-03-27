@@ -54,8 +54,7 @@ int  wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow)
 		DispatchMessage(&o_win.msg_WindowMessage);
 	}
 
-	printf("%d",CloseHandle(hwd_Thread));
-
+	CloseHandle(hwd_Thread);
 	ReleaseDC(NULL, o_win.hdc_WindowHdc);
 	return NULL;
 }
@@ -72,7 +71,7 @@ HANDLE  CreateExec(HINSTANCE h_Instance) {
 	o_win.hd_WindowHandle = CreateWindowEx(
 		win::dw_ExStyle,
 		(LPCWSTR)win::c_WinClassName,
-		(LPCWSTR)win::c_WinTitle,
+		(LPCWSTR)o_win.c_WinTitle,
 		win::dw_Style,
 		win::i_XPos,
 		win::i_YPos,
@@ -90,23 +89,67 @@ long  WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam)
 	if (msg_Message == WM_SETCURSOR && LOWORD(lParam) == HTCLIENT && o_win.b_HideCursor)
 	{
 		SetCursor(NULL);
-
 		return TRUE;
 	}
 
-	if (msg_Message == WM_LBUTTONDOWN) {
-		if (o_win.v_pMouseDown != NULL) {
-			o_win.v_pMouseDown();
+	switch (msg_Message)
+	{
+	case WM_MOUSEWHEEL:
+		if (o_win.v_pMouseScroll != NULL) 
+		{
+			POINT p_ScrollPoint;
+			p_ScrollPoint.x = GET_X_LPARAM(lParam);
+			p_ScrollPoint.y = GET_Y_LPARAM(lParam);
+			ScreenToClient(hd_Handle, &p_ScrollPoint);
+			o_win.v_pMouseScroll(HIWORD(wParam) == 120.0f, p_ScrollPoint);
 		}
 		return 0;
-	}
 
-	if (msg_Message == WM_CLOSE) {
+	case WM_LBUTTONDOWN:
+		if (o_win.v_pLeftMouseDown != NULL) 
+		{
+			POINT p_ClickPoint;
+			p_ClickPoint.x = GET_X_LPARAM(lParam);
+			p_ClickPoint.y = GET_Y_LPARAM(lParam);
+			o_win.v_pLeftMouseDown(p_ClickPoint);
+		}
+		return 0;
+
+	case WM_LBUTTONUP:
+		if (o_win.v_pLeftMouseUp!= NULL) 
+		{
+			POINT p_ClickPoint;
+			p_ClickPoint.x = GET_X_LPARAM(lParam);
+			p_ClickPoint.y = GET_Y_LPARAM(lParam);
+			o_win.v_pLeftMouseUp(p_ClickPoint);
+		}
+		return 0;
+
+	case WM_RBUTTONDOWN:
+		if (o_win.v_pRightMouseDown != NULL)
+		{
+			POINT p_ClickPoint;
+			p_ClickPoint.x = GET_X_LPARAM(lParam);
+			p_ClickPoint.y = GET_Y_LPARAM(lParam);
+			o_win.v_pRightMouseDown(p_ClickPoint);
+		}
+		return 0;
+
+	case WM_RBUTTONUP:
+		if (o_win.v_pRightMouseUp != NULL)
+		{
+			POINT p_ClickPoint;
+			p_ClickPoint.x = GET_X_LPARAM(lParam);
+			p_ClickPoint.y = GET_Y_LPARAM(lParam);
+			o_win.v_pRightMouseUp(p_ClickPoint);
+		}
+		return 0;
+
+	case WM_CLOSE:
 		DestroyWindow(hd_Handle);
 		return 0;
 
-	}
-	if (msg_Message == WM_DESTROY) {
+	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
 	}

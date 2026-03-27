@@ -15,6 +15,11 @@ double V2::Distance(V2 v_Pos)
 	return Distance2(*this, v_Pos);
 }
 
+double V2::Length()
+{
+	return Distance2(*this, V2(0,0));
+}
+
 V2 operator - (V2  &v_Pos1, V2  &v_Pos2) {
 	return V2(v_Pos1.f_Pos[0] - v_Pos2.f_Pos[0], v_Pos1.f_Pos[1] - v_Pos2.f_Pos[1]);
 }
