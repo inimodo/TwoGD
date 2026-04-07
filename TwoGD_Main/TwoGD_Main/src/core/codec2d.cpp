@@ -2,7 +2,7 @@
 
 #define VINDEX(v2) ((int)v2->f_Pos[1] * o_Image->i_Pixels[0] + (int)v2->f_Pos[0])
 
-UCHAR 
+inline UCHAR 
 codec2d::SetPixel(V2 * v_pPoint, COLOR * c_pColor, UCHAR i_PixelFlag,UCHAR i_PrioFlag)
 {
 	if (v_pPoint->f_Pos[0] <= 0 || v_pPoint->f_Pos[0] >= this->o_Image->i_Pixels[0])return GD_OUTOFBOUND;
@@ -23,6 +23,23 @@ UCHAR
 codec2d::DrawLine(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, UCHAR i_PixelFlag, UCHAR i_PrioFlag)
 {
 	V2 v_Delta = (*v_pPointA) - (*v_pPointB), v_Temp;
+	if (v_Delta.f_Pos[Y] == 0) 
+	{
+		if (v_Delta.f_Pos[X] > 0) 
+		{
+			return this->DrawHLine(v_pPointB, (UINT32)v_Delta.f_Pos[X],c_pColor,i_PixelFlag,i_PrioFlag);
+		}
+		return this->DrawHLine(v_pPointA, (UINT32)-v_Delta.f_Pos[X], c_pColor, i_PixelFlag, i_PrioFlag);
+
+	}
+	if (v_Delta.f_Pos[X] == 0)
+	{
+		if (v_Delta.f_Pos[Y] > 0)
+		{
+			return this->DrawVLine(v_pPointB, (UINT32)v_Delta.f_Pos[Y], c_pColor, i_PixelFlag, i_PrioFlag);
+		}
+		return this->DrawVLine(v_pPointA, (UINT32)-v_Delta.f_Pos[Y], c_pColor, i_PixelFlag, i_PrioFlag);
+	}
 	__REGISTER float f_Idi, f_Max = (float)v_Delta.Length();
 	if (f_Max > this->o_Image->i_Pixels[0] + this->o_Image->i_Pixels[1])return GD_OUTOFBOUND;
 
@@ -30,7 +47,18 @@ codec2d::DrawLine(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, UCHAR i_Pixe
 	{
 		v_Temp.f_Pos[0] = (f_Idi / f_Max) * v_Delta.f_Pos[0] + v_pPointB->f_Pos[0];
 		v_Temp.f_Pos[1] = (f_Idi / f_Max) * v_Delta.f_Pos[1] + v_pPointB->f_Pos[1];
-		SetPixel(&v_Temp, c_pColor, i_PixelFlag, i_PrioFlag);
+		
+		if (v_Temp.f_Pos[0] <= 0 || v_Temp.f_Pos[0] >= this->o_Image->i_Pixels[0])continue;
+		if (v_Temp.f_Pos[1] <= 0 || v_Temp.f_Pos[1] >= this->o_Image->i_Pixels[1])continue;
+		if (o_Image->d_pOutputStream[VINDEX((&v_Temp))] != 0x0 && (
+			b_AllowPixelOverwrite == FALSE ||
+			o_Image->d_pPixelFlags[VINDEX((&v_Temp))] == PF_OVERWRITE_FORBIDDEN
+			))continue;
+		if (o_Image->d_pPrioFlags[VINDEX((&v_Temp))] < i_PrioFlag)continue;
+
+		o_Image->d_pPrioFlags[VINDEX((&v_Temp))] = i_PrioFlag;
+		o_Image->d_pPixelFlags[VINDEX((&v_Temp))] = i_PixelFlag;
+		o_Image->d_pOutputStream[VINDEX((&v_Temp))] = c_pColor->GetAsHex();
 	}
 	return GD_TASK_OKAY;
 }
@@ -52,6 +80,7 @@ codec2d::DrawHLine(V2* v_pPoint, UINT32  i_Length, COLOR* c_pColor, UCHAR i_Pixe
 	__REGISTER int i_rIndex = VINDEX(v_pPoint);
 	for (UINT32 i_Index = 0; i_Index < i_Length; i_Index++)
 	{
+		if (i_Index + i_rIndex > this->o_Image->i_OutputSize || i_Index + i_rIndex < 0) continue;
 		o_Image->d_pOutputStream[i_Index + i_rIndex] = c_pColor->GetAsHex();
 		o_Image->d_pPixelFlags[i_Index + i_rIndex] = i_PixelFlag;
 		o_Image->d_pPrioFlags[i_Index + i_rIndex] = i_PrioFlag;
@@ -64,6 +93,7 @@ codec2d::DrawVLine(V2* v_pPoint, UINT32  i_Length, COLOR* c_pColor, UCHAR i_Pixe
 	__REGISTER int i_rIndex = VINDEX(v_pPoint);
 	for (UINT32 i_Index = 0; i_Index < i_Length; i_Index++)
 	{
+		if (i_Index + i_rIndex >= this->o_Image->i_OutputSize || i_Index + i_rIndex < 0) continue;
 		o_Image->d_pOutputStream[o_Image->i_Pixels[0] * i_Index + i_rIndex] = c_pColor->GetAsHex();
 		o_Image->d_pPixelFlags[o_Image->i_Pixels[0] * i_Index + i_rIndex] = i_PixelFlag;
 		o_Image->d_pPrioFlags[o_Image->i_Pixels[0] * i_Index + i_rIndex] = i_PrioFlag;
@@ -81,14 +111,14 @@ codec2d::DrawCanvas(DWORD * d_pBuffer, V2 * v_pPos, UINT32  i_Pixel[2], UCHAR i_
 	return GD_TASK_OKAY;
 }
 UCHAR 
-codec2d::DrawVMap(VMAP * o_VecMap, UCHAR i_PixelFlag, UCHAR i_PrioFlag)
+codec2d::DrawVMap(VMAP * o_VecMap,V2* v_pAnchor, float f_Scale, UCHAR i_PixelFlag, UCHAR i_PrioFlag)
 {
 	for (UINT32 i_Index = 0; i_Index < o_VecMap->i_Connections; i_Index++)
 	{
-		V2 v_A = o_VecMap->l_pLines[i_Index].v_Point[0] * o_VecMap->f_Scale;
-		V2 v_B =o_VecMap->l_pLines[i_Index].v_Point[1] * o_VecMap->f_Scale;
-		v_A = v_A + o_VecMap->v_Anchor;
-		v_B = v_B + o_VecMap->v_Anchor;
+		V2 v_A = o_VecMap->l_pLines[i_Index].v_Point[0] * f_Scale;
+		V2 v_B =o_VecMap->l_pLines[i_Index].v_Point[1] * f_Scale;
+		v_A = v_A + (*v_pAnchor);
+		v_B = v_B + (*v_pAnchor);
 		DrawLine(&v_A, &v_B, &o_VecMap->l_pLines[i_Index].c_Color, i_PixelFlag, i_PrioFlag);
 	}
 	return GD_TASK_OKAY;

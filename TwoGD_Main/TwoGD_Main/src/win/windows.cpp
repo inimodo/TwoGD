@@ -1,6 +1,6 @@
 #include "..\twogd.h"
 
-win::GDWIN o_win;
+GDWIN o_win;
 
 HANDLE  CreateExec(HINSTANCE h_Instance);
 long  WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam);
@@ -33,16 +33,19 @@ DWORD  wWinProcess(LPVOID lv_Void)
 }
 int  wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow)
 {
-	if (gdMain(&o_win) == NULL)
-	{
-		return NULL;
-	}
+	gdCreateWinExec(&o_win);
+	
 	if (CreateExec(h_Instance) == NULL)
 	{
 		return NULL;
 	}
-	ShowWindow(o_win.hd_WindowHandle, i_CmdShow);
+	ShowWindow(o_win.hd_WindowHandle, o_win.i_CmdShow);
 	UpdateWindow(o_win.hd_WindowHandle);
+
+	if (gdMain(&o_win) == NULL)
+	{
+		return NULL;
+	}
 
 	o_win.hdc_WindowHdc = GetDC(o_win.hd_WindowHandle);
 
@@ -63,24 +66,24 @@ HANDLE  CreateExec(HINSTANCE h_Instance) {
 	o_win.w_WndClass = { 0 };
 	o_win.w_WndClass.lpfnWndProc = (WNDPROC)WindowProc;
 	o_win.w_WndClass.hInstance = h_Instance;
-	o_win.w_WndClass.lpszClassName = (LPCWSTR)win::c_WinClassName;
+	o_win.w_WndClass.lpszClassName = (LPCWSTR)o_win.c_WinClassName;
 
 	RegisterClass(&o_win.w_WndClass);
 
 	o_win.h_Instance = h_Instance;
 	o_win.hd_WindowHandle = CreateWindowEx(
-		win::dw_ExStyle,
-		(LPCWSTR)win::c_WinClassName,
+		o_win.dw_ExStyle,
+		(LPCWSTR)o_win.c_WinClassName,
 		(LPCWSTR)o_win.c_WinTitle,
-		win::dw_Style,
-		win::i_XPos,
-		win::i_YPos,
+		o_win.dw_Style,
+		o_win.i_XPos,
+		o_win.i_YPos,
 		o_win.i_Width,
 		o_win.i_Height,
-		win::hd_WndParent,
-		win::h_Menu,
+		o_win.hd_WndParent,
+		o_win.h_Menu,
 		h_Instance,
-		win::lv_Param
+		o_win.lv_Param
 	);
 	return o_win.hd_WindowHandle;
 }

@@ -32,9 +32,8 @@ filer::OpenStream(LPSTR c_StreamName)
 
 vectormap::vectormap()
 {
+	this->b_Loaded = FALSE;
 	this->f_Stream = NULL;
-	this->v_Anchor = V2();
-	this->f_Scale = 1.0f;
 }
 
 UCHAR  
@@ -55,19 +54,31 @@ vectormap::Read(LPSTR c_StreamName)
 	if (this->LoadFile() != GD_TASK_OKAY) {
 		return GD_FILE_FAILED;
 	}
-
+	this->b_Loaded = TRUE;
 	return GD_TASK_OKAY;
 }
 UCHAR 
 vectormap::LoadFile()
 {
+	UINT32 i_MaxX = 0;
+	UINT32 i_MaxY = 0;
 	for (UINT32 i_Index = 0; i_Index < this->i_Points; i_Index++)
 	{
-		if (fscanf(this->f_Stream, GD_VEC_POINTS, &this->v_pPoint[i_Index].f_Pos[0], &this->v_pPoint[i_Index].f_Pos[1]) == NULL)
+		if (fscanf(this->f_Stream, GD_VEC_POINTS, &this->v_pPoint[i_Index].f_Pos[X], &this->v_pPoint[i_Index].f_Pos[Y]) == NULL)
 		{
 			return GD_FILE_FAILED;
 		}
+		if (this->v_pPoint[i_Index].f_Pos[X] > i_MaxX) 
+		{
+			i_MaxX = this->v_pPoint[i_Index].f_Pos[X];
+		}
+		if (this->v_pPoint[i_Index].f_Pos[Y] > i_MaxY)
+		{
+			i_MaxY = this->v_pPoint[i_Index].f_Pos[Y];
+		}
 	}
+	this->i_Height = i_MaxY;
+	this->i_Width = i_MaxX;
 	for (UINT32 i_Index = 0; i_Index < this->i_Colors; i_Index++)
 	{
 		if (fscanf(this->f_Stream, GD_VEC_COLORS, 

@@ -1,21 +1,8 @@
-// TwoGD Win32Socket for C++ 
+// TwoGD Win32 Socket for C++ 
 // Markus Kotar 2026
 
 #pragma once
-
-#define _ALLOW_REGISTER_USE
-//#define _ALLOW_PIXEL_OVERWRITE
-
-#ifndef UNICODE
 #define UNICODE
-#endif 
-
-#ifdef _ALLOW_REGISTER_USE
-#define __REGISTER register
-#else 
-#define __REGISTER 
-#endif
-
 #define _CRT_SECURE_NO_WARNINGS
 #define _USE_MATH_DEFINES
 #include <iostream>
@@ -24,77 +11,55 @@
 #include <math.h>
 #include <windows.h>
 #include <windowsx.h>
-
+#include <stdarg.h>
 #pragma comment(lib, "User32.lib")
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "Gdi32.lib")
 
-#define GD_ALLOC_FAILED 0x1F
-#define GD_TASK_OKAY 0x1A
-#define GD_FILE_FAILED 0x2F
-#define GD_OUTOFBOUND 0x2E
-
-#define DEGTORAD(X) (float)(X*2*M_PI/360.0)
-#define RADTODEG(X) (float)(X/(2*M_PI)*360.0)
-
-#ifdef X 
-#undef X
-#endif   
-#define X 0
-
-#ifdef Y
-#undef Y
-#endif 
-#define Y 1
-
-#ifdef Z 
-#undef Z
-#endif 
-#define Z 2
-
-
-namespace win {
-	const static DWORD dw_ExStyle = 0;
-	const static wchar_t* c_WinClassName = L"WINCLASSEWS";
-	const static DWORD  dw_Style = (WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX);
-	const static int i_XPos = CW_USEDEFAULT;
-	const static int i_YPos = CW_USEDEFAULT;
-	const static HWND hd_WndParent = NULL;
-	const static HMENU h_Menu = NULL;
-	const static  LPVOID lv_Param = NULL;
-
-	typedef struct o_win {
-		wchar_t* c_WinTitle;
-		UINT32 i_Width, i_Height;
-		HINSTANCE h_Instance;
-		HWND hd_WindowHandle;
-		MSG msg_WindowMessage;
-		HDC hdc_WindowHdc;
-		WNDCLASS w_WndClass;
-		POINT v_CursorPos;
-		void(*v_pLeftMouseDown)(POINT v_ClickPoint);
-		void(*v_pLeftMouseUp)(POINT v_ClickPoint);
-		void(*v_pRightMouseDown)(POINT v_ClickPoint);
-		void(*v_pRightMouseUp)(POINT v_ClickPoint);
-		void(*v_pMouseScroll)(BOOL b_Up, POINT v_ScrollPoint);
-		BOOL b_HasFocus;
-		BOOL b_HideCursor = FALSE;
-	}GDWIN;
-
-}
+typedef struct o_win {
+	DWORD dw_ExStyle = 0;
+	wchar_t* c_WinClassName = (wchar_t*)"WINCLASSEWS";
+	DWORD  dw_Style;
+	int i_XPos = CW_USEDEFAULT;
+	int i_YPos = CW_USEDEFAULT;
+	int i_CmdShow;
+	HWND hd_WndParent = NULL;
+	HMENU h_Menu = NULL;
+	LPVOID lv_Param = NULL;
+	wchar_t* c_WinTitle;
+	UINT32 i_Width, i_Height;
+	HINSTANCE h_Instance;
+	HWND hd_WindowHandle;
+	MSG msg_WindowMessage;
+	HDC hdc_WindowHdc;
+	WNDCLASS w_WndClass;
+	POINT v_CursorPos;
+	void(*v_pLeftMouseDown)(POINT v_ClickPoint);
+	void(*v_pLeftMouseUp)(POINT v_ClickPoint);
+	void(*v_pRightMouseDown)(POINT v_ClickPoint);
+	void(*v_pRightMouseUp)(POINT v_ClickPoint);
+	void(*v_pMouseScroll)(BOOL b_Up, POINT v_ScrollPoint);
+	BOOL b_HasFocus;
+	BOOL b_HideCursor = FALSE;
+}GDWIN;
 
 extern HANDLE  CreateExec(HINSTANCE h_Instance);
 extern long  WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam);
 extern int  wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow);
 
-extern unsigned char  gdMain(win::GDWIN *);
-extern DWORD*  gdUpdate(win::GDWIN *);
+extern void gdCreateWinExec(GDWIN *);
+extern unsigned char  gdMain(GDWIN *);
+extern DWORD*  gdUpdate(GDWIN *);
 extern void  gdClose();
 
 typedef unsigned char UCHAR;
 typedef unsigned int UINT32;
 
+#define __REGISTER register
 #define PTOV2(POI) V2((float)((POINT)POI).x,(float)((POINT)POI).y)
+#define X 0
+#define Y 1
+#define Z 2
 
 typedef class o_vec2 {
 public:
@@ -157,8 +122,16 @@ double Distance2(V2 v_PosOne, V2 v_PosTwo);
 double Distance3(V3 v_PosOne, V3 v_PosTwo);
 
 
-	#define PF_OVERWRITE_ALLOWED   0xA
-	#define PF_OVERWRITE_FORBIDDEN 0xF
+#define PF_OVERWRITE_ALLOWED   0xA
+#define PF_OVERWRITE_FORBIDDEN 0xF
+
+#define GD_ALLOC_FAILED 0x1F
+#define GD_TASK_OKAY 0x1A
+#define GD_FILE_FAILED 0x2F
+#define GD_OUTOFBOUND 0x2E
+
+#define DEGTORAD(X) (float)(X*2*M_PI/360.0)
+#define RADTODEG(X) (float)(X/(2*M_PI)*360.0)
 
 typedef class canvas {
 public:
@@ -233,13 +206,12 @@ public:
 
 typedef class vectormap : public FILER {
 public:
-	float f_Scale;
-	V2 v_Anchor;
+	BOOL b_Loaded;
 	V2 * v_pPoint;
 	COLOR * c_pColor;
 	LINE * l_pLines;
 	UINT32 i_Connections, i_Points, i_Colors;
-
+	UINT32 i_Width, i_Height;
 	vectormap();
 private:
 	UCHAR  ReadHeader();
@@ -278,13 +250,30 @@ public:
 	UCHAR  DrawHLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
 	UCHAR  DrawVLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
 	UCHAR  DrawCanvas(DWORD * d_pBuffer, V2 * v_pPos, UINT32  i_Pixels[2], UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
-	UCHAR  DrawVMap(VMAP * o_VecMap, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
+	UCHAR  DrawVMap(VMAP * o_VecMap, V2* v_pAnchor, float f_Scale = 1.0f, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
 
 	BOOL b_AllowPixelOverwrite = TRUE;
 protected:
 	CANVAS * o_Image;
 
 }CODEC2D;
+
+#define ASCII_CHAR_COUNT 128
+#define MAXIMAL_TEXT_LENGTH 256
+#define FILEEND_VMF "vmf"
+
+typedef class font_handler {
+public:
+	font_handler() {}
+	font_handler(CODEC2D* o_pCodec, LPSTR c_pFontFolder);
+
+	void Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...);
+	
+	UINT32 i_Padding;
+protected:
+	CODEC2D* o_pCodec;
+	VMAP v_pFont[ASCII_CHAR_COUNT];
+}FONTHANDLER;
 
 
 
@@ -367,7 +356,7 @@ public:
 	float f_CHSize = 0.2f;
 
 
-	void UpdateCamCtrlr(win::GDWIN *o_win);
+	void UpdateCamCtrlr(GDWIN *o_win);
 	void DrawCrosshair();
 }CAMCTRLR;
 

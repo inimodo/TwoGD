@@ -48,6 +48,9 @@
     <ClCompile Include="src\env\world_ctrlr.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="src\env\font_handler.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\twogd.h">

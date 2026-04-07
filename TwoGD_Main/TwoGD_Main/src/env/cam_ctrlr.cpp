@@ -7,9 +7,10 @@ o_camctrlr::o_camctrlr(CAM3D* o_camera_, CODEC3D* o_pCodec_)
 	this->o_pCodec = o_pCodec_;
 }
 
-void o_camctrlr::UpdateCamCtrlr(win::GDWIN * o_win)
+void o_camctrlr::UpdateCamCtrlr(GDWIN * o_win)
 {
 	V2 v_Middle = V2(o_camera->i_Dimensions[0] / 2.0f, o_camera->i_Dimensions[1] / 2.0f);
+	if (GetAsyncKeyState(VK_LCONTROL) != 0) b_MouseCtrl = !b_MouseCtrl;
 	if (o_win->b_HasFocus && b_MouseCtrl)
 	{
 		o_win->b_HideCursor = TRUE;
@@ -34,6 +35,7 @@ void o_camctrlr::UpdateCamCtrlr(win::GDWIN * o_win)
 
 		if (GetAsyncKeyState('D') != 0) v_UnitVec.f_Pos[X] += f_MoveSpeed;
 		if (GetAsyncKeyState('A') != 0) v_UnitVec.f_Pos[X] += -f_MoveSpeed;
+		
 
 		v_UnitVec.RotateThis(o_camera->i_Rotation);
 		v_UnitVec.f_Pos[Y] = 0;
@@ -55,7 +57,7 @@ void o_camctrlr::UpdateCamCtrlr(win::GDWIN * o_win)
 		if (GetAsyncKeyState(VK_NUMPAD0) != 0)
 		{
 			o_camera->i_Rotation = v_UnitVec;
-			o_camera->i_Position = v_UnitVec;
+			o_camera->i_Position = V3(0,2,0);
 			o_camera->f_FOV = 2;
 		}
 	}
