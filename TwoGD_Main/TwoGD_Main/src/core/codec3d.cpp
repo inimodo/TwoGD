@@ -38,7 +38,7 @@ camera::Translate(V3 * v_pPoint, V2 * v_pResult)
 	
 	if (f_abs > this->f_Frustum[1] || f_abs < this->f_Frustum[0]) return GD_OUTOFBOUND;
 
-	o_Delta.CamRotateThis(this->i_Rotation);//<-REDUCTION OF SPEED BY 10x
+	o_Delta.CamRotateThisOpt(this->i_Rotation);//<-REDUCTION OF SPEED BY 10x
 	
 	if (o_Delta.f_Pos[2] < 0) return GD_OUTOFBOUND;
 

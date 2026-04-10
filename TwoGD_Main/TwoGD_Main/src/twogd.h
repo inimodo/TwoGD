@@ -91,6 +91,7 @@ public:
 	void RotateThis(o_vec3 v_Rot);
 	o_vec3 RotateTo(o_vec3 v_Rot);
 	void CamRotateThis(o_vec3 v_Rot);
+	void CamRotateThisOpt(o_vec3 v_Rot);
 	o_vec3 CamRotateTo(o_vec3 v_Rot);
 	void RotateAroundThis(o_vec3 v_UnitV, float f_phi);
 	o_vec3 RotateAroundTo(o_vec3 v_UnitV, float f_phi);

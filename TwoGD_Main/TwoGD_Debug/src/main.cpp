@@ -1,8 +1,8 @@
 #include"twogd.h"
 #include <chrono>
 
-#define MSPEED 0.1f
-#define VSPEED 0.05f
+#define MSPEED 0.2f
+#define VSPEED 0.1f
 #define WINDOW_SIZE 100
 #define WINDOW_WIDTH 16
 #define WINDOW_HEIGHT 9
@@ -161,7 +161,7 @@ unsigned char  gdMain(GDWIN* o_win)
 
 	o_2DCodec = CODEC2D(&o_Img);
 	o_3DCodec = CODEC3D(&o_Img, &o_Cam);
-	o_fhandler = FONTHANDLER(&o_2DCodec, (const LPSTR)"C:\\Users\\____\\source\\repos\\inimodo\\TwoGD\\TwoGD_Main\\TwoGD_Main\\font\\vmf\\*");
+	o_fhandler = FONTHANDLER(&o_2DCodec, (const LPSTR)"C:\\Users\\PyroJunkie\\source\\repos\\inimodo\\TwoGD\\TwoGD_Main\\TwoGD_Main\\font\\vmf\\*");
 	o_fhandler.i_Padding = 10;
 	o_Wrld = WORLD(&o_3DCodec);
 
@@ -200,7 +200,7 @@ DWORD*  gdUpdate(GDWIN * o_win)
 
 	o_Img.CleanBuffer();
 	//o_fhandler.Write(V2(10,10),0.5f,"ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789 _!$%&/()=?\n");
-
+	//o_fhandler.Write(V2(10, 10), 0.5f, "%d ms\n", i_AvrTime);
 	o_CamCtrlr.UpdateCamCtrlr(o_win);
 	o_CamCtrlr.DrawCrosshair();
 
