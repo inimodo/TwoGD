@@ -77,26 +77,28 @@ codec2d::DrawRect(V2* v_pPointA, V2* v_pPointB, COLOR* c_pColor, UCHAR i_PixelFl
 UCHAR 
 codec2d::DrawHLine(V2* v_pPoint, UINT32  i_Length, COLOR* c_pColor, UCHAR i_PixelFlag, UCHAR i_PrioFlag)
 {
-	__REGISTER int i_rIndex = VINDEX(v_pPoint);
+	__REGISTER UINT32 i_rIndex = VINDEX(v_pPoint), i_Pos = 0;
 	for (UINT32 i_Index = 0; i_Index < i_Length; i_Index++)
 	{
-		if (i_Index + i_rIndex > this->o_Image->i_OutputSize || i_Index + i_rIndex < 0) continue;
-		o_Image->d_pOutputStream[i_Index + i_rIndex] = c_pColor->GetAsHex();
-		o_Image->d_pPixelFlags[i_Index + i_rIndex] = i_PixelFlag;
-		o_Image->d_pPrioFlags[i_Index + i_rIndex] = i_PrioFlag;
+		i_Pos = i_Index + i_rIndex;
+		if (i_Pos >= this->o_Image->i_OutputSize || i_Pos < 0) continue;
+		o_Image->d_pOutputStream[i_Pos] = c_pColor->GetAsHex();
+		o_Image->d_pPixelFlags[i_Pos] = i_PixelFlag;
+		o_Image->d_pPrioFlags[i_Pos] = i_PrioFlag;
 	}
 	return GD_TASK_OKAY;
 }
 UCHAR 
 codec2d::DrawVLine(V2* v_pPoint, UINT32  i_Length, COLOR* c_pColor, UCHAR i_PixelFlag, UCHAR i_PrioFlag)
 {
-	__REGISTER int i_rIndex = VINDEX(v_pPoint);
+	__REGISTER UINT32 i_rIndex = VINDEX(v_pPoint), i_Pos = 0;
 	for (UINT32 i_Index = 0; i_Index < i_Length; i_Index++)
 	{
-		if (i_Index + i_rIndex >= this->o_Image->i_OutputSize || i_Index + i_rIndex < 0) continue;
-		o_Image->d_pOutputStream[o_Image->i_Pixels[0] * i_Index + i_rIndex] = c_pColor->GetAsHex();
-		o_Image->d_pPixelFlags[o_Image->i_Pixels[0] * i_Index + i_rIndex] = i_PixelFlag;
-		o_Image->d_pPrioFlags[o_Image->i_Pixels[0] * i_Index + i_rIndex] = i_PrioFlag;
+		i_Pos = o_Image->i_Pixels[0] * i_Index + i_rIndex;
+		if (i_Pos >= this->o_Image->i_OutputSize || i_Pos < 0) continue;
+		o_Image->d_pOutputStream[i_Pos] = c_pColor->GetAsHex();
+		o_Image->d_pPixelFlags[i_Pos] = i_PixelFlag;
+		o_Image->d_pPrioFlags[i_Pos] = i_PrioFlag;
 	}
 	return GD_TASK_OKAY;
 }

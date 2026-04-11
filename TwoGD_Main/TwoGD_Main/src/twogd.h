@@ -6,6 +6,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define _USE_MATH_DEFINES
 #include <iostream>
+#include <chrono>
 #include <xmmintrin.h>
 #include <malloc.h>
 #include <math.h>
@@ -92,6 +93,7 @@ public:
 	o_vec3 RotateTo(o_vec3 v_Rot);
 	void CamRotateThis(o_vec3 v_Rot);
 	void CamRotateThisOpt(o_vec3 v_Rot);
+	void CamRotateThisStatic(o_vec3 v_Rot);
 	o_vec3 CamRotateTo(o_vec3 v_Rot);
 	void RotateAroundThis(o_vec3 v_UnitV, float f_phi);
 	o_vec3 RotateAroundTo(o_vec3 v_UnitV, float f_phi);
@@ -269,8 +271,10 @@ public:
 	font_handler(CODEC2D* o_pCodec, LPSTR c_pFontFolder);
 
 	void Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...);
-	
+	UCHAR Dispose();
+
 	UINT32 i_Padding;
+	UINT32 i_SpaceWidth;
 protected:
 	CODEC2D* o_pCodec;
 	VMAP v_pFont[ASCII_CHAR_COUNT];
@@ -401,8 +405,24 @@ public:
 	UINT32 AppendLayer(LPSTR c_StreamName, COLOR c_Color);
 	UCHAR GetObjInCrosshair(CAM3D * o_pCam, FLOAT f_CutoffAngleInRad, UINT32 * i_pLayer);
 	UCHAR Render();
-	UCHAR  Dispose();
+	UCHAR Dispose();
 
 	o_world();
 	o_world(CODEC3D * o_Codec);
 }WORLD;
+
+
+typedef class perlog {
+protected:
+	std::chrono::high_resolution_clock::time_point a_Start, a_Stop;
+	int * i_Buffer;
+	int i_BufferSize;
+public:
+	perlog(int i_BufferSize);
+	perlog();
+
+	void Start();
+	void Stop();
+	float GetDelta();
+	UCHAR Dispose();
+} PERLOG;

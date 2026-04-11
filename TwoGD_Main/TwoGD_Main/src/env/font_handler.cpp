@@ -3,6 +3,7 @@
 font_handler::font_handler(CODEC2D* o_pCodec, LPSTR c_pFontFolder) 
 {
 	this->i_Padding = 2;
+	this->i_SpaceWidth = 10;
 	for (int i_Index = 0; i_Index < ASCII_CHAR_COUNT; i_Index++)
 	{
 		this->v_pFont[i_Index] = VMAP();
@@ -53,14 +54,12 @@ font_handler::font_handler(CODEC2D* o_pCodec, LPSTR c_pFontFolder)
 
 		if (i_ASCIIIndex >= 0) 
 		{
-			printf("%s %d\n", c_File, i_ASCIIIndex);
 			v_pFont[i_ASCIIIndex].Read(c_File);
 		}
 
 	} while (FindNextFileA(f_Handle, &o_FileData) != 0);
 	FindClose(f_Handle);
 	this->o_pCodec = o_pCodec;
-
 }
 
 void font_handler::Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...) 
@@ -73,11 +72,33 @@ void font_handler::Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...
 	int i_Index = 0;
 	while (c_new[i_Index] != '\0')
 	{
-		if ((int)c_new[i_Index] >= 0 && (int)c_new[i_Index] < ASCII_CHAR_COUNT) 
+		if ((int)c_new[i_Index] < 0 && (int)c_new[i_Index] >= ASCII_CHAR_COUNT) 
 		{
-			this->o_pCodec->DrawVMap(&this->v_pFont[(int)c_new[i_Index]], &v_Cursor, f_Scale);
-			v_Cursor.f_Pos[X] += this->i_Padding + this->v_pFont[(int)c_new[i_Index]].i_Width * f_Scale;
+			i_Index++;
+			continue;
 		}
+		if (this->v_pFont[(int)c_new[i_Index]].b_Loaded == FALSE) 
+		{
+			v_Cursor.f_Pos[X] += this->i_Padding + this->i_SpaceWidth * f_Scale;
+			i_Index++;
+			continue;
+		}
+		this->o_pCodec->DrawVMap(&this->v_pFont[(int)c_new[i_Index]], &v_Cursor, f_Scale);
+		v_Cursor.f_Pos[X] += this->i_Padding + this->v_pFont[(int)c_new[i_Index]].i_Width * f_Scale;
 		i_Index++;
 	}
+}
+
+
+UCHAR font_handler::Dispose() 
+{
+	for (int i_Index = 0; i_Index < ASCII_CHAR_COUNT; i_Index++)
+	{
+		if (this->v_pFont[i_Index].b_Loaded == FALSE)
+		{
+			continue;
+		}
+		this->v_pFont[i_Index].Dispose();
+	}
+	return GD_TASK_OKAY;
 }

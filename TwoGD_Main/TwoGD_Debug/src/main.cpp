@@ -1,26 +1,23 @@
 #include"twogd.h"
-#include <chrono>
 
 #define MSPEED 0.2f
 #define VSPEED 0.1f
 #define WINDOW_SIZE 100
 #define WINDOW_WIDTH 16
 #define WINDOW_HEIGHT 9
-#define GRID_SIZE 50
+#define GRID_SIZE 100
 
 CODEC3D o_3DCodec;
 CODEC2D o_2DCodec;
 CONSOLE o_Console;
 CANVAS o_Img;
-
 CAM3D o_Cam;
 CAMCTRLR o_CamCtrlr;
-VMAP v_Vmap;
-
 WORLD o_Wrld;
 FONTHANDLER o_fhandler;
+PERLOG o_Perlog;
 
-int Demo_DrawGrid() 
+int DrawGrid() 
 {
 	int i_EdgeCount = 3;
 	V3 v_PointA = V3(0,0,0),v_PointB= V3(0,0,0);
@@ -71,28 +68,6 @@ int Demo_DrawGrid()
 
 	return i_EdgeCount;
 }
-
-UCHAR DemoVignetteShader(camera *o_Cam, V3 *v_Vertex, V2 *v_Point, COLOR *c_Color)
-{
-	float f_Dis = v_Point->Distance(V2(o_Cam->i_Dimensions[0] / 2, o_Cam->i_Dimensions[1] / 2));
-	float f_Max = sqrt(
-		(o_Cam->i_Dimensions[0] / 2.0f)*(o_Cam->i_Dimensions[0] / 2.0f)+
-		(o_Cam->i_Dimensions[1] / 2.0f)*(o_Cam->i_Dimensions[1] / 2.0f));
-	float f_scale = ((f_Dis*0.5f) / f_Max);
-
-	c_Color->c_Color[0] = (UCHAR)((float)c_Color->c_Color[0] * (1.0f - f_scale));
-	c_Color->c_Color[1] = (UCHAR)((float)c_Color->c_Color[1] * (1.0f - f_scale));
-	c_Color->c_Color[2] = (UCHAR)((float)c_Color->c_Color[2] * (1.0f - f_scale));
-
-	if (f_scale > 1.0f)
-	{
-		c_Color->c_Color[0] = 0;
-		c_Color->c_Color[1] = 0;
-		c_Color->c_Color[2] = 0;
-	}
-	return GD_TASK_OKAY;
-}
-
 
 void MouseScroll(BOOL b_Up,POINT v_ScrollPoint) 
 {
@@ -149,73 +124,45 @@ unsigned char  gdMain(GDWIN* o_win)
 		V3(0, 2, 0),
 		V3(0, 0, 0)
 	);
-	//o_Cam.s_Shader = DemoVignetteShader;
 
-	o_CamCtrlr = CAMCTRLR(
-		&o_Cam,
-		&o_3DCodec
-	);
-
-
+	o_CamCtrlr = CAMCTRLR(&o_Cam, &o_3DCodec);
 	o_Img.Prepare(o_win->i_Width, o_win->i_Height);
-
 	o_2DCodec = CODEC2D(&o_Img);
 	o_3DCodec = CODEC3D(&o_Img, &o_Cam);
-	o_fhandler = FONTHANDLER(&o_2DCodec, (const LPSTR)"C:\\Users\\PyroJunkie\\source\\repos\\inimodo\\TwoGD\\TwoGD_Main\\TwoGD_Main\\font\\vmf\\*");
+	o_fhandler = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\*");
 	o_fhandler.i_Padding = 10;
+	o_fhandler.i_SpaceWidth = 20;
+	o_Perlog = PERLOG(10);
 	o_Wrld = WORLD(&o_3DCodec);
-
 	o_Wrld.AppendLayer((const LPSTR)"src\\obj\\obj2.objf", co_Red);
-	o_Wrld.o_Layers[0].o_Obj.v_Anchor = V3(7, 1, 0);
-
-	o_Wrld.AppendLayer((const LPSTR)"src\\obj\\obj2.objf", co_Blue);
-	o_Wrld.o_Layers[1].o_Obj.v_Anchor = V3(-7, 1, 0);
-
+	o_Wrld.o_Layers[0].o_Obj.v_Anchor = V3(10, 1, 0);
+	o_Wrld.AppendLayer((const LPSTR)"src\\obj\\obj3.objf", co_Blue);
+	o_Wrld.o_Layers[1].o_Obj.v_Anchor = V3(-10, 1, 0);
 	o_Wrld.AppendLayer((const LPSTR)"src\\obj\\obj2.objf", co_Green);
-	o_Wrld.o_Layers[2].o_Obj.v_Anchor = V3(0, 1, 7);
-
+	o_Wrld.o_Layers[2].o_Obj.v_Anchor = V3(0, 1, 10);
 	o_Wrld.AppendLayer((const LPSTR)"src\\obj\\obj2.objf", co_Pink);
-	o_Wrld.o_Layers[3].o_Obj.v_Anchor = V3(0, 1, -7);
-
+	o_Wrld.o_Layers[3].o_Obj.v_Anchor = V3(0, 1, -10);
 
 	return TRUE;
 }
 
 DWORD*  gdUpdate(GDWIN * o_win)
 {
-	
-	static int i_Counter = 0;
-	static long long i_AvrTime = 0;
-	static long long i_Time = 0;
-	if (i_Counter > 5)
-	{
-		i_AvrTime = (int)((float)i_Time / (float)5);
-		i_Time = 0;
-		i_Counter = 0;
-	}
-	i_Counter++;
-	//BEGIN RENDER
-	auto a_TimeA = std::chrono::high_resolution_clock::now();
-	
-
+	o_Perlog.Start();
 	o_Img.CleanBuffer();
-	//o_fhandler.Write(V2(10,10),0.5f,"ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789 _!$%&/()=?\n");
-	//o_fhandler.Write(V2(10, 10), 0.5f, "%d ms\n", i_AvrTime);
+	o_fhandler.Write(V2(10, 10), 0.5f, "%.1f ms\n", o_Perlog.GetDelta());
 	o_CamCtrlr.UpdateCamCtrlr(o_win);
 	o_CamCtrlr.DrawCrosshair();
-
-	int i_CountedEdges = Demo_DrawGrid();
-
+	DrawGrid();
 	o_Wrld.Render();
-
-	auto a_TimeB = std::chrono::high_resolution_clock::now();
-	//END RENDER
-	i_Time += std::chrono::duration_cast<std::chrono::milliseconds>(a_TimeB - a_TimeA).count();
-	system("cls");
-	printf("Render Took: %d ms (%.1f FPS)\nHas Focus: %d\nDrawn Edges: %d\n", i_AvrTime,(1.0f/ (i_AvrTime/1000.0f)), o_win->b_HasFocus, i_CountedEdges);
+	o_Perlog.Stop();
 	return o_Img.d_pOutputStream;
 }
 
-void  gdClose() {
+void  gdClose() 
+{
 	o_Img.Dispose();
+	o_Wrld.Dispose();
+	o_Perlog.Dispose();
+	o_fhandler.Dispose();
 }

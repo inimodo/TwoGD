@@ -70,11 +70,11 @@ vectormap::LoadFile()
 		}
 		if (this->v_pPoint[i_Index].f_Pos[X] > i_MaxX) 
 		{
-			i_MaxX = this->v_pPoint[i_Index].f_Pos[X];
+			i_MaxX = (UINT32)this->v_pPoint[i_Index].f_Pos[X];
 		}
 		if (this->v_pPoint[i_Index].f_Pos[Y] > i_MaxY)
 		{
-			i_MaxY = this->v_pPoint[i_Index].f_Pos[Y];
+			i_MaxY = (UINT32)this->v_pPoint[i_Index].f_Pos[Y];
 		}
 	}
 	this->i_Height = i_MaxY;

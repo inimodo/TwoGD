@@ -62,7 +62,49 @@ void V3::CamRotateThisOpt(V3 v_Rot)
 	);
 }
 
+void V3::CamRotateThisStatic(V3 v_Rot)
+{
+	static V3 v_RotSaved = V3(0,0,0);
+	static M3X3 m_Y = M3X3(V3(0, 0, 0), V3(0, 0, 0), V3(0, 0, 0));
+	static M3X3 m_X = M3X3(V3(0, 0, 0), V3(0, 0, 0), V3(0, 0, 0));
 
+	if (v_RotSaved.f_Pos[X] != v_Rot.f_Pos[X] || v_RotSaved.f_Pos[Y] != v_Rot.f_Pos[Y]) 
+	{
+		float f_sin_Y = sin(v_Rot.f_Pos[1]);
+		float f_cos_Y = cos(v_Rot.f_Pos[1]);
+		float f_cos_X = cos(v_Rot.f_Pos[0]);
+		float f_sin_X = sin(v_Rot.f_Pos[0]);
+	
+		m_Y = M3X3(
+			V3(f_cos_X, 0, -f_sin_X),
+			V3(0, 1.0, 0),
+			V3(f_sin_X, 0, f_cos_X)
+		);
+
+		m_X = M3X3(
+			V3(
+				f_cos_Y + f_cos_X * f_cos_X * (1.0f - f_cos_Y),
+				f_sin_X * f_sin_Y,
+				f_cos_X * f_sin_X * (1.0f - f_cos_Y)
+			),
+			V3(
+				-f_sin_X * f_sin_Y,
+				f_cos_Y,
+				f_cos_X * f_sin_Y
+			),
+			V3(
+				f_cos_X * f_sin_X * (1.0f - f_cos_Y),
+				-f_cos_X * f_sin_Y,
+				f_cos_Y + f_sin_X * f_sin_X * (1.0f - f_cos_Y)
+			)
+		);
+
+
+		v_RotSaved = v_Rot;
+	}
+
+	*this = m_Y * (m_X * *this);
+}
 
 V3 V3::CamRotateTo(V3 v_Rot)// NEED HEAVY OPT.
 {
