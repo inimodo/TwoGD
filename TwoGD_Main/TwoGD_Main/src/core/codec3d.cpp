@@ -95,7 +95,7 @@ codec3d::DrawObject(OBJ3D * o_Object, COLOR * c_pColor, UCHAR i_PixelFlag,UCHAR 
 				if (this->o_Camera->s_Shader(this->o_Camera, &v_pVertexA, &v_PointA, &c_Color) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
 				if (this->o_Camera->s_Shader(this->o_Camera, &v_pVertexB, &v_PointB, &c_Color) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
 			}
-			this->DrawLine(&v_PointA, &v_PointB, &c_Color, i_PixelFlag);
+			this->DrawLine(&v_PointA, &v_PointB, &c_Color, i_PixelFlag, i_PrioFlag);
 		}
 	}
 	return GD_TASK_OKAY;

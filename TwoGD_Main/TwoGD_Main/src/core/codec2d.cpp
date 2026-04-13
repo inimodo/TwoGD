@@ -125,7 +125,71 @@ codec2d::DrawVMap(VMAP * o_VecMap,V2* v_pAnchor, float f_Scale, UCHAR i_PixelFla
 	}
 	return GD_TASK_OKAY;
 }
+UCHAR
+codec2d::DrawChar(VMAP* o_VecMap, V2* v_pAnchor, COLOR* c_pColor, float f_Scale)
+{
+	V2 v_H, v_L, v_Point;
+	for (int i_Y = 0; i_Y < o_VecMap->i_Height * f_Scale; i_Y++)
+	{
+		float f_Edges[128];
+		float f_EdgesSorted[128];
+		int i_EdgeCount = 0;
 
+		float f_Y = (i_Y + 0.01f) ;
+		for (UINT32 i_Index = 0; i_Index < o_VecMap->i_Connections; i_Index++)
+		{
+			v_H = o_VecMap->l_pLines[i_Index].v_Point[0];
+			v_L = o_VecMap->l_pLines[i_Index].v_Point[1];
+
+			if (o_VecMap->l_pLines[i_Index].v_Point[0].f_Pos[Y] < o_VecMap->l_pLines[i_Index].v_Point[1].f_Pos[Y])
+			{
+				v_L = o_VecMap->l_pLines[i_Index].v_Point[0];
+				v_H = o_VecMap->l_pLines[i_Index].v_Point[1];
+			}
+
+			v_L = v_L * f_Scale;
+			v_H = v_H * f_Scale;
+
+			if (!(v_H.f_Pos[Y] > f_Y && v_L.f_Pos[Y] < f_Y))
+			{
+				continue;
+			}
+			float f_k = (v_H.f_Pos[Y] - v_L.f_Pos[Y]) / (v_H.f_Pos[X] - v_L.f_Pos[X]);
+			float f_d = v_H.f_Pos[Y] - v_H.f_Pos[X] * f_k;
+			float f_X = (f_Y - f_d) / f_k;
+			if (v_H.f_Pos[X] == v_L.f_Pos[X]) 
+			{
+				f_X = v_H.f_Pos[X];
+			}
+			f_Edges[i_EdgeCount] = f_X;
+			i_EdgeCount++;
+		}
+
+		for (int i_Sort = 0; i_Sort < i_EdgeCount; i_Sort++)
+		{
+			int i_Highest = 0;
+			for (int i_Cylce = 0; i_Cylce < i_EdgeCount; i_Cylce++)
+			{
+				if (f_Edges[i_Cylce] > f_Edges[i_Highest])
+				{
+					i_Highest = i_Cylce;
+				}
+			}
+			f_EdgesSorted[i_EdgeCount-i_Sort-1] = f_Edges[i_Highest];
+			f_Edges[i_Highest] = 0;
+		}
+
+		for (int i_Index = 0; i_Index < i_EdgeCount; i_Index+=2)
+		{
+			v_Point = *v_pAnchor;
+			v_Point.f_Pos[Y] += f_Y;
+			v_Point.f_Pos[X] += f_EdgesSorted[i_Index];
+			this->DrawHLine(&v_Point, f_EdgesSorted[i_Index+1]- f_EdgesSorted[i_Index], c_pColor,PF_FONT,0);
+		}
+	}
+
+	return GD_TASK_OKAY;
+}
 
 
 

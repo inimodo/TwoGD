@@ -4,6 +4,7 @@ font_handler::font_handler(CODEC2D* o_pCodec, LPSTR c_pFontFolder)
 {
 	this->i_Padding = 2;
 	this->i_SpaceWidth = 10;
+	this->c_Color = COLOR(255,255,255);
 	for (int i_Index = 0; i_Index < ASCII_CHAR_COUNT; i_Index++)
 	{
 		this->v_pFont[i_Index] = VMAP();
@@ -83,7 +84,7 @@ void font_handler::Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...
 			i_Index++;
 			continue;
 		}
-		this->o_pCodec->DrawVMap(&this->v_pFont[(int)c_new[i_Index]], &v_Cursor, f_Scale);
+		this->o_pCodec->DrawChar(&this->v_pFont[(int)c_new[i_Index]], &v_Cursor, &this->c_Color, f_Scale);
 		v_Cursor.f_Pos[X] += this->i_Padding + this->v_pFont[(int)c_new[i_Index]].i_Width * f_Scale;
 		i_Index++;
 	}

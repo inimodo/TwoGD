@@ -5,7 +5,7 @@ from os import listdir
 from os.path import isfile, join
 
 
-CURVE_STEPS = 2
+CURVE_STEPS = 1
 
 
 

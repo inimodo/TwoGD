@@ -5,7 +5,7 @@
 #define WINDOW_SIZE 100
 #define WINDOW_WIDTH 16
 #define WINDOW_HEIGHT 9
-#define GRID_SIZE 100
+#define GRID_SIZE 50
 
 CODEC3D o_3DCodec;
 CODEC2D o_2DCodec;
@@ -71,6 +71,8 @@ int DrawGrid()
 
 void MouseScroll(BOOL b_Up,POINT v_ScrollPoint) 
 {
+	if (b_Up)o_Cam.f_FOV += 0.1f;
+	if (!b_Up)o_Cam.f_FOV -= 0.1f;
 	printf("%d %d %d\n",v_ScrollPoint.x, v_ScrollPoint.y,b_Up);
 }
 void LeftMouseDown(POINT v_ClickPoint)
@@ -150,7 +152,7 @@ DWORD*  gdUpdate(GDWIN * o_win)
 {
 	o_Perlog.Start();
 	o_Img.CleanBuffer();
-	o_fhandler.Write(V2(10, 10), 0.5f, "%.1f ms\n", o_Perlog.GetDelta());
+	o_fhandler.Write(V2(10, 10), 0.5f, "%.0fms\n", o_Perlog.GetDelta());
 	o_CamCtrlr.UpdateCamCtrlr(o_win);
 	o_CamCtrlr.DrawCrosshair();
 	DrawGrid();

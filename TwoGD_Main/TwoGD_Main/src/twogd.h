@@ -127,6 +127,7 @@ double Distance3(V3 v_PosOne, V3 v_PosTwo);
 
 #define PF_OVERWRITE_ALLOWED   0xA
 #define PF_OVERWRITE_FORBIDDEN 0xF
+#define PF_FONT 0xF0
 
 #define GD_ALLOC_FAILED 0x1F
 #define GD_TASK_OKAY 0x1A
@@ -247,13 +248,14 @@ public:
 	codec2d(CANVAS * o_pCanvas){
 		o_Image = o_pCanvas;
 	}
-	UCHAR  SetPixel(V2 * v_pPoint, COLOR * c_pColor,UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
-	UCHAR  DrawLine(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
-	UCHAR  DrawRect(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
-	UCHAR  DrawHLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
-	UCHAR  DrawVLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
-	UCHAR  DrawCanvas(DWORD * d_pBuffer, V2 * v_pPos, UINT32  i_Pixels[2], UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
-	UCHAR  DrawVMap(VMAP * o_VecMap, V2* v_pAnchor, float f_Scale = 1.0f, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
+	UCHAR  SetPixel(V2 * v_pPoint, COLOR * c_pColor,UCHAR i_PixelFlag , UCHAR i_PrioFlag );
+	UCHAR  DrawLine(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, UCHAR i_PixelFlag , UCHAR i_PrioFlag );
+	UCHAR  DrawRect(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, UCHAR i_PixelFlag , UCHAR i_PrioFlag );
+	UCHAR  DrawHLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag , UCHAR i_PrioFlag );
+	UCHAR  DrawVLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag , UCHAR i_PrioFlag );
+	UCHAR  DrawCanvas(DWORD * d_pBuffer, V2 * v_pPos, UINT32  i_Pixels[2], UCHAR i_PixelFlag , UCHAR i_PrioFlag );
+	UCHAR  DrawVMap(VMAP * o_VecMap, V2* v_pAnchor, float f_Scale , UCHAR i_PixelFlag , UCHAR i_PrioFlag );
+	UCHAR  DrawChar(VMAP * o_VecMap, V2* v_pAnchor, COLOR* c_pColor, float f_Scale );
 
 	BOOL b_AllowPixelOverwrite = TRUE;
 protected:
@@ -275,6 +277,7 @@ public:
 
 	UINT32 i_Padding;
 	UINT32 i_SpaceWidth;
+	COLOR c_Color;
 protected:
 	CODEC2D* o_pCodec;
 	VMAP v_pFont[ASCII_CHAR_COUNT];
