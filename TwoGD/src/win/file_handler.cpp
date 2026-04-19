@@ -129,9 +129,18 @@ vectormap::Prepare()
 UCHAR  
 vectormap::Dispose() 
 {
-	free(this->c_pColor);
-	free(this->v_pPoint);
-	free(this->l_pLines);
+	if (this->c_pColor != NULL) 
+	{
+		free(this->c_pColor);
+	}
+	if (this->v_pPoint != NULL)
+	{
+		free(this->v_pPoint);
+	}
+	if (this->l_pLines != NULL)
+	{
+		free(this->l_pLines);
+	}
 	return GD_TASK_OKAY;
 }
 

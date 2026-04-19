@@ -48,7 +48,7 @@
     <ClCompile Include="src\env\world_ctrlr.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\env\font_handler.cpp">
+    <ClCompile Include="src\ttf\font_handler.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="src\env\performace_logger.cpp">

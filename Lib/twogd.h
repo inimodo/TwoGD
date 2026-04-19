@@ -240,6 +240,21 @@ public:
 	BOOL b_Enabled = TRUE;
 }LAYER;
 
+typedef class cmap {
+public:
+	cmap() {}
+	BOOL b_Loaded;
+	LINE* l_pLines;
+	UINT32 i_Count;
+	UINT32 i_Width;
+	UINT32	i_Height;
+	int16_t i_XMin;
+	int16_t i_YMin;
+	int16_t i_XMax;
+	int16_t i_YMax;
+
+	UCHAR Dispose();
+}CHARMAP;
 
 
 typedef class codec2d {
@@ -255,35 +270,13 @@ public:
 	UCHAR  DrawVLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag , UCHAR i_PrioFlag );
 	UCHAR  DrawCanvas(DWORD * d_pBuffer, V2 * v_pPos, UINT32  i_Pixels[2], UCHAR i_PixelFlag , UCHAR i_PrioFlag );
 	UCHAR  DrawVMap(VMAP * o_VecMap, V2* v_pAnchor, float f_Scale , UCHAR i_PixelFlag , UCHAR i_PrioFlag );
-	UCHAR  DrawChar(VMAP * o_VecMap, V2* v_pAnchor, COLOR* c_pColor, float f_Scale );
+	UCHAR  DrawChar(CHARMAP* o_VecMap, V2* v_pAnchor, COLOR* c_pColor, float f_Scale );
 
 	BOOL b_AllowPixelOverwrite = TRUE;
 protected:
 	CANVAS * o_Image;
 
 }CODEC2D;
-
-#define ASCII_CHAR_COUNT 128
-#define MAXIMAL_TEXT_LENGTH 256
-#define FILEEND_VMF "vmf"
-
-typedef class font_handler {
-public:
-	font_handler() {}
-	font_handler(CODEC2D* o_pCodec, LPSTR c_pFontFolder);
-
-	void Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...);
-	UCHAR Dispose();
-
-	UINT32 i_Padding;
-	UINT32 i_SpaceWidth;
-	COLOR c_Color;
-protected:
-	CODEC2D* o_pCodec;
-	VMAP v_pFont[ASCII_CHAR_COUNT];
-}FONTHANDLER;
-
-
 
 typedef class camera {
 public:
@@ -429,3 +422,143 @@ public:
 	float GetDelta();
 	UCHAR Dispose();
 } PERLOG;
+
+
+
+typedef struct {
+	uint32_t i_ScalerType;
+	uint16_t i_NumTables;
+	uint16_t i_SearchRange;
+	uint16_t i_EntrySelector;
+	uint16_t i_RangeShift;
+} TTFHEADER;
+
+typedef struct {
+	uint8_t i_Tag[4];
+	uint32_t i_Checksum;
+	uint32_t i_Offset;
+	uint32_t i_Length;
+} TTFTABLEDIR;
+
+typedef struct {
+	uint32_t i_Version;
+	uint32_t i_FontRevision;
+	uint32_t i_CheckSumAdjustment;
+	uint32_t i_MagicNumber;
+	uint16_t i_Flags;
+	uint16_t i_UnitsPerEm;
+	uint64_t i_Created;
+	uint64_t i_Modified;
+	uint16_t i_XMin;
+	uint16_t i_YMin;
+	uint16_t i_XMax;
+	uint16_t i_YMax;
+	uint16_t i_MacStyle;
+	uint16_t i_LowestRecPPEM;
+	uint16_t i_FontDirectionHint;
+	uint16_t i_IndexToLocFormat;
+	uint16_t i_GlyphDataFormat;
+}TTFHEAD;
+
+typedef struct {
+	uint32_t i_Version;
+	uint16_t i_NumGlyph;
+}TTFMAXP;
+
+typedef struct {
+	int16_t i_NumberOfContours;
+	int16_t i_XMin;
+	int16_t i_YMin;
+	int16_t i_XMax;
+	int16_t i_YMax;
+} TTFGLYFH;
+
+typedef struct {
+	uint32_t i_GlyphStart;
+	uint32_t i_GlyphStop;
+	uint32_t i_GlyphSize;
+	TTFGLYFH ttf_HEAD;
+	uint16_t* i_EndPtsOfContours; // ttf_HEAD.i_NumberOfContours
+	uint16_t i_NumPoints;
+	uint16_t i_InstructionLength;
+	uint8_t* i_Instructions; // i_InstructionLength
+	uint8_t* i_Flags; // i_NumPoints
+	int32_t* i_XCoords;// i_NumPoints
+	int32_t* i_YCoords;// i_NumPoints
+} TTFGLYF;
+
+typedef struct {
+	uint16_t i_PlatformID;
+	uint16_t i_EncodingID;
+	uint32_t i_SubtableOffset;
+} TTFENCODINGRECORD;
+
+typedef struct {
+	uint16_t i_Version;
+	uint16_t i_NumTables;
+	TTFENCODINGRECORD* ttf_Record;
+	uint32_t i_UnicodeSubtableOffset;
+	uint16_t i_Format;
+	uint16_t i_Length;
+	uint16_t i_Language;
+	uint16_t i_SegCount;
+	uint16_t i_SearchRange;
+	uint16_t i_EntrySelector;
+	uint16_t i_RangeShift;
+	uint16_t* i_EndCode;
+	uint16_t i_ReservedPad;
+	uint16_t* i_StartCode;
+	int16_t* i_IdDelta;
+	uint16_t* i_IdRangeOffset;
+	uint16_t* i_GlyphIdArray;
+} TTFCMAP;
+
+#define TTF_FLAG_ONCURVEPOINT (uint8_t)(1)
+#define TTF_FLAG_XSHORTVEC (uint8_t)(1<<1)
+#define TTF_FLAG_YSHORTVEC (uint8_t)(1<<2)
+#define TTF_FLAG_REPEAT (uint8_t)(1<<3)
+#define TTF_FLAG_XSAME (uint8_t)(1<<4)
+#define TTF_FLAG_YSAME (uint8_t)(1<<5)
+
+#define TTF_FORMAT 4
+
+#define TTF_UNICODE_ENCODINGID 1
+#define TTF_UNICODE_PLATFORMID 3
+
+#define ASCII_CHARS 128
+#define ASCII_CHAR_START '!'
+#define ASCII_CHAR_STOP '}'
+
+#define MAXIMAL_TEXT_LENGTH 256
+
+typedef class font_handler {
+public:
+	font_handler() {}
+	font_handler(CODEC2D* o_pCodec, LPSTR c_pFontPath, int i_DivPerCurve);
+	void Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...);
+	UCHAR Dispose();
+
+	UCHAR i_LastError;
+	UINT32 i_Padding;
+	UINT32 i_SpaceWidth;
+	COLOR c_Color;
+protected:
+	char Load(LPSTR s_Path);
+	void Free();
+
+	CODEC2D* o_pCodec;
+	CHARMAP v_pFont[ASCII_CHARS];
+
+	FILE* f_File;
+
+	TTFHEAD ttf_HEAD;
+	TTFMAXP ttf_MAXP;
+	TTFCMAP ttf_CMAP;
+	TTFGLYF* ttf_pGLYF; // ttf_MAXP.i_NumGlyph
+	TTFHEADER ttf_Header;
+	TTFTABLEDIR* ttf_Tables; // ttf_Header.i_NumTables
+	uint32_t i_GlyphOffset;
+	uint32_t i_LocaOffset;
+	uint32_t i_CmapOffset;
+	uint16_t c_ASCIIMapping[ASCII_CHARS];
+}FONTHANDLER;

@@ -131,7 +131,7 @@ unsigned char  gdMain(GDWIN* o_win)
 	o_Img.Prepare(o_win->i_Width, o_win->i_Height);
 	o_2DCodec = CODEC2D(&o_Img);
 	o_3DCodec = CODEC3D(&o_Img, &o_Cam);
-	o_fhandler = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\*");
+	o_fhandler = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font.ttf",5);
 	o_fhandler.i_Padding = 10;
 	o_fhandler.i_SpaceWidth = 20;
 	o_Perlog = PERLOG(10);
@@ -152,11 +152,13 @@ DWORD*  gdUpdate(GDWIN * o_win)
 {
 	o_Perlog.Start();
 	o_Img.CleanBuffer();
-	o_fhandler.Write(V2(10, 10), 0.5f, "%.0fms\n", o_Perlog.GetDelta());
-	o_CamCtrlr.UpdateCamCtrlr(o_win);
-	o_CamCtrlr.DrawCrosshair();
-	DrawGrid();
-	o_Wrld.Render();
+	o_fhandler.Write(V2(100, 100), 0.05f, "ABCDEFGHIJKMNOPQRSTUVWXYZ\n");
+	o_fhandler.Write(V2(100, 500), 0.05f, "abcdefghijkmnopqrstuvwxyz\n");
+	//o_fhandler.Write(V2(10, 10), 0.5f, "%.0fms\n", o_Perlog.GetDelta());
+	//o_CamCtrlr.UpdateCamCtrlr(o_win);
+	//o_CamCtrlr.DrawCrosshair();
+	//DrawGrid();
+	//o_Wrld.Render();
 	o_Perlog.Stop();
 	return o_Img.d_pOutputStream;
 }
