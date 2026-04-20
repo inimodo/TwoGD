@@ -1,6 +1,9 @@
 #include "..\twogd.h"
 #include <vector>
 
+#define ISONCURVE(I) (this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].i_Flags[I] & TTF_FLAG_ONCURVEPOINT) 
+#define V2FROMCOORD(P) V2((float)this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].i_XCoords[P] , (float)this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].i_YCoords[P]*-1.0f)
+
 using namespace std;
 
 V2 Berzier(V2 v_A,V2 v_B,V2 v_S1,float f_T) 
@@ -12,7 +15,6 @@ V2 Berzier(V2 v_A,V2 v_B,V2 v_S1,float f_T)
     return v_R;
 }
 
-
 V2 Midpoint(V2 v_A, V2 v_B)
 {
     V2 v_R = V2();
@@ -21,35 +23,24 @@ V2 Midpoint(V2 v_A, V2 v_B)
     return v_R;
 }
 
-//V2 Berzier2(V2 v_A, V2 v_B, V2 v_S1, V2 v_S2, float f_T)
-//{
-//    float f_NT = (1.0f - f_T);
-//    V2 v_R = V2();
-//    v_R.f_Pos[X] = v_A.f_Pos[X] * (f_NT * f_NT * f_NT) + 3.0f * f_NT * f_NT * f_T * v_S1.f_Pos[X] + 3.0f * f_NT * f_T * f_T * v_S2.f_Pos[X] + f_T * f_T * f_T * v_B.f_Pos[X];
-//    v_R.f_Pos[Y] = v_A.f_Pos[Y] * (f_NT * f_NT * f_NT) + 3.0f * f_NT * f_NT * f_T * v_S1.f_Pos[Y] + 3.0f * f_NT * f_T * f_T * v_S2.f_Pos[Y] + f_T * f_T * f_T * v_B.f_Pos[Y];
-//    return v_R;
-//}
-#define ISONCURVE(I) (this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].i_Flags[I] & TTF_FLAG_ONCURVEPOINT) 
-#define ALLOWEDSTEP(I) ( I < this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].i_NumPoints )
-#define V2FROMCOORD(P) V2(this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].i_XCoords[P],this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].i_YCoords[P]*-1)
-
 font_handler::font_handler(CODEC2D* o_pCodec, LPSTR c_pFontFolder, int i_DivPerCurve)
 {
 	this->i_Padding = 2;
 	this->i_SpaceWidth = 10;
 	this->c_Color = COLOR(255,255,255);
     this->o_pCodec = o_pCodec;
-
 	this->Load(c_pFontFolder);
 
 	for (int i_Index = 0; i_Index < ASCII_CHARS; i_Index++)
 	{
         this->v_pFont[i_Index] = CHARMAP();
+        this->v_pFont[i_Index].b_Loaded = FALSE;
+
 		if (i_Index < ASCII_CHAR_START || i_Index > ASCII_CHAR_STOP)
 		{
 			continue;
 		}
-		printf("\n%c\n",(char)i_Index);
+
 		if (this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].i_GlyphSize == 0 || 
             this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].ttf_HEAD.i_NumberOfContours == 0) 
 		{
@@ -69,71 +60,47 @@ font_handler::font_handler(CODEC2D* o_pCodec, LPSTR c_pFontFolder, int i_DivPerC
         for (int i_Cont = 0; i_Cont < this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].ttf_HEAD.i_NumberOfContours; i_Cont++)
         {
             vector<V2> v_Dots;
-
-            
-
-            for (int i_Point = i_Start; i_Point < this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].i_EndPtsOfContours[i_Cont]+1; i_Point++)
+            V2 v_Current = V2FROMCOORD(i_Start);
+            uint16_t i_Size = this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].i_EndPtsOfContours[i_Cont] + 1;
+            for (int i_Point = i_Start; i_Point < i_Size; i_Point++)
             {
-                printf("\t[%d] %d %d F: \t%u\n", i_Point,
-                    this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].i_XCoords[i_Point],
-                    this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].i_YCoords[i_Point],
-                    this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].i_Flags[i_Point] & TTF_FLAG_ONCURVEPOINT
-                );
-
-
-                if (ISONCURVE(i_Point))
+                uint16_t i_Next = i_Point + 1;
+                if (i_Point + 1 > i_Size - 1) 
                 {
-                    if (!ALLOWEDSTEP(i_Point + 1)) // Last step
-                    {
-                        v_Dots.push_back(V2FROMCOORD(i_Point));
-                        continue;
-                    }
-                    if (ALLOWEDSTEP(i_Point + 1))  // line
-                    {
-                        if ( ISONCURVE(i_Point + 1))
-                        {
-                            v_Dots.push_back(V2FROMCOORD(i_Point));
-                            continue;
-                        }
-                    }
-                    if (ALLOWEDSTEP(i_Point + 2))  // No mid
-                    {
-                        if (!ISONCURVE(i_Point+1) && ISONCURVE(i_Point + 2))
-                        {
-                            for (float f_T = 0; f_T < 1.0f; f_T+=(1.0f/(float)i_DivPerCurve))
-                            {
-                                V2 v_P = Berzier(V2FROMCOORD(i_Point), V2FROMCOORD(i_Point+2), V2FROMCOORD(i_Point+1),f_T);
-                                v_Dots.push_back(v_P);
-                            }
-                            i_Point += 1;
-                            continue;
-                        }
-                    }
-                    if (ALLOWEDSTEP(i_Point + 3))  // With mid
-                    {
-                        if (!ISONCURVE(i_Point + 1) && !ISONCURVE(i_Point + 2) && ISONCURVE(i_Point + 3))
-                        {
-                            V2 v_Mid = Midpoint(V2FROMCOORD(i_Point+1), V2FROMCOORD(i_Point+2));
-                            for (float f_T = 0; f_T < 1.0f; f_T += (1.0f / (float)i_DivPerCurve))
-                            {
-                                V2 v_P = Berzier(V2FROMCOORD(i_Point), v_Mid, V2FROMCOORD(i_Point + 1), f_T);
-                                v_Dots.push_back(v_P);
-                            }
-
-                            for (float f_T = 0; f_T < 1.0f; f_T += (1.0f / (float)i_DivPerCurve))
-                            {
-                                V2 v_P = Berzier(v_Mid, V2FROMCOORD(i_Point + 3), V2FROMCOORD(i_Point + 2), f_T);
-                                v_Dots.push_back(v_P);
-                            }
-                            i_Point += 2;
-                            continue;
-
-                        }
-                    }
-
+                    i_Next = i_Start;
                 }
 
+                V2 v_P1 = V2FROMCOORD(i_Point);
+                V2 v_P2 = V2FROMCOORD(i_Next);
 
+                if (ISONCURVE(i_Point)) 
+                {
+                    v_Dots.push_back(v_P1);
+                    v_Current = v_P1;
+                }
+                else 
+                {
+                    if (ISONCURVE(i_Point + 1)) 
+                    {
+                        for (float f_T = 0; f_T <= 1.0f; f_T += (1.0f / (float)i_DivPerCurve))
+                        {
+                            V2 v_P = Berzier(v_Current, v_P2, v_P1, f_T);
+                            v_Dots.push_back(v_P);
+                        }
+                        v_Current = v_P2;
+                        i_Point++;
+                    }
+                    else 
+                    {
+                        V2 v_Mid = Midpoint(v_P1,v_P2);
+                        for (float f_T = 0; f_T <= 1.0f; f_T += (1.0f / (float)i_DivPerCurve))
+                        {
+                            V2 v_P = Berzier(v_Current, v_Mid, v_P1, f_T);
+                            v_Dots.push_back(v_P);
+                        }
+                        v_Current = v_Mid;
+                    }
+                }
             }
 
             V2 v_Start, v_Latest;
@@ -162,20 +129,12 @@ font_handler::font_handler(CODEC2D* o_pCodec, LPSTR c_pFontFolder, int i_DivPerC
             i_Start = this->ttf_pGLYF[this->c_ASCIIMapping[i_Index]].i_EndPtsOfContours[i_Cont]+1;
         }
 
-
         this->v_pFont[i_Index].l_pLines = (LINE*)malloc(sizeof(LINE)* o_Lines.size());
         memcpy(this->v_pFont[i_Index].l_pLines, o_Lines.data(), o_Lines.size() * sizeof(LINE));
-        this->v_pFont[i_Index].i_Count = o_Lines.size();
+        this->v_pFont[i_Index].i_Count = (uint32_t)o_Lines.size();
         this->v_pFont[i_Index].b_Loaded = TRUE;
 
-        printf("\n\n");
-        for (int i = 0; i < o_Lines.size(); i++)
-        {
-            printf("\t%.0f %.0f %.0f %.0f\n", o_Lines[i].v_Point[0].f_Pos[X], o_Lines[i].v_Point[0].f_Pos[Y], o_Lines[i].v_Point[1].f_Pos[X], o_Lines[i].v_Point[1].f_Pos[Y]);
-        }
-
 	}
-
 }
 
 void font_handler::Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...) 
@@ -199,7 +158,7 @@ void font_handler::Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...
 			i_Index++;
 			continue;
 		}
-		this->o_pCodec->DrawChar(&this->v_pFont[(int)c_new[i_Index]], &v_Cursor, &this->c_Color, f_Scale);
+		this->o_pCodec->DrawChar(&this->v_pFont[(int)c_new[i_Index]], &v_Cursor, &this->c_Color, f_Scale ,ttf_HEAD.i_UnitsPerEm);
 		v_Cursor.f_Pos[X] += this->i_Padding + this->v_pFont[(int)c_new[i_Index]].i_Width * f_Scale;
 		i_Index++;
 	}
@@ -570,7 +529,7 @@ char font_handler::Load(LPSTR s_Path)
     }
 
     fread(ttf_CMAP.i_GlyphIdArray, sizeof(uint16_t), i_GlyphIdArraySize, f_File);
-    for (int i_Index = 0; i_Index < i_GlyphIdArraySize; i_Index++)
+    for (uint32_t i_Index = 0; i_Index < i_GlyphIdArraySize; i_Index++)
     {
         ttf_CMAP.i_GlyphIdArray[i_Index] = _byteswap_ushort(ttf_CMAP.i_GlyphIdArray[i_Index]);
     }

@@ -270,7 +270,7 @@ public:
 	UCHAR  DrawVLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag , UCHAR i_PrioFlag );
 	UCHAR  DrawCanvas(DWORD * d_pBuffer, V2 * v_pPos, UINT32  i_Pixels[2], UCHAR i_PixelFlag , UCHAR i_PrioFlag );
 	UCHAR  DrawVMap(VMAP * o_VecMap, V2* v_pAnchor, float f_Scale , UCHAR i_PixelFlag , UCHAR i_PrioFlag );
-	UCHAR  DrawChar(CHARMAP* o_VecMap, V2* v_pAnchor, COLOR* c_pColor, float f_Scale );
+	UCHAR  DrawChar(CHARMAP* o_VecMap, V2* v_pAnchor, COLOR* c_pColor, float f_Scale, uint32_t i_UnitsPerEm);
 
 	BOOL b_AllowPixelOverwrite = TRUE;
 protected:
@@ -534,7 +534,7 @@ typedef struct {
 typedef class font_handler {
 public:
 	font_handler() {}
-	font_handler(CODEC2D* o_pCodec, LPSTR c_pFontPath, int i_DivPerCurve);
+	font_handler(CODEC2D* o_pCodec, LPSTR c_pFontPath, int i_DivPerCurve=4);
 	void Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...);
 	UCHAR Dispose();
 
