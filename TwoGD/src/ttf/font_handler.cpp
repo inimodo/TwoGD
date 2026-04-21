@@ -25,16 +25,15 @@ V2 Midpoint(V2 v_A, V2 v_B)
 
 font_handler::font_handler(CODEC2D* o_pCodec, LPSTR c_pFontFolder, int i_DivPerCurve)
 {
-	this->i_Padding = 2;
+	this->i_Padding = 5;
 	this->i_SpaceWidth = 10;
 	this->c_Color = COLOR(255,255,255);
     this->o_pCodec = o_pCodec;
-	this->Load(c_pFontFolder);
+	i_LastError = this->Load(c_pFontFolder);
 
 	for (int i_Index = 0; i_Index < ASCII_CHARS; i_Index++)
 	{
         this->v_pFont[i_Index] = CHARMAP();
-        this->v_pFont[i_Index].b_Loaded = FALSE;
 
 		if (i_Index < ASCII_CHAR_START || i_Index > ASCII_CHAR_STOP)
 		{
@@ -144,6 +143,7 @@ void font_handler::Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...
 	CHAR c_new[MAXIMAL_TEXT_LENGTH];
 	vsprintf(c_new, c_pformat, o_args);
 	V2 v_Cursor = V2(v_pAnchor.f_Pos);
+    float f_PixelScale = f_Scale / (float)ttf_HEAD.i_UnitsPerEm;
 	int i_Index = 0;
 	while (c_new[i_Index] != '\0')
 	{
@@ -154,29 +154,53 @@ void font_handler::Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...
 		}
 		if (this->v_pFont[(int)c_new[i_Index]].b_Loaded == FALSE) 
 		{
-			v_Cursor.f_Pos[X] += this->i_Padding + this->i_SpaceWidth * f_Scale;
+			v_Cursor.f_Pos[X] += this->i_Padding + this->i_SpaceWidth * f_PixelScale;
 			i_Index++;
 			continue;
 		}
-		this->o_pCodec->DrawChar(&this->v_pFont[(int)c_new[i_Index]], &v_Cursor, &this->c_Color, f_Scale ,ttf_HEAD.i_UnitsPerEm);
-		v_Cursor.f_Pos[X] += this->i_Padding + this->v_pFont[(int)c_new[i_Index]].i_Width * f_Scale;
+		this->o_pCodec->DrawChar(&this->v_pFont[(int)c_new[i_Index]], &v_Cursor, &this->c_Color, f_PixelScale);
+		v_Cursor.f_Pos[X] += this->i_Padding + this->v_pFont[(int)c_new[i_Index]].i_Width * f_PixelScale;
 		i_Index++;
 	}
 }
 
-
 void font_handler::Free()
 {
+    if (ttf_Tables != NULL) 
+    {
+        free(ttf_Tables);
+    }
+    if (ttf_pGLYF != NULL) 
+    {
+        for (int i_Index = 0; i_Index < ttf_MAXP.i_NumGlyph; i_Index++)
+        {
+            if (ttf_pGLYF[i_Index].i_GlyphSize < 10 )
+            {
+                continue;
+            }
+            if (ttf_pGLYF[i_Index].ttf_HEAD.i_NumberOfContours == 0)
+            {
+                continue;
+            }
+            free(ttf_pGLYF[i_Index].i_EndPtsOfContours);
+            free(ttf_pGLYF[i_Index].i_Instructions);
+            free(ttf_pGLYF[i_Index].i_Flags);
+            free(ttf_pGLYF[i_Index].i_XCoords);
+            free(ttf_pGLYF[i_Index].i_YCoords);
+
+        }
+    }
+    free(ttf_pGLYF);
+    fclose(f_File);
 }
 
-char font_handler::Load(LPSTR s_Path)
+UCHAR font_handler::Load(LPSTR s_Path)
 {
     f_File = fopen(s_Path, "rb");
     if (f_File == NULL)
     {
-        printf("Failed to open .ttf\n");
         Free();
-        return 0;
+        return GD_FILE_FAILED;
     }
 
     fread(&ttf_Header, sizeof(TTFHEADER), 1, f_File);
@@ -189,41 +213,40 @@ char font_handler::Load(LPSTR s_Path)
     ttf_Tables = (TTFTABLEDIR*)malloc(sizeof(TTFTABLEDIR) * ttf_Header.i_NumTables);
     if (ttf_Tables == NULL)
     {
-        printf("Memory Error!");
         Free();
-        return 0;
+        return GD_ALLOC_FAILED;
     }
 
     fread(ttf_Tables, sizeof(TTFTABLEDIR), ttf_Header.i_NumTables, f_File);
 
-    for (int index = 0; index < ttf_Header.i_NumTables; index++)
+    for (int i_Index = 0; i_Index < ttf_Header.i_NumTables; i_Index++)
     {
 
-        ttf_Tables[index].i_Checksum = _byteswap_ulong(ttf_Tables[index].i_Checksum);
-        ttf_Tables[index].i_Offset = _byteswap_ulong(ttf_Tables[index].i_Offset);
-        ttf_Tables[index].i_Length = _byteswap_ulong(ttf_Tables[index].i_Length);
+        ttf_Tables[i_Index].i_Checksum = _byteswap_ulong(ttf_Tables[i_Index].i_Checksum);
+        ttf_Tables[i_Index].i_Offset = _byteswap_ulong(ttf_Tables[i_Index].i_Offset);
+        ttf_Tables[i_Index].i_Length = _byteswap_ulong(ttf_Tables[i_Index].i_Length);
 
-        if (ttf_Tables[index].i_Tag[0] == 'h' && ttf_Tables[index].i_Tag[1] == 'e' && ttf_Tables[index].i_Tag[2] == 'a' && ttf_Tables[index].i_Tag[3] == 'd')
+        if (ttf_Tables[i_Index].i_Tag[0] == 'h' && ttf_Tables[i_Index].i_Tag[1] == 'e' && ttf_Tables[i_Index].i_Tag[2] == 'a' && ttf_Tables[i_Index].i_Tag[3] == 'd')
         {
-            fseek(f_File, ttf_Tables[index].i_Offset, SEEK_SET);
+            fseek(f_File, ttf_Tables[i_Index].i_Offset, SEEK_SET);
             fread(&ttf_HEAD, sizeof(TTFHEAD), 1, f_File);
         }
-        if (ttf_Tables[index].i_Tag[0] == 'm' && ttf_Tables[index].i_Tag[1] == 'a' && ttf_Tables[index].i_Tag[2] == 'x' && ttf_Tables[index].i_Tag[3] == 'p')
+        if (ttf_Tables[i_Index].i_Tag[0] == 'm' && ttf_Tables[i_Index].i_Tag[1] == 'a' && ttf_Tables[i_Index].i_Tag[2] == 'x' && ttf_Tables[i_Index].i_Tag[3] == 'p')
         {
-            fseek(f_File, ttf_Tables[index].i_Offset, SEEK_SET);
+            fseek(f_File, ttf_Tables[i_Index].i_Offset, SEEK_SET);
             fread(&ttf_MAXP, sizeof(TTFMAXP), 1, f_File);
         }
-        if (ttf_Tables[index].i_Tag[0] == 'g' && ttf_Tables[index].i_Tag[1] == 'l' && ttf_Tables[index].i_Tag[2] == 'y' && ttf_Tables[index].i_Tag[3] == 'f')
+        if (ttf_Tables[i_Index].i_Tag[0] == 'g' && ttf_Tables[i_Index].i_Tag[1] == 'l' && ttf_Tables[i_Index].i_Tag[2] == 'y' && ttf_Tables[i_Index].i_Tag[3] == 'f')
         {
-            i_GlyphOffset = ttf_Tables[index].i_Offset;
+            i_GlyphOffset = ttf_Tables[i_Index].i_Offset;
         }
-        if (ttf_Tables[index].i_Tag[0] == 'l' && ttf_Tables[index].i_Tag[1] == 'o' && ttf_Tables[index].i_Tag[2] == 'c' && ttf_Tables[index].i_Tag[3] == 'a')
+        if (ttf_Tables[i_Index].i_Tag[0] == 'l' && ttf_Tables[i_Index].i_Tag[1] == 'o' && ttf_Tables[i_Index].i_Tag[2] == 'c' && ttf_Tables[i_Index].i_Tag[3] == 'a')
         {
-            i_LocaOffset = ttf_Tables[index].i_Offset;
+            i_LocaOffset = ttf_Tables[i_Index].i_Offset;
         }
-        if (ttf_Tables[index].i_Tag[0] == 'c' && ttf_Tables[index].i_Tag[1] == 'm' && ttf_Tables[index].i_Tag[2] == 'a' && ttf_Tables[index].i_Tag[3] == 'p')
+        if (ttf_Tables[i_Index].i_Tag[0] == 'c' && ttf_Tables[i_Index].i_Tag[1] == 'm' && ttf_Tables[i_Index].i_Tag[2] == 'a' && ttf_Tables[i_Index].i_Tag[3] == 'p')
         {
-            i_CmapOffset = ttf_Tables[index].i_Offset;
+            i_CmapOffset = ttf_Tables[i_Index].i_Offset;
         }
     }
 
@@ -233,9 +256,8 @@ char font_handler::Load(LPSTR s_Path)
 
     if (ttf_HEAD.i_MagicNumber != 0x5F0F3CF5)
     {
-        printf("Magic number nthis->ttf_Header matching!");
         Free();
-        return 0;
+        return GD_TTF_ERROR;
     }
 
     ttf_MAXP.i_Version = _byteswap_ulong(ttf_MAXP.i_Version);
@@ -243,9 +265,8 @@ char font_handler::Load(LPSTR s_Path)
 
     if (ttf_MAXP.i_Version != 65536)
     {
-        printf("Invalid TTF Version!");
         Free();
-        return 0;
+        return GD_TTF_ERROR;
     }
 
 
@@ -257,16 +278,15 @@ char font_handler::Load(LPSTR s_Path)
         uint32_t* loca = (uint32_t*)malloc((ttf_MAXP.i_NumGlyph + 1) * sizeof(uint32_t));
         if (loca == NULL)
         {
-            printf("Memory Error!");
             Free();
-            return 0;
+            return GD_ALLOC_FAILED;
         }
         fread(loca, sizeof(uint32_t), ttf_MAXP.i_NumGlyph + 1, f_File);
-        for (int index = 0; index < ttf_MAXP.i_NumGlyph; index++)
+        for (int i_Index = 0; i_Index < ttf_MAXP.i_NumGlyph; i_Index++)
         {
-            ttf_pGLYF[index].i_GlyphStart = i_GlyphOffset + _byteswap_ulong(loca[index]);
-            ttf_pGLYF[index].i_GlyphStop = i_GlyphOffset + _byteswap_ulong(loca[index + 1]);
-            ttf_pGLYF[index].i_GlyphSize = ttf_pGLYF[index].i_GlyphStop - ttf_pGLYF[index].i_GlyphStart;
+            ttf_pGLYF[i_Index].i_GlyphStart = i_GlyphOffset + _byteswap_ulong(loca[i_Index]);
+            ttf_pGLYF[i_Index].i_GlyphStop = i_GlyphOffset + _byteswap_ulong(loca[i_Index + 1]);
+            ttf_pGLYF[i_Index].i_GlyphSize = ttf_pGLYF[i_Index].i_GlyphStop - ttf_pGLYF[i_Index].i_GlyphStart;
         }
         free(loca);
     }
@@ -275,70 +295,67 @@ char font_handler::Load(LPSTR s_Path)
         uint16_t* loca = (uint16_t*)malloc((ttf_MAXP.i_NumGlyph + 1) * sizeof(uint16_t));
         if (loca == NULL)
         {
-            printf("Memory Error!");
             Free();
-            return 0;
+            return GD_ALLOC_FAILED;
         }
         fread(loca, sizeof(uint16_t), ttf_MAXP.i_NumGlyph + 1, f_File);
-        for (int index = 0; index < ttf_MAXP.i_NumGlyph; index++)
+        for (int i_Index = 0; i_Index < ttf_MAXP.i_NumGlyph; i_Index++)
         {
-            ttf_pGLYF[index].i_GlyphStart = i_GlyphOffset + _byteswap_ushort(loca[index]) * 2;
-            ttf_pGLYF[index].i_GlyphStop = i_GlyphOffset + _byteswap_ushort(loca[index + 1]) * 2;
-            ttf_pGLYF[index].i_GlyphSize = ttf_pGLYF[index].i_GlyphStop - ttf_pGLYF[index].i_GlyphStart;
+            ttf_pGLYF[i_Index].i_GlyphStart = i_GlyphOffset + _byteswap_ushort(loca[i_Index]) * 2;
+            ttf_pGLYF[i_Index].i_GlyphStop = i_GlyphOffset + _byteswap_ushort(loca[i_Index + 1]) * 2;
+            ttf_pGLYF[i_Index].i_GlyphSize = ttf_pGLYF[i_Index].i_GlyphStop - ttf_pGLYF[i_Index].i_GlyphStart;
         }
         free(loca);
     }
 
-    for (int index = 0; index < ttf_MAXP.i_NumGlyph; index++)
+    for (int i_Index = 0; i_Index < ttf_MAXP.i_NumGlyph; i_Index++)
     {
-        if (ttf_pGLYF[index].i_GlyphSize < 10) continue;
-        fseek(f_File, ttf_pGLYF[index].i_GlyphStart, SEEK_SET);
-        fread(&(ttf_pGLYF[index].ttf_HEAD), sizeof(TTFGLYFH), 1, f_File);
+        if (ttf_pGLYF[i_Index].i_GlyphSize < 10) continue;
+        fseek(f_File, ttf_pGLYF[i_Index].i_GlyphStart, SEEK_SET);
+        fread(&(ttf_pGLYF[i_Index].ttf_HEAD), sizeof(TTFGLYFH), 1, f_File);
 
-        if (ttf_pGLYF[index].ttf_HEAD.i_NumberOfContours & 0x1)
+        if (ttf_pGLYF[i_Index].ttf_HEAD.i_NumberOfContours & 0x1)
         {
-            ttf_pGLYF[index].ttf_HEAD.i_NumberOfContours = 0;
+            ttf_pGLYF[i_Index].ttf_HEAD.i_NumberOfContours = 0;
             continue;
         }
 
-        ttf_pGLYF[index].ttf_HEAD.i_NumberOfContours = _byteswap_ushort(ttf_pGLYF[index].ttf_HEAD.i_NumberOfContours);
-        ttf_pGLYF[index].ttf_HEAD.i_XMax = _byteswap_ushort(ttf_pGLYF[index].ttf_HEAD.i_XMax);
-        ttf_pGLYF[index].ttf_HEAD.i_XMin = _byteswap_ushort(ttf_pGLYF[index].ttf_HEAD.i_XMin);
-        ttf_pGLYF[index].ttf_HEAD.i_YMax = _byteswap_ushort(ttf_pGLYF[index].ttf_HEAD.i_YMax);
-        ttf_pGLYF[index].ttf_HEAD.i_YMin = _byteswap_ushort(ttf_pGLYF[index].ttf_HEAD.i_YMin);
+        ttf_pGLYF[i_Index].ttf_HEAD.i_NumberOfContours = _byteswap_ushort(ttf_pGLYF[i_Index].ttf_HEAD.i_NumberOfContours);
+        ttf_pGLYF[i_Index].ttf_HEAD.i_XMax = _byteswap_ushort(ttf_pGLYF[i_Index].ttf_HEAD.i_XMax);
+        ttf_pGLYF[i_Index].ttf_HEAD.i_XMin = _byteswap_ushort(ttf_pGLYF[i_Index].ttf_HEAD.i_XMin);
+        ttf_pGLYF[i_Index].ttf_HEAD.i_YMax = _byteswap_ushort(ttf_pGLYF[i_Index].ttf_HEAD.i_YMax);
+        ttf_pGLYF[i_Index].ttf_HEAD.i_YMin = _byteswap_ushort(ttf_pGLYF[i_Index].ttf_HEAD.i_YMin);
 
-        ttf_pGLYF[index].i_EndPtsOfContours = (uint16_t*)malloc(sizeof(uint16_t) * ttf_pGLYF[index].ttf_HEAD.i_NumberOfContours);
-        if (ttf_pGLYF[index].i_EndPtsOfContours == NULL)
+        ttf_pGLYF[i_Index].i_EndPtsOfContours = (uint16_t*)malloc(sizeof(uint16_t) * ttf_pGLYF[i_Index].ttf_HEAD.i_NumberOfContours);
+        if (ttf_pGLYF[i_Index].i_EndPtsOfContours == NULL)
         {
-            printf("Memory Error!");
             Free();
-            return 0;
+            return GD_ALLOC_FAILED;
         }
-        fread(ttf_pGLYF[index].i_EndPtsOfContours, sizeof(uint16_t), ttf_pGLYF[index].ttf_HEAD.i_NumberOfContours, f_File);
+        fread(ttf_pGLYF[i_Index].i_EndPtsOfContours, sizeof(uint16_t), ttf_pGLYF[i_Index].ttf_HEAD.i_NumberOfContours, f_File);
 
-        for (int cont = 0; cont < ttf_pGLYF[index].ttf_HEAD.i_NumberOfContours; cont++)
+        for (int cont = 0; cont < ttf_pGLYF[i_Index].ttf_HEAD.i_NumberOfContours; cont++)
         {
-            ttf_pGLYF[index].i_EndPtsOfContours[cont] = _byteswap_ushort(ttf_pGLYF[index].i_EndPtsOfContours[cont]);
-            ttf_pGLYF[index].i_NumPoints = ttf_pGLYF[index].i_EndPtsOfContours[cont] + 1;
+            ttf_pGLYF[i_Index].i_EndPtsOfContours[cont] = _byteswap_ushort(ttf_pGLYF[i_Index].i_EndPtsOfContours[cont]);
+            ttf_pGLYF[i_Index].i_NumPoints = ttf_pGLYF[i_Index].i_EndPtsOfContours[cont] + 1;
         }
 
-        fread(&(ttf_pGLYF[index].i_InstructionLength), sizeof(uint16_t), 1, f_File);
-        ttf_pGLYF[index].i_InstructionLength = _byteswap_ushort(ttf_pGLYF[index].i_InstructionLength);
-        ttf_pGLYF[index].i_Instructions = (uint8_t*)malloc(sizeof(uint8_t) * ttf_pGLYF[index].i_InstructionLength);
-        if (ttf_pGLYF[index].i_Instructions == NULL)
+        fread(&(ttf_pGLYF[i_Index].i_InstructionLength), sizeof(uint16_t), 1, f_File);
+        ttf_pGLYF[i_Index].i_InstructionLength = _byteswap_ushort(ttf_pGLYF[i_Index].i_InstructionLength);
+        ttf_pGLYF[i_Index].i_Instructions = (uint8_t*)malloc(sizeof(uint8_t) * ttf_pGLYF[i_Index].i_InstructionLength);
+        if (ttf_pGLYF[i_Index].i_Instructions == NULL)
         {
-            printf("Memory Error!");
             Free();
-            return 0;
+            return GD_ALLOC_FAILED;
         }
-        fread(ttf_pGLYF[index].i_Instructions, sizeof(uint8_t), ttf_pGLYF[index].i_InstructionLength, f_File);
+        fread(ttf_pGLYF[i_Index].i_Instructions, sizeof(uint8_t), ttf_pGLYF[i_Index].i_InstructionLength, f_File);
 
-        ttf_pGLYF[index].i_Flags = (uint8_t*)malloc(sizeof(uint8_t) * ttf_pGLYF[index].i_NumPoints);
-        for (int flagIndex = 0; flagIndex < ttf_pGLYF[index].i_NumPoints; flagIndex++)
+        ttf_pGLYF[i_Index].i_Flags = (uint8_t*)malloc(sizeof(uint8_t) * ttf_pGLYF[i_Index].i_NumPoints);
+        for (int flagIndex = 0; flagIndex < ttf_pGLYF[i_Index].i_NumPoints; flagIndex++)
         {
             uint8_t flag;
             fread(&flag, sizeof(uint8_t), 1, f_File);
-            ttf_pGLYF[index].i_Flags[flagIndex] = flag & ~TTF_FLAG_REPEAT;
+            ttf_pGLYF[i_Index].i_Flags[flagIndex] = flag & ~TTF_FLAG_REPEAT;
 
             if (flag & TTF_FLAG_REPEAT)
             {
@@ -347,30 +364,29 @@ char font_handler::Load(LPSTR s_Path)
                 flagIndex++;
                 for (int repeat = 0; repeat < repeating; repeat++)
                 {
-                    ttf_pGLYF[index].i_Flags[flagIndex] = flag & ~TTF_FLAG_REPEAT;
+                    ttf_pGLYF[i_Index].i_Flags[flagIndex] = flag & ~TTF_FLAG_REPEAT;
                     flagIndex++;
                 }
                 flagIndex--;
             }
         }
 
-        ttf_pGLYF[index].i_XCoords = (int32_t*)malloc(sizeof(int32_t) * ttf_pGLYF[index].i_NumPoints);
-        ttf_pGLYF[index].i_YCoords = (int32_t*)malloc(sizeof(int32_t) * ttf_pGLYF[index].i_NumPoints);
-        if (ttf_pGLYF[index].i_XCoords == NULL || ttf_pGLYF[index].i_YCoords == NULL)
+        ttf_pGLYF[i_Index].i_XCoords = (int32_t*)malloc(sizeof(int32_t) * ttf_pGLYF[i_Index].i_NumPoints);
+        ttf_pGLYF[i_Index].i_YCoords = (int32_t*)malloc(sizeof(int32_t) * ttf_pGLYF[i_Index].i_NumPoints);
+        if (ttf_pGLYF[i_Index].i_XCoords == NULL || ttf_pGLYF[i_Index].i_YCoords == NULL)
         {
-            printf("Memory Error!");
             Free();
-            return 0;
+            return GD_ALLOC_FAILED;
         }
         int i_Last = 0;
-        for (int flagIndex = 0; flagIndex < ttf_pGLYF[index].i_NumPoints; flagIndex++)
+        for (int flagIndex = 0; flagIndex < ttf_pGLYF[i_Index].i_NumPoints; flagIndex++)
         {
             int i_Delta;
-            if (ttf_pGLYF[index].i_Flags[flagIndex] & TTF_FLAG_XSHORTVEC)
+            if (ttf_pGLYF[i_Index].i_Flags[flagIndex] & TTF_FLAG_XSHORTVEC)
             {
                 uint8_t i_Read;
                 fread(&i_Read, sizeof(uint8_t), 1, f_File);
-                if (ttf_pGLYF[index].i_Flags[flagIndex] & TTF_FLAG_XSAME)
+                if (ttf_pGLYF[i_Index].i_Flags[flagIndex] & TTF_FLAG_XSAME)
                 {
                     i_Delta = i_Read;
                 }
@@ -381,7 +397,7 @@ char font_handler::Load(LPSTR s_Path)
             }
             else
             {
-                if (ttf_pGLYF[index].i_Flags[flagIndex] & TTF_FLAG_XSAME)
+                if (ttf_pGLYF[i_Index].i_Flags[flagIndex] & TTF_FLAG_XSAME)
                 {
                     i_Delta = 0;
                 }
@@ -393,19 +409,19 @@ char font_handler::Load(LPSTR s_Path)
                     i_Delta = (int16_t)i_Read;
                 }
             }
-            ttf_pGLYF[index].i_XCoords[flagIndex] = i_Last + i_Delta;
-            i_Last = ttf_pGLYF[index].i_XCoords[flagIndex];
+            ttf_pGLYF[i_Index].i_XCoords[flagIndex] = i_Last + i_Delta;
+            i_Last = ttf_pGLYF[i_Index].i_XCoords[flagIndex];
 
         }
         i_Last = 0;
-        for (int flagIndex = 0; flagIndex < ttf_pGLYF[index].i_NumPoints; flagIndex++)
+        for (int flagIndex = 0; flagIndex < ttf_pGLYF[i_Index].i_NumPoints; flagIndex++)
         {
             int i_Delta;
-            if (ttf_pGLYF[index].i_Flags[flagIndex] & TTF_FLAG_YSHORTVEC)
+            if (ttf_pGLYF[i_Index].i_Flags[flagIndex] & TTF_FLAG_YSHORTVEC)
             {
                 uint8_t i_Read;
                 fread(&i_Read, sizeof(uint8_t), 1, f_File);
-                if (ttf_pGLYF[index].i_Flags[flagIndex] & TTF_FLAG_YSAME)
+                if (ttf_pGLYF[i_Index].i_Flags[flagIndex] & TTF_FLAG_YSAME)
                 {
                     i_Delta = i_Read;
                 }
@@ -416,7 +432,7 @@ char font_handler::Load(LPSTR s_Path)
             }
             else
             {
-                if (ttf_pGLYF[index].i_Flags[flagIndex] & TTF_FLAG_YSAME)
+                if (ttf_pGLYF[i_Index].i_Flags[flagIndex] & TTF_FLAG_YSAME)
                 {
                     i_Delta = 0;
                 }
@@ -428,8 +444,8 @@ char font_handler::Load(LPSTR s_Path)
                     i_Delta = (int16_t)i_Read;
                 }
             }
-            ttf_pGLYF[index].i_YCoords[flagIndex] = i_Last + i_Delta;
-            i_Last = ttf_pGLYF[index].i_YCoords[flagIndex];
+            ttf_pGLYF[i_Index].i_YCoords[flagIndex] = i_Last + i_Delta;
+            i_Last = ttf_pGLYF[i_Index].i_YCoords[flagIndex];
         }
     }
 
@@ -442,30 +458,28 @@ char font_handler::Load(LPSTR s_Path)
     ttf_CMAP.ttf_Record = (TTFENCODINGRECORD*)malloc(sizeof(TTFENCODINGRECORD) * ttf_CMAP.i_NumTables);
     if (ttf_CMAP.ttf_Record == NULL)
     {
-        printf("Memory Error!");
         Free();
-        return 0;
+        return GD_ALLOC_FAILED;
     }
     fread(ttf_CMAP.ttf_Record, sizeof(TTFENCODINGRECORD), ttf_CMAP.i_NumTables, f_File);
 
     ttf_CMAP.i_UnicodeSubtableOffset = 0;
-    for (int index = 0; index < ttf_CMAP.i_NumTables; index++)
+    for (int i_Index = 0; i_Index < ttf_CMAP.i_NumTables; i_Index++)
     {
-        ttf_CMAP.ttf_Record[index].i_EncodingID = _byteswap_ushort(ttf_CMAP.ttf_Record[index].i_EncodingID);
-        ttf_CMAP.ttf_Record[index].i_PlatformID = _byteswap_ushort(ttf_CMAP.ttf_Record[index].i_PlatformID);
-        ttf_CMAP.ttf_Record[index].i_SubtableOffset = _byteswap_ulong(ttf_CMAP.ttf_Record[index].i_SubtableOffset);
+        ttf_CMAP.ttf_Record[i_Index].i_EncodingID = _byteswap_ushort(ttf_CMAP.ttf_Record[i_Index].i_EncodingID);
+        ttf_CMAP.ttf_Record[i_Index].i_PlatformID = _byteswap_ushort(ttf_CMAP.ttf_Record[i_Index].i_PlatformID);
+        ttf_CMAP.ttf_Record[i_Index].i_SubtableOffset = _byteswap_ulong(ttf_CMAP.ttf_Record[i_Index].i_SubtableOffset);
 
-        if (ttf_CMAP.ttf_Record[index].i_EncodingID == TTF_UNICODE_ENCODINGID && ttf_CMAP.ttf_Record[index].i_PlatformID == TTF_UNICODE_PLATFORMID)
+        if (ttf_CMAP.ttf_Record[i_Index].i_EncodingID == TTF_UNICODE_ENCODINGID && ttf_CMAP.ttf_Record[i_Index].i_PlatformID == TTF_UNICODE_PLATFORMID)
         {
-            ttf_CMAP.i_UnicodeSubtableOffset = ttf_CMAP.ttf_Record[index].i_SubtableOffset;
+            ttf_CMAP.i_UnicodeSubtableOffset = ttf_CMAP.ttf_Record[i_Index].i_SubtableOffset;
         }
     }
 
     if (ttf_CMAP.i_UnicodeSubtableOffset == 0)
     {
-        printf("No Unicode Table!");
         Free();
-        return 0;
+        return GD_TTF_ERROR;
     }
 
     fseek(f_File, i_CmapOffset + ttf_CMAP.i_UnicodeSubtableOffset, SEEK_SET);
@@ -475,9 +489,8 @@ char font_handler::Load(LPSTR s_Path)
 
     if (ttf_CMAP.i_Format != TTF_FORMAT)
     {
-        printf("Wrong Format!");
         Free();
-        return 0;
+        return GD_TTF_ERROR;
     }
 
     fread(&(ttf_CMAP.i_Length), sizeof(uint16_t), 1, f_File);
@@ -501,9 +514,8 @@ char font_handler::Load(LPSTR s_Path)
 
     if (ttf_CMAP.i_EndCode == NULL || ttf_CMAP.i_StartCode == NULL || ttf_CMAP.i_IdDelta == NULL || ttf_CMAP.i_IdRangeOffset == NULL)
     {
-        printf("Memory Error!");
         Free();
-        return 0;
+        return GD_ALLOC_FAILED;
     }
     fread(ttf_CMAP.i_EndCode, sizeof(uint16_t), ttf_CMAP.i_SegCount, f_File);
     fread(&(ttf_CMAP.i_ReservedPad), sizeof(uint16_t), 1, f_File);
@@ -511,21 +523,20 @@ char font_handler::Load(LPSTR s_Path)
     fread(ttf_CMAP.i_IdDelta, sizeof(int16_t), ttf_CMAP.i_SegCount, f_File);
     fread(ttf_CMAP.i_IdRangeOffset, sizeof(uint16_t), ttf_CMAP.i_SegCount, f_File);
 
-    for (int index = 0; index < ttf_CMAP.i_SegCount; index++)
+    for (int i_Index = 0; i_Index < ttf_CMAP.i_SegCount; i_Index++)
     {
-        ttf_CMAP.i_EndCode[index] = _byteswap_ushort(ttf_CMAP.i_EndCode[index]);
-        ttf_CMAP.i_StartCode[index] = _byteswap_ushort(ttf_CMAP.i_StartCode[index]);
-        ttf_CMAP.i_IdDelta[index] = (int16_t)_byteswap_ushort(ttf_CMAP.i_IdDelta[index]);
-        ttf_CMAP.i_IdRangeOffset[index] = _byteswap_ushort(ttf_CMAP.i_IdRangeOffset[index]);
+        ttf_CMAP.i_EndCode[i_Index] = _byteswap_ushort(ttf_CMAP.i_EndCode[i_Index]);
+        ttf_CMAP.i_StartCode[i_Index] = _byteswap_ushort(ttf_CMAP.i_StartCode[i_Index]);
+        ttf_CMAP.i_IdDelta[i_Index] = (int16_t)_byteswap_ushort(ttf_CMAP.i_IdDelta[i_Index]);
+        ttf_CMAP.i_IdRangeOffset[i_Index] = _byteswap_ushort(ttf_CMAP.i_IdRangeOffset[i_Index]);
     }
 
     uint32_t i_GlyphIdArraySize = (ttf_CMAP.i_Length - (16 + 8 * ttf_CMAP.i_SegCount)) / 2;
     ttf_CMAP.i_GlyphIdArray = (uint16_t*)malloc(sizeof(uint16_t) * i_GlyphIdArraySize);
     if (ttf_CMAP.i_GlyphIdArray == NULL)
     {
-        printf("Memory Error!");
         Free();
-        return 0;
+        return GD_ALLOC_FAILED;
     }
 
     fread(ttf_CMAP.i_GlyphIdArray, sizeof(uint16_t), i_GlyphIdArraySize, f_File);
@@ -565,6 +576,7 @@ char font_handler::Load(LPSTR s_Path)
         }
 
     }
+    return 0;
 }
 
 
@@ -578,7 +590,13 @@ UCHAR font_handler::Dispose()
 		}
 		this->v_pFont[i_Index].Dispose();
 	}
+    Free();
 	return GD_TASK_OKAY;
+}
+
+cmap::cmap()
+{
+    b_Loaded = FALSE;
 }
 
 UCHAR cmap::Dispose()

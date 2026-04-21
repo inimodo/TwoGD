@@ -133,6 +133,7 @@ double Distance3(V3 v_PosOne, V3 v_PosTwo);
 #define GD_TASK_OKAY 0x1A
 #define GD_FILE_FAILED 0x2F
 #define GD_OUTOFBOUND 0x2E
+#define GD_TTF_ERROR 0xF0
 
 #define DEGTORAD(X) (float)(X*2*M_PI/360.0)
 #define RADTODEG(X) (float)(X/(2*M_PI)*360.0)
@@ -242,7 +243,7 @@ public:
 
 typedef class cmap {
 public:
-	cmap() {}
+	cmap();
 	BOOL b_Loaded;
 	LINE* l_pLines;
 	UINT32 i_Count;
@@ -270,7 +271,7 @@ public:
 	UCHAR  DrawVLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag , UCHAR i_PrioFlag );
 	UCHAR  DrawCanvas(DWORD * d_pBuffer, V2 * v_pPos, UINT32  i_Pixels[2], UCHAR i_PixelFlag , UCHAR i_PrioFlag );
 	UCHAR  DrawVMap(VMAP * o_VecMap, V2* v_pAnchor, float f_Scale , UCHAR i_PixelFlag , UCHAR i_PrioFlag );
-	UCHAR  DrawChar(CHARMAP* o_VecMap, V2* v_pAnchor, COLOR* c_pColor, float f_Scale, uint32_t i_UnitsPerEm);
+	UCHAR  DrawChar(CHARMAP* o_VecMap, V2* v_pAnchor, COLOR* c_pColor, float f_Scale);
 
 	BOOL b_AllowPixelOverwrite = TRUE;
 protected:
@@ -543,7 +544,7 @@ public:
 	UINT32 i_SpaceWidth;
 	COLOR c_Color;
 protected:
-	char Load(LPSTR s_Path);
+	UCHAR Load(LPSTR s_Path);
 	void Free();
 
 	CODEC2D* o_pCodec;

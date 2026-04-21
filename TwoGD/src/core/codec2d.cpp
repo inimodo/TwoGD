@@ -126,9 +126,9 @@ codec2d::DrawVMap(VMAP * o_VecMap,V2* v_pAnchor, float f_Scale, UCHAR i_PixelFla
 	return GD_TASK_OKAY;
 }
 UCHAR
-codec2d::DrawChar(CHARMAP* o_VecMap, V2* v_pAnchor, COLOR* c_pColor, float f_Scale, uint32_t i_UnitsPerEm)
+codec2d::DrawChar(CHARMAP* o_VecMap, V2* v_pAnchor, COLOR* c_pColor, float f_Scale)
 {
-	float f_PixelScale = f_Scale / i_UnitsPerEm;
+	
 	V2 v_H, v_L, v_Point;
 	for (int i_Y = (int)(o_VecMap->i_YMin * f_Scale); i_Y < (int)(o_VecMap->i_YMax * f_Scale); i_Y++)
 	{
@@ -179,7 +179,10 @@ codec2d::DrawChar(CHARMAP* o_VecMap, V2* v_pAnchor, COLOR* c_pColor, float f_Sca
 			f_EdgesSorted[i_EdgeCount-i_Sort-1] = f_Edges[i_Highest];
 			f_Edges[i_Highest] = 0;
 		}
-
+		if (i_EdgeCount % 2 != 0) 
+		{
+			continue;
+		}
 		for (int i_Index = 0; i_Index < i_EdgeCount; i_Index+=2)
 		{
 			v_Point = *v_pAnchor;

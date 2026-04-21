@@ -15,8 +15,9 @@ CAM3D o_Cam;
 CAMCTRLR o_CamCtrlr;
 WORLD o_Wrld;
 FONTHANDLER o_fhandler;
+FONTHANDLER o_fhandler2;
 PERLOG o_Perlog;
-float f_Size = 0.2f;
+float f_Size = 100;
 int DrawGrid() 
 {
 	int i_EdgeCount = 3;
@@ -71,8 +72,8 @@ int DrawGrid()
 
 void MouseScroll(BOOL b_Up,POINT v_ScrollPoint) 
 {
-	if (b_Up)f_Size += 0.001f;
-	if (!b_Up)f_Size -= 0.001f;
+	if (b_Up)f_Size += 2;
+	if (!b_Up)f_Size -= 2;
 	printf("%d %d %d\n",v_ScrollPoint.x, v_ScrollPoint.y,b_Up);
 }
 void LeftMouseDown(POINT v_ClickPoint)
@@ -132,8 +133,7 @@ unsigned char  gdMain(GDWIN* o_win)
 	o_2DCodec = CODEC2D(&o_Img);
 	o_3DCodec = CODEC3D(&o_Img, &o_Cam);
 	o_fhandler = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font.ttf");
-	o_fhandler.i_Padding = 10;
-	o_fhandler.i_SpaceWidth = 20;
+	o_fhandler2 = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font2.ttf");
 	o_Perlog = PERLOG(10);
 	o_Wrld = WORLD(&o_3DCodec);
 	o_Wrld.AppendLayer((const LPSTR)"src\\obj\\obj2.objf", co_Red);
@@ -152,7 +152,7 @@ DWORD*  gdUpdate(GDWIN * o_win)
 {
 	o_Perlog.Start();
 	o_Img.CleanBuffer();
-	o_fhandler.Write(V2(100, 300), f_Size, "ABCDEFGHIJKMNOPQRSTUVWXYZ\n");
+	o_fhandler2.Write(V2(100, 300), f_Size, "ABCDEFGHIJKMNOPQRSTUVWXYZ\n");
 	o_fhandler.Write(V2(100, 800), f_Size, "abcdefghijkmnopqrstuvwxyz\n");
 	//o_fhandler.Write(V2(10, 10), 0.5f, "%.0fms\n", o_Perlog.GetDelta());
 	//o_CamCtrlr.UpdateCamCtrlr(o_win);
