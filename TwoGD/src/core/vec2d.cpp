@@ -32,18 +32,18 @@ V2 operator * (V2  &v_Pos1, int &i_Lenght) {
 V2 operator * (V2  &v_Pos1, float &f_Lenght) {
 	return V2(v_Pos1.f_Pos[0] * f_Lenght, v_Pos1.f_Pos[1] * f_Lenght);
 }
-o_vec2::o_vec2()
+vec2::vec2()
 {
 	f_Pos[0] = 0;
 	f_Pos[1] = 0;
 }
-o_vec2::o_vec2(float f_X = 0, float f_Y = 0)
+vec2::vec2(float f_X = 0, float f_Y = 0)
 {
 	f_Pos[0] = f_X;
 	f_Pos[1] = f_Y;
 }
 
-o_vec2::o_vec2(float f_dPos[2])
+vec2::vec2(float f_dPos[2])
 {
 	f_Pos[0] = f_dPos[0];
 	f_Pos[1] = f_dPos[1];

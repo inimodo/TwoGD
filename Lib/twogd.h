@@ -17,7 +17,7 @@
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "Gdi32.lib")
 
-typedef struct o_win {
+typedef struct win {
 	DWORD dw_ExStyle = 0;
 	wchar_t* c_WinClassName = (wchar_t*)"WINCLASSEWS";
 	DWORD  dw_Style;
@@ -28,7 +28,7 @@ typedef struct o_win {
 	HMENU h_Menu = NULL;
 	LPVOID lv_Param = NULL;
 	wchar_t* c_WinTitle;
-	UINT32 i_Width, i_Height;
+	uint32_t i_Width, i_Height;
 	HINSTANCE h_Instance;
 	HWND hd_WindowHandle;
 	MSG msg_WindowMessage;
@@ -42,19 +42,18 @@ typedef struct o_win {
 	void(*v_pMouseScroll)(BOOL b_Up, POINT v_ScrollPoint);
 	BOOL b_HasFocus;
 	BOOL b_HideCursor = FALSE;
-}GDWIN;
+}WIN;
 
 extern HANDLE  CreateExec(HINSTANCE h_Instance);
 extern long  WindowProc(HWND hd_Handle, UINT msg_Message, WPARAM wParam, LPARAM lParam);
 extern int  wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow);
 
-extern void gdCreateWinExec(GDWIN *);
-extern unsigned char  gdMain(GDWIN *);
-extern DWORD*  gdUpdate(GDWIN *);
+extern void gdCreateWinExec(WIN *);
+extern unsigned char  gdMain(WIN *);
+extern DWORD*  gdUpdate(WIN *);
 extern void  gdClose();
 
-typedef unsigned char UCHAR;
-typedef unsigned int UINT32;
+typedef unsigned char uint8_t;
 
 #define __REGISTER register
 #define PTOV2(POI) V2((float)((POINT)POI).x,(float)((POINT)POI).y)
@@ -62,17 +61,17 @@ typedef unsigned int UINT32;
 #define Y 1
 #define Z 2
 
-typedef class o_vec2 {
+typedef class vec2 {
 public:
 	float f_Pos[Z];
 
-	void Delta(o_vec2 v_Pos);
-	double Distance(o_vec2 v_Pos);
+	void Delta(vec2 v_Pos);
+	double Distance(vec2 v_Pos);
 	double Length();
 
-	o_vec2();
-	o_vec2(float f_X, float f_Y);
-	o_vec2(float f_Pos[2]);
+	vec2();
+	vec2(float f_X, float f_Y);
+	vec2(float f_Pos[2]);
 
 }V2;
 
@@ -82,35 +81,35 @@ V2 operator * (V2  &v_Pos1, int &i_Lenght);
 V2 operator * (V2  &v_Pos1, float &f_Lenght);
 
 
-typedef class o_vec3 {
+typedef class vec3 {
 public:
 	float f_Pos[3];
 
 	void NormalizeThis();
-	o_vec3 NormalizeTo();
+	vec3 NormalizeTo();
 	
-	void RotateThis(o_vec3 v_Rot);
-	o_vec3 RotateTo(o_vec3 v_Rot);
-	void CamRotateThis(o_vec3 v_Rot);
-	void CamRotateThisOpt(o_vec3 v_Rot);
-	void CamRotateThisStatic(o_vec3 v_Rot);
-	o_vec3 CamRotateTo(o_vec3 v_Rot);
-	void RotateAroundThis(o_vec3 v_UnitV, float f_phi);
-	o_vec3 RotateAroundTo(o_vec3 v_UnitV, float f_phi);
+	void RotateThis(vec3 v_Rot);
+	vec3 RotateTo(vec3 v_Rot);
+	void CamRotateThis(vec3 v_Rot);
+	void CamRotateThisOpt(vec3 v_Rot);
+	void CamRotateThisStatic(vec3 v_Rot);
+	vec3 CamRotateTo(vec3 v_Rot);
+	void RotateAroundThis(vec3 v_UnitV, float f_phi);
+	vec3 RotateAroundTo(vec3 v_UnitV, float f_phi);
 
-	void DeltaThis(o_vec3 v_Pos);
-	o_vec3 DeltaTo(o_vec3 v_Pos);
+	void DeltaThis(vec3 v_Pos);
+	vec3 DeltaTo(vec3 v_Pos);
 
-	o_vec3 AngleTo(o_vec3 v_Pos);
-	o_vec3 Angle();
+	vec3 AngleTo(vec3 v_Pos);
+	vec3 Angle();
 
-	double DistanceTo(o_vec3 v_Pos);
+	double DistanceTo(vec3 v_Pos);
 	float Length();
-	float DotProduct(o_vec3 v_Pos);
+	float DotProduct(vec3 v_Pos);
 
-	o_vec3();
-	o_vec3(float f_X, float f_Y, float f_Z);
-	o_vec3(float f_Pos[3]);
+	vec3();
+	vec3(float f_X, float f_Y, float f_Z);
+	vec3(float f_Pos[3]);
 
 }V3;
 
@@ -140,24 +139,24 @@ double Distance3(V3 v_PosOne, V3 v_PosTwo);
 
 typedef class canvas {
 public:
-	UINT32 i_Pixels[2];
+	uint32_t i_Pixels[2];
 
-	UINT32 i_OutputSize;
+	uint32_t i_OutputSize;
 	DWORD * d_pOutputStream;
-	UCHAR * d_pPixelFlags;
-	UCHAR * d_pPrioFlags;
+	uint8_t * d_pPixelFlags;
+	uint8_t * d_pPrioFlags;
 
 
-	UCHAR  CleanBuffer();
+	uint8_t  CleanBuffer();
 
-	UCHAR  Prepare(int i_Width, int i_Height);
-	UCHAR  Dispose();
+	uint8_t  Prepare(int i_Width, int i_Height);
+	uint8_t  Dispose();
 }CANVAS;
 
-typedef struct o_color {
-	UCHAR c_Color[3];
-	o_color(UCHAR c_R, UCHAR c_G, UCHAR c_B);
-	o_color();
+typedef struct color {
+	uint8_t c_Color[3];
+	color(uint8_t c_R, uint8_t c_G, uint8_t c_B);
+	color();
 	DWORD GetAsHex();
 } COLOR;
 
@@ -182,8 +181,8 @@ typedef struct o_face {
 typedef class filer {
 protected:
 	FILE * f_Stream = NULL;
-	UCHAR  OpenStream(LPSTR c_StreamName);
-	UCHAR  CloseStream();
+	uint8_t  OpenStream(LPSTR c_StreamName);
+	uint8_t  CloseStream();
 
 }FILER;
 
@@ -197,15 +196,15 @@ public:
 	V3 * v_pPoint;
 	COLOR c_pColor;
 	FACE * o_pFace;
-	UINT32 i_Faces, i_Points;
+	uint32_t i_Faces, i_Points;
 
 private:
-	UCHAR  ReadHeader();
-	UCHAR  LoadFile();
-	UCHAR  Prepare();
+	uint8_t  ReadHeader();
+	uint8_t  LoadFile();
+	uint8_t  Prepare();
 public:
-	UCHAR  Read(LPSTR c_StreamName);
-	UCHAR  Dispose();
+	uint8_t  Read(LPSTR c_StreamName);
+	uint8_t  Dispose();
 }OBJ3D;
 
 
@@ -215,16 +214,16 @@ public:
 	V2 * v_pPoint;
 	COLOR * c_pColor;
 	LINE * l_pLines;
-	UINT32 i_Connections, i_Points, i_Colors;
-	UINT32 i_Width, i_Height;
+	uint32_t i_Connections, i_Points, i_Colors;
+	uint32_t i_Width, i_Height;
 	vectormap();
 private:
-	UCHAR  ReadHeader();
-	UCHAR  LoadFile();
-	UCHAR  Prepare();
+	uint8_t  ReadHeader();
+	uint8_t  LoadFile();
+	uint8_t  Prepare();
 public:
-	UCHAR  Read(LPSTR c_StreamName);
-	UCHAR  Dispose();
+	uint8_t  Read(LPSTR c_StreamName);
+	uint8_t  Dispose();
 }VMAP;
 
 typedef class layer {
@@ -232,8 +231,8 @@ public:
 	layer();
 	layer(LPSTR c_StreamName, COLOR c_Color);
 
-	UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED;
-	UINT32 i_PrioFlag =0;
+	uint8_t i_PixelFlag = PF_OVERWRITE_ALLOWED;
+	uint32_t i_PrioFlag =0;
 	OBJ3D o_Obj;
 
 
@@ -246,15 +245,15 @@ public:
 	cmap();
 	BOOL b_Loaded;
 	LINE* l_pLines;
-	UINT32 i_Count;
-	UINT32 i_Width;
-	UINT32	i_Height;
+	uint32_t i_Count;
+	uint32_t i_Width;
+	uint32_t	i_Height;
 	int16_t i_XMin;
 	int16_t i_YMin;
 	int16_t i_XMax;
 	int16_t i_YMax;
 
-	UCHAR Dispose();
+	uint8_t Dispose();
 }CHARMAP;
 
 
@@ -264,14 +263,14 @@ public:
 	codec2d(CANVAS * o_pCanvas){
 		o_Image = o_pCanvas;
 	}
-	UCHAR  SetPixel(V2 * v_pPoint, COLOR * c_pColor,UCHAR i_PixelFlag , UCHAR i_PrioFlag );
-	UCHAR  DrawLine(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, UCHAR i_PixelFlag , UCHAR i_PrioFlag );
-	UCHAR  DrawRect(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, UCHAR i_PixelFlag , UCHAR i_PrioFlag );
-	UCHAR  DrawHLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag , UCHAR i_PrioFlag );
-	UCHAR  DrawVLine(V2 * v_pPoint, UINT32  i_Length, COLOR * c_pColor, UCHAR i_PixelFlag , UCHAR i_PrioFlag );
-	UCHAR  DrawCanvas(DWORD * d_pBuffer, V2 * v_pPos, UINT32  i_Pixels[2], UCHAR i_PixelFlag , UCHAR i_PrioFlag );
-	UCHAR  DrawVMap(VMAP * o_VecMap, V2* v_pAnchor, float f_Scale , UCHAR i_PixelFlag , UCHAR i_PrioFlag );
-	UCHAR  DrawChar(CHARMAP* o_VecMap, V2* v_pAnchor, COLOR* c_pColor, float f_Scale);
+	uint8_t  SetPixel(V2 * v_pPoint, COLOR * c_pColor,uint8_t i_PixelFlag , uint8_t i_PrioFlag );
+	uint8_t  DrawLine(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, uint8_t i_PixelFlag , uint8_t i_PrioFlag );
+	uint8_t  DrawRect(V2 * v_pPointA, V2 * v_pPointB, COLOR * c_pColor, uint8_t i_PixelFlag , uint8_t i_PrioFlag );
+	uint8_t  DrawHLine(V2 * v_pPoint, uint32_t  i_Length, COLOR * c_pColor, uint8_t i_PixelFlag , uint8_t i_PrioFlag );
+	uint8_t  DrawVLine(V2 * v_pPoint, uint32_t  i_Length, COLOR * c_pColor, uint8_t i_PixelFlag , uint8_t i_PrioFlag );
+	uint8_t  DrawCanvas(DWORD * d_pBuffer, V2 * v_pPos, uint32_t  i_Pixels[2], uint8_t i_PixelFlag , uint8_t i_PrioFlag );
+	uint8_t  DrawVMap(VMAP * o_VecMap, V2* v_pAnchor, float f_Scale , uint8_t i_PixelFlag , uint8_t i_PrioFlag );
+	uint8_t  DrawChar(CHARMAP* o_VecMap, V2* v_pAnchor, COLOR* c_pColor, float f_Scale);
 
 	BOOL b_AllowPixelOverwrite = TRUE;
 protected:
@@ -285,16 +284,16 @@ public:
 	camera(
 		FLOAT f_Frustum_Low,
 		FLOAT f_Frustum_Far,
-		UINT32 i_Dimensions_Width,
-		UINT32 i_Dimensions_Height,
+		uint32_t i_Dimensions_Width,
+		uint32_t i_Dimensions_Height,
 		FLOAT f_FOV,
 		V3 i_Position,
 		V3 i_Rotation
 	);
-	UCHAR(*s_Shader)(camera *o_Cam, V3 *v_Vertex, V2 *v_Point, COLOR *c_Color)= NULL;
+	uint8_t(*s_Shader)(camera *o_Cam, V3 *v_Vertex, V2 *v_Point, COLOR *c_Color)= NULL;
 
 	FLOAT f_Frustum[2];
-	UINT32 i_Dimensions[2];
+	uint32_t i_Dimensions[2];
 	FLOAT f_FOV;
 	V3 i_Position;
 	V3 i_Rotation;
@@ -302,8 +301,8 @@ public:
 
 	BOOL b_UseCutoffAngles = TRUE;
 
-	inline UCHAR  Translate(V3 * v_pPoint, V2 * v_pResult);
-	UCHAR  Relate(V2 * v_pScreenPos, V3 * v_pAngle);
+	inline uint8_t  Translate(V3 * v_pPoint, V2 * v_pResult);
+	uint8_t  Relate(V2 * v_pScreenPos, V3 * v_pAngle);
 }CAM3D;
 
 
@@ -314,8 +313,8 @@ public:
 		o_Image = o_pCanvas;
 		o_Camera = o_pCamera;
 	}
-	UCHAR  DrawObject(OBJ3D * o_Object, COLOR * c_pColor, UCHAR i_PixelFlag = PF_OVERWRITE_ALLOWED,UCHAR i_PrioFlag = 0);
-	UCHAR  DrawEdge(V3 * v_pVertexA, V3 * v_pVertexB, COLOR * c_pColor, UCHAR i_PixelFlag= PF_OVERWRITE_ALLOWED, UCHAR i_PrioFlag = 0);
+	uint8_t  DrawObject(OBJ3D * o_Object, COLOR * c_pColor, uint8_t i_PixelFlag = PF_OVERWRITE_ALLOWED,uint8_t i_PrioFlag = 0);
+	uint8_t  DrawEdge(V3 * v_pVertexA, V3 * v_pVertexB, COLOR * c_pColor, uint8_t i_PixelFlag= PF_OVERWRITE_ALLOWED, uint8_t i_PrioFlag = 0);
 
 	CAM3D * o_Camera;
 }CODEC3D;
@@ -340,10 +339,10 @@ private:
 #define CHST_BASIC 0xA
 #define CHST_AXIS  0xB
 	
-typedef class o_camctrlr {
+typedef class camctrlr {
 public:
-	o_camctrlr();
-	o_camctrlr( CAM3D* o_camera, CODEC3D* o_pCodec);
+	camctrlr();
+	camctrlr( CAM3D* o_camera, CODEC3D* o_pCodec);
 	CAM3D* o_camera;
 	CODEC3D* o_pCodec;
 
@@ -358,21 +357,20 @@ public:
 	float f_CHSize = 0.2f;
 
 
-	void UpdateCamCtrlr(GDWIN *o_win);
+	void UpdateCamCtrlr(WIN *o_Win);
 	void DrawCrosshair();
 }CAMCTRLR;
 
 
 
-typedef struct o_m3x3 {
+typedef struct m3x3 {
 public:
-	o_m3x3();
-	o_m3x3(V3 v_v1, V3 v_v2, V3 v_v3);
-	o_m3x3(float f_UnitValue);
+	m3x3();
+	m3x3(V3 v_V1, V3 v_V2, V3 v_V3);
+	m3x3(float f_UnitValue);
 
 	V3 v_v1, v_v2, v_v3;
 
-	void print();
 } M3X3;
 
 M3X3 M3X3RotX(float f_phi);
@@ -392,20 +390,20 @@ V3 operator * (M3X3  const&m_M, V3 const&v_V);
 
 
 
-typedef class o_world {
-	UINT32 i_Length;
+typedef class world {
+	uint32_t i_Length;
 public:
-	UINT32 Length() const { return i_Length; }
+	uint32_t Length() const { return i_Length; }
 	LAYER * o_Layers = NULL;
 	CODEC3D * o_Codec = NULL;
 
-	UINT32 AppendLayer(LPSTR c_StreamName, COLOR c_Color);
-	UCHAR GetObjInCrosshair(CAM3D * o_pCam, FLOAT f_CutoffAngleInRad, UINT32 * i_pLayer);
-	UCHAR Render();
-	UCHAR Dispose();
+	uint32_t AppendLayer(LPSTR c_StreamName, COLOR c_Color);
+	uint8_t GetObjInCrosshair(CAM3D * o_pCam, FLOAT f_CutoffAngleInRad, uint32_t * i_pLayer);
+	uint8_t Render();
+	uint8_t Dispose();
 
-	o_world();
-	o_world(CODEC3D * o_Codec);
+	world();
+	world(CODEC3D * o_Codec);
 }WORLD;
 
 
@@ -421,7 +419,7 @@ public:
 	void Start();
 	void Stop();
 	float GetDelta();
-	UCHAR Dispose();
+	uint8_t Dispose();
 } PERLOG;
 
 
@@ -479,13 +477,13 @@ typedef struct {
 	uint32_t i_GlyphStop;
 	uint32_t i_GlyphSize;
 	TTFGLYFH ttf_HEAD;
-	uint16_t* i_EndPtsOfContours; // ttf_HEAD.i_NumberOfContours
+	uint16_t* i_EndPtsOfContours;
 	uint16_t i_NumPoints;
 	uint16_t i_InstructionLength;
-	uint8_t* i_Instructions; // i_InstructionLength
-	uint8_t* i_Flags; // i_NumPoints
-	int32_t* i_XCoords;// i_NumPoints
-	int32_t* i_YCoords;// i_NumPoints
+	uint8_t* i_Instructions; 
+	uint8_t* i_Flags; 
+	int32_t* i_XCoords;
+	int32_t* i_YCoords;
 } TTFGLYF;
 
 typedef struct {
@@ -520,16 +518,12 @@ typedef struct {
 #define TTF_FLAG_REPEAT (uint8_t)(1<<3)
 #define TTF_FLAG_XSAME (uint8_t)(1<<4)
 #define TTF_FLAG_YSAME (uint8_t)(1<<5)
-
 #define TTF_FORMAT 4
-
 #define TTF_UNICODE_ENCODINGID 1
 #define TTF_UNICODE_PLATFORMID 3
-
 #define ASCII_CHARS 128
 #define ASCII_CHAR_START '!'
 #define ASCII_CHAR_STOP '}'
-
 #define MAXIMAL_TEXT_LENGTH 256
 
 typedef class font_handler {
@@ -537,14 +531,14 @@ public:
 	font_handler() {}
 	font_handler(CODEC2D* o_pCodec, LPSTR c_pFontPath, int i_DivPerCurve=4);
 	void Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...);
-	UCHAR Dispose();
+	uint8_t Dispose();
 
-	UCHAR i_LastError;
-	UINT32 i_Padding;
-	UINT32 i_SpaceWidth;
+	uint8_t i_LastError;
+	uint32_t i_Padding;
+	uint32_t i_SpaceWidth;
 	COLOR c_Color;
 protected:
-	UCHAR Load(LPSTR s_Path);
+	uint8_t Load(LPSTR s_Path);
 	void Free();
 
 	CODEC2D* o_pCodec;
@@ -555,9 +549,9 @@ protected:
 	TTFHEAD ttf_HEAD;
 	TTFMAXP ttf_MAXP;
 	TTFCMAP ttf_CMAP;
-	TTFGLYF* ttf_pGLYF; // ttf_MAXP.i_NumGlyph
+	TTFGLYF* ttf_pGLYF; 
 	TTFHEADER ttf_Header;
-	TTFTABLEDIR* ttf_Tables; // ttf_Header.i_NumTables
+	TTFTABLEDIR* ttf_Tables;
 	uint32_t i_GlyphOffset;
 	uint32_t i_LocaOffset;
 	uint32_t i_CmapOffset;

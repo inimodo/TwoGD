@@ -194,7 +194,7 @@ void font_handler::Free()
     fclose(f_File);
 }
 
-UCHAR font_handler::Load(LPSTR s_Path)
+uint8_t font_handler::Load(LPSTR s_Path)
 {
     f_File = fopen(s_Path, "rb");
     if (f_File == NULL)
@@ -573,14 +573,14 @@ UCHAR font_handler::Load(LPSTR s_Path)
             {
                 c_ASCIIMapping[c_ASCII] = (c_ASCIIMapping[c_ASCII] + ttf_CMAP.i_IdDelta[i_Segment]) & 0xFFFF;
             }
-        }
+        } 
 
     }
     return 0;
 }
 
 
-UCHAR font_handler::Dispose() 
+uint8_t font_handler::Dispose() 
 {
 	for (int i_Index = 0; i_Index < ASCII_CHARS; i_Index++)
 	{
@@ -599,7 +599,7 @@ cmap::cmap()
     b_Loaded = FALSE;
 }
 
-UCHAR cmap::Dispose()
+uint8_t cmap::Dispose()
 {
     if (this->l_pLines != NULL)
     {

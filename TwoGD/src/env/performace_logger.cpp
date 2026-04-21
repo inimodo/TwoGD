@@ -7,18 +7,18 @@ perlog::perlog()
 
 }
 
-perlog::perlog(int i_BufferSize)
+perlog::perlog(int i_BufferSize_)
 {
-	this->i_BufferSize = i_BufferSize;
-	this->i_Buffer = (int*)malloc(sizeof(int)*i_BufferSize);
-	if (this->i_Buffer == NULL) 
+	i_BufferSize = i_BufferSize_;
+	i_Buffer = (int*)malloc(sizeof(int)*i_BufferSize);
+	if (i_Buffer == NULL) 
 	{
-		this->i_BufferSize = 0;
+		i_BufferSize = 0;
 		return;
 	}
-	for (int i_Index = 0; i_Index < this->i_BufferSize; i_Index++)
+	for (int i_Index = 0; i_Index < i_BufferSize; i_Index++)
 	{
-		this->i_Buffer[i_Index] = 0;
+		i_Buffer[i_Index] = 0;
 	}
 }
 
@@ -30,25 +30,25 @@ void perlog::Start()
 void perlog::Stop()
 {
 	a_Stop = high_resolution_clock::now();
-	memmove(this->i_Buffer+1, this->i_Buffer, (this->i_BufferSize - 1)*sizeof(long long));
-	this->i_Buffer[0] = (int)duration_cast<milliseconds>(a_Stop - a_Start).count();
+	memmove(i_Buffer+1, i_Buffer, (i_BufferSize - 1)*sizeof(long long));
+	i_Buffer[0] = (int)duration_cast<milliseconds>(a_Stop - a_Start).count();
 }
 
 float perlog::GetDelta()
 {
 	int i_Avr = 0;
-	for (int i_Index = 0; i_Index < this->i_BufferSize; i_Index++)
+	for (int i_Index = 0; i_Index < i_BufferSize; i_Index++)
 	{
-		i_Avr += this->i_Buffer[i_Index];
+		i_Avr += i_Buffer[i_Index];
 	}
-	return (float)i_Avr / (float)this->i_BufferSize;
+	return (float)i_Avr / (float)i_BufferSize;
 }
 
-UCHAR perlog::Dispose() 
+uint8_t perlog::Dispose() 
 {
-	if (this->i_Buffer != NULL) 
+	if (i_Buffer != NULL) 
 	{
-		free(this->i_Buffer);
+		free(i_Buffer);
 	}
 	return GD_TASK_OKAY;
 }

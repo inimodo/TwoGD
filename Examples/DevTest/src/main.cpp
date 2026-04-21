@@ -93,43 +93,43 @@ void RightMouseUp(POINT v_ClickPoint)
 	printf("%d %d\n", v_ClickPoint.x, v_ClickPoint.y);
 }
 
-void gdCreateWinExec(GDWIN* o_win)
+void gdCreateWinExec(WIN* o_Win)
 {
-	o_win->i_Width = WINDOW_WIDTH * WINDOW_SIZE;
-	o_win->i_Height = WINDOW_HEIGHT * WINDOW_SIZE;
-	o_win->v_pLeftMouseDown = LeftMouseDown;
-	o_win->v_pLeftMouseUp = LeftMouseUp;
-	o_win->v_pRightMouseDown = RightMouseDown;
-	o_win->v_pRightMouseUp = RightMouseUp;
-	o_win->v_pMouseScroll = MouseScroll;
-	o_win->c_WinTitle = (wchar_t*)L"Demo Window";
-	o_win->i_XPos = 0;
-	o_win->i_YPos = 0;
-	o_win->dw_Style = (WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
-	o_win->i_CmdShow = SW_MAXIMIZE;
+	o_Win->i_Width = WINDOW_WIDTH * WINDOW_SIZE;
+	o_Win->i_Height = WINDOW_HEIGHT * WINDOW_SIZE;
+	o_Win->v_pLeftMouseDown = LeftMouseDown;
+	o_Win->v_pLeftMouseUp = LeftMouseUp;
+	o_Win->v_pRightMouseDown = RightMouseDown;
+	o_Win->v_pRightMouseUp = RightMouseUp;
+	o_Win->v_pMouseScroll = MouseScroll;
+	o_Win->c_WinTitle = (wchar_t*)L"Demo Window";
+	o_Win->i_XPos = 0;
+	o_Win->i_YPos = 0;
+	o_Win->dw_Style = (WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
+	o_Win->i_CmdShow = SW_MAXIMIZE;
 }
 
-unsigned char  gdMain(GDWIN* o_win)
+unsigned char  gdMain(WIN* o_Win)
 {
 	o_Console.Create();
 	
 	RECT o_rect;
-	GetWindowRect(o_win->hd_WindowHandle,&o_rect);
-	o_win->i_Width = o_rect.left + o_rect.right;
-	o_win->i_Height = o_rect.top + o_rect.bottom;
+	GetWindowRect(o_Win->hd_WindowHandle,&o_rect);
+	o_Win->i_Width = o_rect.left + o_rect.right;
+	o_Win->i_Height = o_rect.top + o_rect.bottom;
 	
 	o_Cam = CAM3D(
 		(FLOAT)0.01f,
 		(FLOAT)250.0,
-		(UINT32)o_win->i_Width,
-		(UINT32)o_win->i_Height,
+		(uint32_t)o_Win->i_Width,
+		(uint32_t)o_Win->i_Height,
 		(FLOAT)2.0f,
 		V3(0, 2, 0),
 		V3(0, 0, 0)
 	);
 
 	o_CamCtrlr = CAMCTRLR(&o_Cam, &o_3DCodec);
-	o_Img.Prepare(o_win->i_Width, o_win->i_Height);
+	o_Img.Prepare(o_Win->i_Width, o_Win->i_Height);
 	o_2DCodec = CODEC2D(&o_Img);
 	o_3DCodec = CODEC3D(&o_Img, &o_Cam);
 	o_fhandler = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font.ttf");
@@ -148,17 +148,16 @@ unsigned char  gdMain(GDWIN* o_win)
 	return TRUE;
 }
 
-DWORD*  gdUpdate(GDWIN * o_win)
+DWORD*  gdUpdate(WIN * o_Win)
 {
 	o_Perlog.Start();
 	o_Img.CleanBuffer();
-	o_fhandler2.Write(V2(100, 300), f_Size, "ABCDEFGHIJKMNOPQRSTUVWXYZ\n");
-	o_fhandler.Write(V2(100, 800), f_Size, "abcdefghijkmnopqrstuvwxyz\n");
-	//o_fhandler.Write(V2(10, 10), 0.5f, "%.0fms\n", o_Perlog.GetDelta());
-	//o_CamCtrlr.UpdateCamCtrlr(o_win);
-	//o_CamCtrlr.DrawCrosshair();
-	//DrawGrid();
-	//o_Wrld.Render();
+
+	o_fhandler.Write(V2(10, 30), 25, "%.0fms\n", o_Perlog.GetDelta());
+	o_CamCtrlr.UpdateCamCtrlr(o_Win);
+	o_CamCtrlr.DrawCrosshair();
+	DrawGrid();
+	o_Wrld.Render();
 	o_Perlog.Stop();
 	return o_Img.d_pOutputStream;
 }

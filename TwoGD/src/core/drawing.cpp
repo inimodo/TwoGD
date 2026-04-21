@@ -1,22 +1,22 @@
 #include "..\twogd.h"
-o_color::o_color()
+color::color()
 {
 	c_Color[0] = 0;
 	c_Color[1] = 0;
 	c_Color[2] = 0;
 }
-DWORD o_color::GetAsHex()
+DWORD color::GetAsHex()
 {
 	return RGB(c_Color[0], c_Color[1], c_Color[2]);
 }
-o_color::o_color(UCHAR c_R, UCHAR c_G, UCHAR c_B)
+color::color(uint8_t c_R, uint8_t c_G, uint8_t c_B)
 {
 	c_Color[0] = c_R;
 	c_Color[1] = c_G;
 	c_Color[2] = c_B;
 }
 
-UCHAR
+uint8_t
 canvas::Dispose()
 {
 	free(d_pOutputStream);
@@ -25,22 +25,22 @@ canvas::Dispose()
 	return GD_TASK_OKAY;
 
 }
-UCHAR
+uint8_t
 canvas::CleanBuffer()
 {
 	memset((void *)d_pOutputStream, 0, i_OutputSize * sizeof(DWORD));
-	memset((void *)d_pPixelFlags, PF_OVERWRITE_ALLOWED , i_OutputSize * sizeof(UCHAR));
-	memset((void *)d_pPrioFlags, 255, i_OutputSize * sizeof(UCHAR));
+	memset((void *)d_pPixelFlags, PF_OVERWRITE_ALLOWED , i_OutputSize * sizeof(uint8_t));
+	memset((void *)d_pPrioFlags, 255, i_OutputSize * sizeof(uint8_t));
 	return GD_TASK_OKAY;
 
 }
-UCHAR
+uint8_t
 canvas::Prepare(int i_Width, int i_Height)
 {
 	i_OutputSize = i_Width * i_Height;
 	d_pOutputStream = (DWORD *)malloc(sizeof(DWORD)*i_OutputSize);
-	d_pPixelFlags = (UCHAR *)malloc(sizeof(UCHAR)*i_OutputSize);
-	d_pPrioFlags = (UCHAR *)malloc(sizeof(UCHAR)*i_OutputSize);
+	d_pPixelFlags = (uint8_t *)malloc(sizeof(uint8_t)*i_OutputSize);
+	d_pPrioFlags = (uint8_t *)malloc(sizeof(uint8_t)*i_OutputSize);
 	
 	if (d_pOutputStream == NULL || d_pPixelFlags == NULL || d_pPrioFlags == NULL) 
 	{
@@ -52,6 +52,6 @@ canvas::Prepare(int i_Width, int i_Height)
 	i_Pixels[1] = i_Height;
 	i_Pixels[0] = i_Width;
 
-	return this->CleanBuffer();
+	return CleanBuffer();
 }
 

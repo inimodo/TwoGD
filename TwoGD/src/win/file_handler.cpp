@@ -5,23 +5,23 @@
 #define GD_VEC_COLORS "c %d %d %d\n"
 #define GD_VEC_LINE "l %d %d %d\n"
 
-UCHAR 
+uint8_t 
 filer::CloseStream() 
 {
-	if (this->f_Stream != NULL) 
+	if (f_Stream != NULL) 
 	{
-		return fclose(this->f_Stream);
+		return fclose(f_Stream);
 	}
 	return GD_TASK_OKAY;
 }
-UCHAR 
+uint8_t 
 filer::OpenStream(LPSTR c_StreamName)
 {
-	if (this->f_Stream == NULL) 
+	if (f_Stream == NULL) 
 	{
-		this->f_Stream = fopen(c_StreamName, "r");
+		f_Stream = fopen(c_StreamName, "r");
 
-		if (this->f_Stream == NULL)
+		if (f_Stream == NULL)
 		{
 			return GD_FILE_FAILED;
 		}
@@ -32,154 +32,154 @@ filer::OpenStream(LPSTR c_StreamName)
 
 vectormap::vectormap()
 {
-	this->b_Loaded = FALSE;
-	this->f_Stream = NULL;
+	b_Loaded = FALSE;
+	f_Stream = NULL;
 }
 
-UCHAR  
+uint8_t  
 vectormap::Read(LPSTR c_StreamName)
 {
-	if (this->OpenStream(c_StreamName) != GD_TASK_OKAY) {
+	if (OpenStream(c_StreamName) != GD_TASK_OKAY) {
 		return GD_FILE_FAILED;
 	}
 
-	if (this->ReadHeader() != GD_TASK_OKAY) {
+	if (ReadHeader() != GD_TASK_OKAY) {
 		return GD_FILE_FAILED;
 	}
 
-	if (this->Prepare() != GD_TASK_OKAY) {
+	if (Prepare() != GD_TASK_OKAY) {
 		return GD_ALLOC_FAILED;
 	}
 
-	if (this->LoadFile() != GD_TASK_OKAY) {
+	if (LoadFile() != GD_TASK_OKAY) {
 		return GD_FILE_FAILED;
 	}
-	this->b_Loaded = TRUE;
+	b_Loaded = TRUE;
 	return GD_TASK_OKAY;
 }
-UCHAR 
+uint8_t 
 vectormap::LoadFile()
 {
-	UINT32 i_MaxX = 0;
-	UINT32 i_MaxY = 0;
-	for (UINT32 i_Index = 0; i_Index < this->i_Points; i_Index++)
+	uint32_t i_MaxX = 0;
+	uint32_t i_MaxY = 0;
+	for (uint32_t i_Index = 0; i_Index < i_Points; i_Index++)
 	{
-		if (fscanf(this->f_Stream, GD_VEC_POINTS, &this->v_pPoint[i_Index].f_Pos[X], &this->v_pPoint[i_Index].f_Pos[Y]) == NULL)
+		if (fscanf(f_Stream, GD_VEC_POINTS, &v_pPoint[i_Index].f_Pos[X], &v_pPoint[i_Index].f_Pos[Y]) == NULL)
 		{
 			return GD_FILE_FAILED;
 		}
-		if (this->v_pPoint[i_Index].f_Pos[X] > i_MaxX) 
+		if (v_pPoint[i_Index].f_Pos[X] > i_MaxX) 
 		{
-			i_MaxX = (UINT32)this->v_pPoint[i_Index].f_Pos[X];
+			i_MaxX = (uint32_t)v_pPoint[i_Index].f_Pos[X];
 		}
-		if (this->v_pPoint[i_Index].f_Pos[Y] > i_MaxY)
+		if (v_pPoint[i_Index].f_Pos[Y] > i_MaxY)
 		{
-			i_MaxY = (UINT32)this->v_pPoint[i_Index].f_Pos[Y];
+			i_MaxY = (uint32_t)v_pPoint[i_Index].f_Pos[Y];
 		}
 	}
-	this->i_Height = i_MaxY;
-	this->i_Width = i_MaxX;
-	for (UINT32 i_Index = 0; i_Index < this->i_Colors; i_Index++)
+	i_Height = i_MaxY;
+	i_Width = i_MaxX;
+	for (uint32_t i_Index = 0; i_Index < i_Colors; i_Index++)
 	{
-		if (fscanf(this->f_Stream, GD_VEC_COLORS, 
-			(int*)&(this->c_pColor[i_Index].c_Color[0]), 
-			(int*)&(this->c_pColor[i_Index].c_Color[1]),
-			(int*)&(this->c_pColor[i_Index].c_Color[2])) == NULL)
+		if (fscanf(f_Stream, GD_VEC_COLORS, 
+			(int*)&(c_pColor[i_Index].c_Color[0]), 
+			(int*)&(c_pColor[i_Index].c_Color[1]),
+			(int*)&(c_pColor[i_Index].c_Color[2])) == NULL)
 		{
 			return GD_FILE_FAILED;
 		}
 	}
 	int i_Lone, i_Ltwo, i_Lcolor;
-	for (UINT32 i_Index = 0; i_Index < this->i_Connections; i_Index++)
+	for (uint32_t i_Index = 0; i_Index < i_Connections; i_Index++)
 	{
-		if (fscanf(this->f_Stream, GD_VEC_LINE, &i_Lone, &i_Ltwo, &i_Lcolor) == NULL)
+		if (fscanf(f_Stream, GD_VEC_LINE, &i_Lone, &i_Ltwo, &i_Lcolor) == NULL)
 		{
 			return GD_FILE_FAILED;
 		}
 		
-		this->l_pLines[i_Index].c_Color = this->c_pColor[i_Lcolor];
-		this->l_pLines[i_Index].v_Point[0] = this->v_pPoint[i_Lone];
-		this->l_pLines[i_Index].v_Point[1] = this->v_pPoint[i_Ltwo];
+		l_pLines[i_Index].c_Color = c_pColor[i_Lcolor];
+		l_pLines[i_Index].v_Point[0] = v_pPoint[i_Lone];
+		l_pLines[i_Index].v_Point[1] = v_pPoint[i_Ltwo];
 	}
 	return GD_TASK_OKAY;
 }
-UCHAR
+uint8_t
 vectormap::ReadHeader()
 {
-	if (fscanf(this->f_Stream, GD_VEC_HEADER, &this->i_Points, &this->i_Colors, &this->i_Connections) == NULL)
+	if (fscanf(f_Stream, GD_VEC_HEADER, &i_Points, &i_Colors, &i_Connections) == NULL)
 	{
 		return GD_FILE_FAILED;
 	}
 	return GD_TASK_OKAY;
 }
-UCHAR 
+uint8_t 
 vectormap::Prepare()
 {
-	this->v_pPoint = (V2*)malloc(sizeof(V2)*this->i_Points);
-	this->l_pLines = (LINE*)malloc(sizeof(LINE)*this->i_Connections);
-	this->c_pColor = (COLOR*)malloc(sizeof(COLOR)*this->i_Colors);
+	v_pPoint = (V2*)malloc(sizeof(V2)*i_Points);
+	l_pLines = (LINE*)malloc(sizeof(LINE)*i_Connections);
+	c_pColor = (COLOR*)malloc(sizeof(COLOR)*i_Colors);
 
-	if (this->v_pPoint == NULL || this->c_pColor == NULL || this->l_pLines == NULL) {
-		this->Dispose();
+	if (v_pPoint == NULL || c_pColor == NULL || l_pLines == NULL) {
+		Dispose();
 		return GD_ALLOC_FAILED;
 	}
 	return GD_TASK_OKAY;
 }
 
-UCHAR  
+uint8_t  
 vectormap::Dispose() 
 {
-	if (this->c_pColor != NULL) 
+	if (c_pColor != NULL) 
 	{
-		free(this->c_pColor);
+		free(c_pColor);
 	}
-	if (this->v_pPoint != NULL)
+	if (v_pPoint != NULL)
 	{
-		free(this->v_pPoint);
+		free(v_pPoint);
 	}
-	if (this->l_pLines != NULL)
+	if (l_pLines != NULL)
 	{
-		free(this->l_pLines);
+		free(l_pLines);
 	}
 	return GD_TASK_OKAY;
 }
 
 object::object()
 {
-	this->f_Stream = NULL;
-	this->i_Faces = 0;
-	this->i_Points = 0;
-	this->v_Anchor = V3();
+	f_Stream = NULL;
+	i_Faces = 0;
+	i_Points = 0;
+	v_Anchor = V3();
 }
 
 object::object(LPSTR c_StreamName)
 {
-	this->f_Stream = NULL;
-	this->i_Faces = 0;
-	this->i_Points = 0;
-	this->v_Anchor = V3();
-	this->Read(c_StreamName);
+	f_Stream = NULL;
+	i_Faces = 0;
+	i_Points = 0;
+	v_Anchor = V3();
+	Read(c_StreamName);
 }
 
-UCHAR 
+uint8_t 
 object::Read(LPSTR c_StreamName) 
 {
-	if (this->OpenStream(c_StreamName) != GD_TASK_OKAY) 
+	if (OpenStream(c_StreamName) != GD_TASK_OKAY) 
 	{
 		return GD_FILE_FAILED;
 	}
 
-	if (this->ReadHeader() != GD_TASK_OKAY) 
+	if (ReadHeader() != GD_TASK_OKAY) 
 	{
 		return GD_FILE_FAILED;
 	}
 
-	if (this->Prepare() != GD_TASK_OKAY) 
+	if (Prepare() != GD_TASK_OKAY) 
 	{
 		return GD_ALLOC_FAILED;
 	}
 
-	if (this->LoadFile() != GD_TASK_OKAY) {
+	if (LoadFile() != GD_TASK_OKAY) {
 
 		return GD_FILE_FAILED;
 	}
@@ -187,62 +187,62 @@ object::Read(LPSTR c_StreamName)
 }
 
 
-UCHAR
+uint8_t
 object::ReadHeader() 
 {
 	CHAR c_Buffer[256];
-	while (!feof(this->f_Stream)) 
+	while (!feof(f_Stream)) 
 	{
-		fscanf(this->f_Stream,"%s",c_Buffer);
+		fscanf(f_Stream,"%s",c_Buffer);
 		if (c_Buffer[1] == '\0') 
 		{
-			if (c_Buffer[0] == 'f')this->i_Faces++;
-			if (c_Buffer[0] == 'v')this->i_Points++;
+			if (c_Buffer[0] == 'f')i_Faces++;
+			if (c_Buffer[0] == 'v')i_Points++;
 		}
 	}
-	rewind(this->f_Stream);
+	rewind(f_Stream);
 	return GD_TASK_OKAY;
 }
 
-UCHAR 
+uint8_t 
 object::Prepare()
 {
-	this->v_pPoint = (V3*)malloc(sizeof(V3)*this->i_Points);
-	this->o_pFace = (FACE*)malloc(sizeof(FACE)*this->i_Faces);
+	v_pPoint = (V3*)malloc(sizeof(V3)*i_Points);
+	o_pFace = (FACE*)malloc(sizeof(FACE)*i_Faces);
 
-	if (this->v_pPoint == NULL || this->o_pFace == NULL ) {
-		this->Dispose();
+	if (v_pPoint == NULL || o_pFace == NULL ) {
+		Dispose();
 		return GD_ALLOC_FAILED;
 	}
 	return GD_TASK_OKAY;
 }
 
-UCHAR 
+uint8_t 
 object::LoadFile()
 {
 	CHAR c_Buffer[256];
 		int i_VerticiesC = 0, i_FacesC = 0;
-	while (!feof(this->f_Stream))
+	while (!feof(f_Stream))
 	{
-		fscanf(this->f_Stream, "%s", c_Buffer);
+		fscanf(f_Stream, "%s", c_Buffer);
 		if (c_Buffer[1] == '\0')
 		{
-			if (i_VerticiesC  == this->i_Points && i_FacesC  == this->i_Faces)continue;
+			if (i_VerticiesC  == i_Points && i_FacesC  == i_Faces)continue;
 			if (c_Buffer[0] == 'f') 
 			{
 				int i_Buffer = 0,i_A,i_B,i_C;
-				fscanf(this->f_Stream, "%d/%d/%d %d/%d/%d %d/%d/%d",&i_A,&i_Buffer,&i_Buffer,&i_B,&i_Buffer,&i_Buffer,&i_C,&i_Buffer,&i_Buffer);	
-				this->o_pFace[i_FacesC].v_Point[0] = this->v_pPoint[i_A-1];
-				this->o_pFace[i_FacesC].v_Point[1] = this->v_pPoint[i_B-1];
-				this->o_pFace[i_FacesC].v_Point[2] = this->v_pPoint[i_C-1];
+				fscanf(f_Stream, "%d/%d/%d %d/%d/%d %d/%d/%d",&i_A,&i_Buffer,&i_Buffer,&i_B,&i_Buffer,&i_Buffer,&i_C,&i_Buffer,&i_Buffer);	
+				o_pFace[i_FacesC].v_Point[0] = v_pPoint[i_A-1];
+				o_pFace[i_FacesC].v_Point[1] = v_pPoint[i_B-1];
+				o_pFace[i_FacesC].v_Point[2] = v_pPoint[i_C-1];
 				i_FacesC++;
 			}
 			if (c_Buffer[0] == 'v') 
 			{
-				fscanf(this->f_Stream, "%f %f %f", 
-					&this->v_pPoint[i_VerticiesC].f_Pos[0],
-					&this->v_pPoint[i_VerticiesC].f_Pos[1],
-					&this->v_pPoint[i_VerticiesC].f_Pos[2]);
+				fscanf(f_Stream, "%f %f %f", 
+					&v_pPoint[i_VerticiesC].f_Pos[0],
+					&v_pPoint[i_VerticiesC].f_Pos[1],
+					&v_pPoint[i_VerticiesC].f_Pos[2]);
 				
 				i_VerticiesC++;
 			}
@@ -251,23 +251,23 @@ object::LoadFile()
 	return GD_TASK_OKAY;
 }
 
-UCHAR 
+uint8_t 
 object::Dispose() 
 {
-	free(this->v_pPoint);
-	free(this->o_pFace);
-	fclose(this->f_Stream);
+	free(v_pPoint);
+	free(o_pFace);
+	fclose(f_Stream);
 	return GD_TASK_OKAY;
 
 }
 
 layer::layer()
 {
-	this->o_Obj = OBJ3D();
+	o_Obj = OBJ3D();
 }
 
 layer::layer(LPSTR c_StreamName, COLOR c_Color_)
 {
-	this->c_Color = c_Color_;
-	this->o_Obj = OBJ3D(c_StreamName);
+	c_Color = c_Color_;
+	o_Obj = OBJ3D(c_StreamName);
 }

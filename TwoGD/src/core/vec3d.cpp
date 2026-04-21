@@ -2,12 +2,12 @@
 
 void V3::NormalizeThis()
 {
-	*this = this->NormalizeTo();
+	*this = NormalizeTo();
 }
 
 V3 V3::NormalizeTo()
 {
-	float f_abs = this->Length();
+	float f_abs = Length();
 	V3 o_Norm = V3(
 		f_Pos[0]/ f_abs,
 		f_Pos[1]/ f_abs,
@@ -21,12 +21,12 @@ float V3::DotProduct(V3 v_Pos)
 	return f_Pos[0] * v_Pos.f_Pos[0] + f_Pos[1] * v_Pos.f_Pos[1] + f_Pos[2] * v_Pos.f_Pos[2];
 }
 
-void o_vec3::RotateAroundThis(o_vec3 v_UnitV,float f_phi)
+void vec3::RotateAroundThis(vec3 v_UnitV,float f_phi)
 {
 	*this = M3X3RotU(v_UnitV, f_phi) * *this;
 }
 
-V3 o_vec3::RotateAroundTo(o_vec3 v_UnitV, float f_phi)
+V3 vec3::RotateAroundTo(vec3 v_UnitV, float f_phi)
 {
 	return M3X3RotU(v_UnitV, f_phi) * *this;
 }
@@ -50,9 +50,9 @@ void V3::CamRotateThisOpt(V3 v_Rot)
 
 
 	V3 v_x = V3(
-		(f_cos_Y + f_cos_X * f_cos_X * f_one_cos) * this->f_Pos[X] - f_sin_X * f_sin_Y * this->f_Pos[Y] + f_cos_X * f_sin_X * f_one_cos * this->f_Pos[Z],
-		f_sin_X * f_sin_Y * this->f_Pos[X] + f_cos_Y * this->f_Pos[Y] - f_cos_X * f_sin_Y * this->f_Pos[Z],
-		f_cos_X * f_sin_X * f_one_cos * this->f_Pos[X] + f_cos_X * f_sin_Y * this->f_Pos[Y] + (f_cos_Y + f_sin_X * f_sin_X * f_one_cos) * this->f_Pos[Z]
+		(f_cos_Y + f_cos_X * f_cos_X * f_one_cos) * f_Pos[X] - f_sin_X * f_sin_Y * f_Pos[Y] + f_cos_X * f_sin_X * f_one_cos * f_Pos[Z],
+		f_sin_X * f_sin_Y * f_Pos[X] + f_cos_Y * f_Pos[Y] - f_cos_X * f_sin_Y * f_Pos[Z],
+		f_cos_X * f_sin_X * f_one_cos * f_Pos[X] + f_cos_X * f_sin_Y * f_Pos[Y] + (f_cos_Y + f_sin_X * f_sin_X * f_one_cos) * f_Pos[Z]
 	);
 
 	*this = V3(
@@ -137,17 +137,17 @@ V3 V3::AngleTo(V3 v_Pos)
 
 V3 V3::Angle()
 {
-	return this->AngleTo(V3(0,0,0));
+	return AngleTo(V3(0,0,0));
 }
 
 void V3::CamRotateThis(V3 v_Rot)
 {   
-	*this = this->CamRotateTo(v_Rot);
+	*this = CamRotateTo(v_Rot);
 }
 
 void V3::RotateThis(V3 v_Rot)
 {
-	*this = this->RotateTo(v_Rot);
+	*this = RotateTo(v_Rot);
 }
 
 void V3::DeltaThis(V3 v_Pos)
@@ -192,20 +192,20 @@ V3 operator * (V3  &v_Pos, float &f_Lenght) {
 	return V3(v_Pos.f_Pos[0] * f_Lenght, v_Pos.f_Pos[1] * f_Lenght, v_Pos.f_Pos[2] * f_Lenght);
 }
 
-o_vec3::o_vec3()
+vec3::vec3()
 {
 	f_Pos[0] = 0;
 	f_Pos[1] = 0;
 	f_Pos[2] = 0;
 }
-o_vec3::o_vec3(float f_X = 0, float f_Y = 0, float f_Z = 0)
+vec3::vec3(float f_X = 0, float f_Y = 0, float f_Z = 0)
 {
 	f_Pos[0] = f_X;
 	f_Pos[1] = f_Y;
 	f_Pos[2] = f_Z;
 }
 
-o_vec3::o_vec3(float f_dPos[3])
+vec3::vec3(float f_dPos[3])
 {
 	f_Pos[0] = f_dPos[0];
 	f_Pos[1] = f_dPos[1];

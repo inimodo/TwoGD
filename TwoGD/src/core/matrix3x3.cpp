@@ -1,18 +1,17 @@
 #include "..\twogd.h"
 
-o_m3x3::o_m3x3(V3 v_v1, V3 v_v2, V3 v_v3)
+m3x3::m3x3(V3 v_V1, V3 v_V2, V3 v_V3)
 {
-	this->v_v1 = v_v1;
-	this->v_v2 = v_v2;
-	this->v_v3 = v_v3;
+	v_v1 = v_V1;
+	v_v2 = v_V2;
+	v_v3 = v_V3;
 }
 
-
-o_m3x3::o_m3x3(float f_Unit)
+m3x3::m3x3(float f_Unit)
 {
-	this->v_v1 = V3(f_Unit,0,0);
-	this->v_v2 = V3(0, f_Unit, 0);;
-	this->v_v3 = V3(0, 0, f_Unit);;
+	v_v1 = V3(f_Unit,0,0);
+	v_v2 = V3(0, f_Unit, 0);;
+	v_v3 = V3(0, 0, f_Unit);;
 }
 
 M3X3 MMultM(M3X3 m_M1, M3X3 m_M2)
@@ -115,13 +114,6 @@ M3X3 operator*(M3X3 const& m_M1, M3X3 const& m_M2)
 V3 operator*(M3X3 const& m_M, V3 const& v_V)
 {
 	return MMultV(m_M, v_V);
-}
-
-void o_m3x3::print()
-{
-	printf("%f\t %f\t %f\n"  ,this->v_v1.f_Pos[0], this->v_v2.f_Pos[0], this->v_v3.f_Pos[0]);
-	printf("%f\t %f\t %f\n"  ,this->v_v1.f_Pos[1], this->v_v2.f_Pos[1], this->v_v3.f_Pos[1]);
-	printf("%f\t %f\t %f\n\n",this->v_v1.f_Pos[2], this->v_v2.f_Pos[2], this->v_v3.f_Pos[2]);
 }
 
 M3X3 M3X3RotX(float f_phi)

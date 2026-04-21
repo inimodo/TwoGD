@@ -1,27 +1,27 @@
 #include "..\twogd.h"
 
-o_camctrlr::o_camctrlr() {}
-o_camctrlr::o_camctrlr(CAM3D* o_camera_, CODEC3D* o_pCodec_) 
+camctrlr::camctrlr() {}
+camctrlr::camctrlr(CAM3D* o_camera_, CODEC3D* o_pCodec_) 
 {
-	this->o_camera = o_camera_;
-	this->o_pCodec = o_pCodec_;
+	o_camera = o_camera_;
+	o_pCodec = o_pCodec_;
 }
 
-void o_camctrlr::UpdateCamCtrlr(GDWIN * o_win)
+void camctrlr::UpdateCamCtrlr(WIN * o_Win)
 {
 	V2 v_Middle = V2(o_camera->i_Dimensions[0] / 2.0f, o_camera->i_Dimensions[1] / 2.0f);
 	if (GetAsyncKeyState(VK_LCONTROL) != 0) b_MouseCtrl = !b_MouseCtrl;
-	if (o_win->b_HasFocus && b_MouseCtrl)
+	if (o_Win->b_HasFocus && b_MouseCtrl)
 	{
-		o_win->b_HideCursor = TRUE;
+		o_Win->b_HideCursor = TRUE;
 
 		POINT v_Point;
 		v_Point.x = (LONG)v_Middle.f_Pos[X];
 		v_Point.y = (LONG)v_Middle.f_Pos[Y];
-		ClientToScreen(o_win->hd_WindowHandle, &v_Point);
+		ClientToScreen(o_Win->hd_WindowHandle, &v_Point);
 		SetCursorPos(v_Point.x, v_Point.y);
 
-		V2 v_Delta = PTOV2(o_win->v_CursorPos);
+		V2 v_Delta = PTOV2(o_Win->v_CursorPos);
 		float f_Ampl = 1.0f / (float)v_Delta.Distance(v_Middle);
 		v_Delta = v_Delta - v_Middle;
 
@@ -63,11 +63,11 @@ void o_camctrlr::UpdateCamCtrlr(GDWIN * o_win)
 	}
 	else
 	{
-		o_win->b_HideCursor = FALSE;
+		o_Win->b_HideCursor = FALSE;
 	}
 }
 
-void o_camctrlr::DrawCrosshair()
+void camctrlr::DrawCrosshair()
 {
 	V2 v_X = V2(o_pCodec->o_Camera->i_Dimensions[0] / 2.0f - f_CHSize, o_pCodec->o_Camera->i_Dimensions[1] / 2.0f);
 	V2 v_Y = V2(o_pCodec->o_Camera->i_Dimensions[0] / 2.0f, o_pCodec->o_Camera->i_Dimensions[1] / 2.0f - f_CHSize);
@@ -80,8 +80,8 @@ void o_camctrlr::DrawCrosshair()
 	switch (i_CHStyle)
 	{
 	case CHST_BASIC:
-		o_pCodec->DrawHLine(&v_X, (UINT32)(f_CHSize * 2.0f), &c_CHColor, PF_OVERWRITE_FORBIDDEN,0);
-		o_pCodec->DrawVLine(&v_Y, (UINT32)(f_CHSize * 2.0f), &c_CHColor, PF_OVERWRITE_FORBIDDEN,0);
+		o_pCodec->DrawHLine(&v_X, (uint32_t)(f_CHSize * 2.0f), &c_CHColor, PF_OVERWRITE_FORBIDDEN,0);
+		o_pCodec->DrawVLine(&v_Y, (uint32_t)(f_CHSize * 2.0f), &c_CHColor, PF_OVERWRITE_FORBIDDEN,0);
 
 		break;
 	case CHST_AXIS:
