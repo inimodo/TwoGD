@@ -9,9 +9,9 @@ V3 V3::NormalizeTo()
 {
 	float f_abs = Length();
 	V3 o_Norm = V3(
-		f_Pos[0]/ f_abs,
-		f_Pos[1]/ f_abs,
-		f_Pos[2]/ f_abs
+		f_Pos[0] / f_abs,
+		f_Pos[1] / f_abs,
+		f_Pos[2] / f_abs
 	);
 	return o_Norm;
 }
@@ -21,7 +21,7 @@ float V3::DotProduct(V3 v_Pos)
 	return f_Pos[0] * v_Pos.f_Pos[0] + f_Pos[1] * v_Pos.f_Pos[1] + f_Pos[2] * v_Pos.f_Pos[2];
 }
 
-void vec3::RotateAroundThis(vec3 v_UnitV,float f_phi)
+void vec3::RotateAroundThis(vec3 v_UnitV, float f_phi)
 {
 	*this = M3X3RotU(v_UnitV, f_phi) * *this;
 }
@@ -64,17 +64,17 @@ void V3::CamRotateThisOpt(V3 v_Rot)
 
 void V3::CamRotateThisStatic(V3 v_Rot)
 {
-	static V3 v_RotSaved = V3(0,0,0);
+	static V3 v_RotSaved = V3(0, 0, 0);
 	static M3X3 m_Y = M3X3(V3(0, 0, 0), V3(0, 0, 0), V3(0, 0, 0));
 	static M3X3 m_X = M3X3(V3(0, 0, 0), V3(0, 0, 0), V3(0, 0, 0));
 
-	if (v_RotSaved.f_Pos[X] != v_Rot.f_Pos[X] || v_RotSaved.f_Pos[Y] != v_Rot.f_Pos[Y]) 
+	if (v_RotSaved.f_Pos[X] != v_Rot.f_Pos[X] || v_RotSaved.f_Pos[Y] != v_Rot.f_Pos[Y])
 	{
 		float f_sin_Y = sin(v_Rot.f_Pos[1]);
 		float f_cos_Y = cos(v_Rot.f_Pos[1]);
 		float f_cos_X = cos(v_Rot.f_Pos[0]);
 		float f_sin_X = sin(v_Rot.f_Pos[0]);
-	
+
 		m_Y = M3X3(
 			V3(f_cos_X, 0, -f_sin_X),
 			V3(0, 1.0, 0),
@@ -120,9 +120,9 @@ V3 V3::CamRotateTo(V3 v_Rot)// NEED HEAVY OPT.
 		-sin(-v_Rot.f_Pos[0])
 	);
 
-	M3X3 m_X = M3X3RotU(v_UnitV,v_Rot.f_Pos[1]);
+	M3X3 m_X = M3X3RotU(v_UnitV, v_Rot.f_Pos[1]);
 
-	return m_Y *( m_X * *this);
+	return m_Y * (m_X * *this);
 }
 
 V3 V3::AngleTo(V3 v_Pos)
@@ -132,16 +132,16 @@ V3 V3::AngleTo(V3 v_Pos)
 	float f_leftright = asin(o_Delta.f_Pos[0] / f_abs);
 	float f_updown = asin(o_Delta.f_Pos[1] / f_abs);
 
-	return V3(f_leftright, f_updown,0);
+	return V3(f_leftright, f_updown, 0);
 }
 
 V3 V3::Angle()
 {
-	return AngleTo(V3(0,0,0));
+	return AngleTo(V3(0, 0, 0));
 }
 
 void V3::CamRotateThis(V3 v_Rot)
-{   
+{
 	*this = CamRotateTo(v_Rot);
 }
 
@@ -173,22 +173,33 @@ double V3::DistanceTo(V3 v_Pos)
 	return Distance3(*this, v_Pos);
 }
 
-V3 operator - (V3  &v_Pos1, V3  &v_Pos2) {
+V3 operator - (V3& v_Pos1, V3& v_Pos2) 
+{
 	return V3(v_Pos1.f_Pos[0] - v_Pos2.f_Pos[0], v_Pos1.f_Pos[1] - v_Pos2.f_Pos[1], v_Pos1.f_Pos[2] - v_Pos2.f_Pos[2]);
 }
-V3 operator + (V3  &v_Pos1, V3  &v_Pos2) {
+
+V3 operator + (V3& v_Pos1, V3& v_Pos2) 
+{
 	return V3(v_Pos1.f_Pos[0] + v_Pos2.f_Pos[0], v_Pos1.f_Pos[1] + v_Pos2.f_Pos[1], v_Pos1.f_Pos[2] + v_Pos2.f_Pos[2]);
 }
-V3 operator + (V3  &v_Pos1, V3  const&v_Pos2) {
+
+V3 operator + (V3& v_Pos1, V3  const& v_Pos2)
+{
 	return V3(v_Pos1.f_Pos[0] + v_Pos2.f_Pos[0], v_Pos1.f_Pos[1] + v_Pos2.f_Pos[1], v_Pos1.f_Pos[2] + v_Pos2.f_Pos[2]);
 }
-V3 operator * (V3  &v_Pos1, V3  &v_Pos2) {
+
+V3 operator * (V3& v_Pos1, V3& v_Pos2) 
+{
 	return V3(v_Pos1.f_Pos[0] * v_Pos2.f_Pos[0], v_Pos1.f_Pos[1] * v_Pos2.f_Pos[1], v_Pos1.f_Pos[2] * v_Pos2.f_Pos[2]);
 }
-V3 operator * (V3  &v_Pos, float const&f_Lenght) {
+
+V3 operator * (V3& v_Pos, float const& f_Lenght) 
+{
 	return V3(v_Pos.f_Pos[0] * f_Lenght, v_Pos.f_Pos[1] * f_Lenght, v_Pos.f_Pos[2] * f_Lenght);
 }
-V3 operator * (V3  &v_Pos, float &f_Lenght) {
+
+V3 operator * (V3& v_Pos, float& f_Lenght) 
+{
 	return V3(v_Pos.f_Pos[0] * f_Lenght, v_Pos.f_Pos[1] * f_Lenght, v_Pos.f_Pos[2] * f_Lenght);
 }
 
@@ -198,6 +209,7 @@ vec3::vec3()
 	f_Pos[1] = 0;
 	f_Pos[2] = 0;
 }
+
 vec3::vec3(float f_X = 0, float f_Y = 0, float f_Z = 0)
 {
 	f_Pos[0] = f_X;

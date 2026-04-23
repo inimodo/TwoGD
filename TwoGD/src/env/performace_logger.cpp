@@ -10,8 +10,8 @@ perlog::perlog()
 perlog::perlog(int i_BufferSize_)
 {
 	i_BufferSize = i_BufferSize_;
-	i_Buffer = (int*)malloc(sizeof(int)*i_BufferSize);
-	if (i_Buffer == NULL) 
+	i_Buffer = (int*)malloc(sizeof(int) * i_BufferSize);
+	if (i_Buffer == NULL)
 	{
 		i_BufferSize = 0;
 		return;
@@ -30,7 +30,7 @@ void perlog::Start()
 void perlog::Stop()
 {
 	a_Stop = high_resolution_clock::now();
-	memmove(i_Buffer+1, i_Buffer, (i_BufferSize - 1)*sizeof(long long));
+	memmove(i_Buffer + 1, i_Buffer, (i_BufferSize - 1) * sizeof(long long));
 	i_Buffer[0] = (int)duration_cast<milliseconds>(a_Stop - a_Start).count();
 }
 
@@ -44,9 +44,9 @@ float perlog::GetDelta()
 	return (float)i_Avr / (float)i_BufferSize;
 }
 
-uint8_t perlog::Dispose() 
+uint8_t perlog::Dispose()
 {
-	if (i_Buffer != NULL) 
+	if (i_Buffer != NULL)
 	{
 		free(i_Buffer);
 	}

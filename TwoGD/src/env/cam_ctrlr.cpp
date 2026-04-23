@@ -1,13 +1,17 @@
 #include "..\twogd.h"
 
-camctrlr::camctrlr() {}
-camctrlr::camctrlr(CAM3D* o_camera_, CODEC3D* o_pCodec_) 
+camctrlr::camctrlr() 
+{
+
+}
+
+camctrlr::camctrlr(CAM3D* o_camera_, CODEC3D* o_pCodec_)
 {
 	o_camera = o_camera_;
 	o_pCodec = o_pCodec_;
 }
 
-void camctrlr::UpdateCamCtrlr(WIN * o_Win)
+void camctrlr::UpdateCamCtrlr(WIN* o_Win)
 {
 	V2 v_Middle = V2(o_camera->i_Dimensions[0] / 2.0f, o_camera->i_Dimensions[1] / 2.0f);
 	if (GetAsyncKeyState(VK_LCONTROL) != 0) b_MouseCtrl = !b_MouseCtrl;
@@ -35,7 +39,7 @@ void camctrlr::UpdateCamCtrlr(WIN * o_Win)
 
 		if (GetAsyncKeyState('D') != 0) v_UnitVec.f_Pos[X] += f_MoveSpeed;
 		if (GetAsyncKeyState('A') != 0) v_UnitVec.f_Pos[X] += -f_MoveSpeed;
-		
+
 
 		v_UnitVec.RotateThis(o_camera->i_Rotation);
 		v_UnitVec.f_Pos[Y] = 0;
@@ -57,7 +61,7 @@ void camctrlr::UpdateCamCtrlr(WIN * o_Win)
 		if (GetAsyncKeyState(VK_NUMPAD0) != 0)
 		{
 			o_camera->i_Rotation = v_UnitVec;
-			o_camera->i_Position = V3(0,2,0);
+			o_camera->i_Position = V3(0, 2, 0);
 			o_camera->f_FOV = 2;
 		}
 	}
@@ -80,8 +84,8 @@ void camctrlr::DrawCrosshair()
 	switch (i_CHStyle)
 	{
 	case CHST_BASIC:
-		o_pCodec->DrawHLine(&v_X, (uint32_t)(f_CHSize * 2.0f), &c_CHColor, PF_OVERWRITE_FORBIDDEN,0);
-		o_pCodec->DrawVLine(&v_Y, (uint32_t)(f_CHSize * 2.0f), &c_CHColor, PF_OVERWRITE_FORBIDDEN,0);
+		o_pCodec->DrawHLine(&v_X, (uint32_t)(f_CHSize * 2.0f), &c_CHColor);
+		o_pCodec->DrawVLine(&v_Y, (uint32_t)(f_CHSize * 2.0f), &c_CHColor);
 
 		break;
 	case CHST_AXIS:
@@ -93,9 +97,9 @@ void camctrlr::DrawCrosshair()
 		v_UnitY = v_UnitY + v_Anchor;
 		v_UnitZ = v_UnitZ + v_Anchor;
 
-		o_pCodec->DrawEdge(&v_Anchor, &v_UnitX, (COLOR*)&co_Red,PF_OVERWRITE_FORBIDDEN,0);
-		o_pCodec->DrawEdge(&v_Anchor, &v_UnitY, (COLOR*)&co_Green, PF_OVERWRITE_FORBIDDEN,0);
-		o_pCodec->DrawEdge(&v_Anchor, &v_UnitZ, (COLOR*)&co_Blue, PF_OVERWRITE_FORBIDDEN,0);
+		o_pCodec->DrawEdge(&v_Anchor, &v_UnitX, (COLOR*)&co_Red, PF_OVERWRITE_FORBIDDEN, 0);
+		o_pCodec->DrawEdge(&v_Anchor, &v_UnitY, (COLOR*)&co_Green, PF_OVERWRITE_FORBIDDEN, 0);
+		o_pCodec->DrawEdge(&v_Anchor, &v_UnitZ, (COLOR*)&co_Blue, PF_OVERWRITE_FORBIDDEN, 0);
 		break;
 	}
 }

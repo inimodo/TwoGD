@@ -9,7 +9,7 @@ m3x3::m3x3(V3 v_V1, V3 v_V2, V3 v_V3)
 
 m3x3::m3x3(float f_Unit)
 {
-	v_v1 = V3(f_Unit,0,0);
+	v_v1 = V3(f_Unit, 0, 0);
 	v_v2 = V3(0, f_Unit, 0);;
 	v_v3 = V3(0, 0, f_Unit);;
 }
@@ -63,49 +63,53 @@ M3X3 M3X3RotU(V3 v_UnitV, float f_phi)
 	//Rodrigues' Rotation Formula
 	return M3X3(
 		V3(
-			f_cos + v_UnitV.f_Pos[X]* v_UnitV.f_Pos[X]*(1.0f- f_cos),
-			v_UnitV.f_Pos[Z]* f_sin + v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Y]*(1.0f- f_cos),
-			-v_UnitV.f_Pos[Y]* f_sin + v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Z]*(1.0f- f_cos)
+			f_cos + v_UnitV.f_Pos[X] * v_UnitV.f_Pos[X] * (1.0f - f_cos),
+			v_UnitV.f_Pos[Z] * f_sin + v_UnitV.f_Pos[X] * v_UnitV.f_Pos[Y] * (1.0f - f_cos),
+			-v_UnitV.f_Pos[Y] * f_sin + v_UnitV.f_Pos[X] * v_UnitV.f_Pos[Z] * (1.0f - f_cos)
 		),
 		V3(
-			v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Y]*(1.0f- f_cos)- v_UnitV.f_Pos[Z]* f_sin,
-			f_cos + v_UnitV.f_Pos[Y]* v_UnitV.f_Pos[Y]*(1.0f- f_cos),
-			v_UnitV.f_Pos[X]* f_sin + v_UnitV.f_Pos[Y]* v_UnitV.f_Pos[Z]*(1.0f- f_cos)
+			v_UnitV.f_Pos[X] * v_UnitV.f_Pos[Y] * (1.0f - f_cos) - v_UnitV.f_Pos[Z] * f_sin,
+			f_cos + v_UnitV.f_Pos[Y] * v_UnitV.f_Pos[Y] * (1.0f - f_cos),
+			v_UnitV.f_Pos[X] * f_sin + v_UnitV.f_Pos[Y] * v_UnitV.f_Pos[Z] * (1.0f - f_cos)
 		),
 		V3(
-			v_UnitV.f_Pos[Y]* f_sin + v_UnitV.f_Pos[X]* v_UnitV.f_Pos[Z]*(1.0f- f_cos),
-			-v_UnitV.f_Pos[X]* f_sin + v_UnitV.f_Pos[Y]* v_UnitV.f_Pos[Z]*(1.0f- f_cos),
-			f_cos + v_UnitV.f_Pos[Z]* v_UnitV.f_Pos[Z]*(1.0f- f_cos)
+			v_UnitV.f_Pos[Y] * f_sin + v_UnitV.f_Pos[X] * v_UnitV.f_Pos[Z] * (1.0f - f_cos),
+			-v_UnitV.f_Pos[X] * f_sin + v_UnitV.f_Pos[Y] * v_UnitV.f_Pos[Z] * (1.0f - f_cos),
+			f_cos + v_UnitV.f_Pos[Z] * v_UnitV.f_Pos[Z] * (1.0f - f_cos)
 		)
 	);
 }
 
-M3X3 operator*(M3X3 & m_M, float & f_S)
+M3X3 operator*(M3X3& m_M, float& f_S)
 {
-	return MMultS(m_M,f_S);
+	return MMultS(m_M, f_S);
 }
-M3X3 operator+(M3X3 & m_M1, M3X3 & m_M2)
+
+M3X3 operator+(M3X3& m_M1, M3X3& m_M2)
 {
 	return MAddM(m_M1, m_M2);
 }
-M3X3 operator*(M3X3 & m_M1, M3X3 & m_M2)
+
+M3X3 operator*(M3X3& m_M1, M3X3& m_M2)
 {
 	return MMultM(m_M1, m_M2);
 }
 
-V3 operator*(M3X3 & m_M, V3 & v_V)
+V3 operator*(M3X3& m_M, V3& v_V)
 {
-	return MMultV(m_M,v_V);
+	return MMultV(m_M, v_V);
 }
 
 M3X3 operator*(M3X3 const& m_M, float const& f_S)
 {
 	return MMultS(m_M, f_S);
 }
+
 M3X3 operator+(M3X3 const& m_M1, M3X3 const& m_M2)
 {
 	return MAddM(m_M1, m_M2);
 }
+
 M3X3 operator*(M3X3 const& m_M1, M3X3 const& m_M2)
 {
 	return MMultM(m_M1, m_M2);
@@ -119,11 +123,12 @@ V3 operator*(M3X3 const& m_M, V3 const& v_V)
 M3X3 M3X3RotX(float f_phi)
 {
 	return M3X3(
-		V3(1,0,0),
-		V3(0,cos(f_phi),sin(f_phi)),
-		V3(0,-sin(f_phi),cos(f_phi))
+		V3(1, 0, 0),
+		V3(0, cos(f_phi), sin(f_phi)),
+		V3(0, -sin(f_phi), cos(f_phi))
 	);
 }
+
 M3X3 M3X3RotY(float f_phi)
 {
 	return M3X3(

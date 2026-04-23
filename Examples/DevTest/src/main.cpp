@@ -1,7 +1,5 @@
 #include"twogd.h"
 
-#define MSPEED 0.2f
-#define VSPEED 0.1f
 #define WINDOW_SIZE 100
 #define WINDOW_WIDTH 16
 #define WINDOW_HEIGHT 9
@@ -15,7 +13,6 @@ CAM3D o_Cam;
 CAMCTRLR o_CamCtrlr;
 WORLD o_Wrld;
 FONTHANDLER o_fhandler;
-FONTHANDLER o_fhandler2;
 PERLOG o_Perlog;
 float f_Size = 100;
 int DrawGrid() 
@@ -129,20 +126,21 @@ unsigned char  gdMain(WIN* o_Win)
 	);
 
 	o_CamCtrlr = CAMCTRLR(&o_Cam, &o_3DCodec);
+	o_CamCtrlr.f_MoveSpeed = 0.4f;
+	o_CamCtrlr.f_ViewSpeed = 0.1f;
 	o_Img.Prepare(o_Win->i_Width, o_Win->i_Height);
 	o_2DCodec = CODEC2D(&o_Img);
 	o_3DCodec = CODEC3D(&o_Img, &o_Cam);
 	o_fhandler = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font.ttf");
-	o_fhandler2 = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font2.ttf");
 	o_Perlog = PERLOG(10);
 	o_Wrld = WORLD(&o_3DCodec);
-	o_Wrld.AppendLayer((const LPSTR)"src\\obj\\obj2.objf", co_Red);
+	o_Wrld.AppendLayer((const LPSTR)"3dobj\\obj2.obj", co_Red);
 	o_Wrld.o_Layers[0].o_Obj.v_Anchor = V3(10, 1, 0);
-	o_Wrld.AppendLayer((const LPSTR)"src\\obj\\obj3.objf", co_Blue);
+	o_Wrld.AppendLayer((const LPSTR)"3dobj\\obj3.obj", co_Blue);
 	o_Wrld.o_Layers[1].o_Obj.v_Anchor = V3(-10, 1, 0);
-	o_Wrld.AppendLayer((const LPSTR)"src\\obj\\obj2.objf", co_Green);
+	o_Wrld.AppendLayer((const LPSTR)"3dobj\\obj2.obj", co_Green);
 	o_Wrld.o_Layers[2].o_Obj.v_Anchor = V3(0, 1, 10);
-	o_Wrld.AppendLayer((const LPSTR)"src\\obj\\obj2.objf", co_Pink);
+	o_Wrld.AppendLayer((const LPSTR)"3dobj\\obj2.obj", co_Pink);
 	o_Wrld.o_Layers[3].o_Obj.v_Anchor = V3(0, 1, -10);
 
 	return TRUE;
@@ -150,9 +148,8 @@ unsigned char  gdMain(WIN* o_Win)
 
 DWORD*  gdUpdate(WIN * o_Win)
 {
-	o_Perlog.Start();
 	o_Img.CleanBuffer();
-
+	o_Perlog.Start();
 	o_fhandler.Write(V2(10, 30), 25, "%.0fms\n", o_Perlog.GetDelta());
 	o_CamCtrlr.UpdateCamCtrlr(o_Win);
 	o_CamCtrlr.DrawCrosshair();
