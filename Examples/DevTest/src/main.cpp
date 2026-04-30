@@ -13,6 +13,7 @@ CAM3D o_Cam;
 CAMCTRLR o_CamCtrlr;
 WORLD o_Wrld;
 FONTHANDLER o_fhandler;
+FONTHANDLER o_fhandler2;
 PERLOG o_Perlog;
 float f_Size = 100;
 int DrawGrid() 
@@ -132,6 +133,7 @@ unsigned char  gdMain(WIN* o_Win)
 	o_2DCodec = CODEC2D(&o_Img);
 	o_3DCodec = CODEC3D(&o_Img, &o_Cam);
 	o_fhandler = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font.ttf");
+	o_fhandler2 = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font2.ttf");
 	o_Perlog = PERLOG(10);
 	o_Wrld = WORLD(&o_3DCodec);
 	o_Wrld.AppendLayer((const LPSTR)"3dobj\\obj2.obj", co_Red);

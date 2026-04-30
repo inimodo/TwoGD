@@ -105,6 +105,8 @@ public:
 	double DistanceTo(vec3 v_Pos);
 	float Length();
 	float DotProduct(vec3 v_Pos);
+	void CrossProduct(vec3 v_Pos);
+
 
 	vec3();
 	vec3(float f_X, float f_Y, float f_Z);
@@ -229,7 +231,6 @@ public:
 	uint32_t i_PrioFlag = 0;
 	OBJ3D o_Obj;
 
-
 	COLOR c_Color;
 	BOOL b_Enabled = TRUE;
 }LAYER;
@@ -241,7 +242,7 @@ public:
 	LINE* l_pLines;
 	uint32_t i_Count;
 	uint32_t i_Width;
-	uint32_t	i_Height;
+	uint32_t i_Height;
 	int16_t i_XMin;
 	int16_t i_YMin;
 	int16_t i_XMax;
@@ -250,6 +251,7 @@ public:
 	uint8_t Dispose();
 }CHARMAP;
 
+V2 Berzier(V2 v_A, V2 v_B, V2 v_S1, float f_T);
 
 typedef class codec2d {
 public:
@@ -259,6 +261,7 @@ public:
 	}
 	uint8_t  SetPixel(V2* v_pPoint, COLOR* c_pColor, uint8_t i_PixelFlag = PF_OVERWRITE_ALLOWED, uint8_t i_PrioFlag = 0);
 	uint8_t  DrawLine(V2* v_pPointA, V2* v_pPointB, COLOR* c_pColor, uint8_t i_PixelFlag = PF_OVERWRITE_ALLOWED, uint8_t i_PrioFlag = 0);
+	uint8_t  DrawBezier(V2* v_pPointA, V2* v_pPointS, V2* v_pPointB, COLOR* c_pColor, int i_DivPerCurve = 4, uint8_t i_PixelFlag = PF_OVERWRITE_ALLOWED, uint8_t i_PrioFlag = 0);
 	uint8_t  DrawRect(V2* v_pPointA, V2* v_pPointB, COLOR* c_pColor, uint8_t i_PixelFlag = PF_OVERWRITE_ALLOWED, uint8_t i_PrioFlag = 0);
 	uint8_t  DrawHLine(V2* v_pPoint, uint32_t  i_Length, COLOR* c_pColor, uint8_t i_PixelFlag = PF_OVERWRITE_ALLOWED, uint8_t i_PrioFlag = 0);
 	uint8_t  DrawVLine(V2* v_pPoint, uint32_t  i_Length, COLOR* c_pColor, uint8_t i_PixelFlag = PF_OVERWRITE_ALLOWED, uint8_t i_PrioFlag = 0);
@@ -540,3 +543,13 @@ protected:
 	uint32_t i_CmapOffset;
 	uint16_t c_ASCIIMapping[ASCII_CHARS];
 }FONTHANDLER;
+
+
+typedef class gui_handler {
+public:
+	gui_handler() {}
+	gui_handler(CODEC2D* o_pCodec, FONTHANDLER* o_pFont);
+private:
+	CODEC2D* o_pCodec;
+	FONTHANDLER* o_pFont;
+} GUI;

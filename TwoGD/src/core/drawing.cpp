@@ -50,8 +50,8 @@ uint8_t canvas::Prepare(int i_Width, int i_Height)
 		if (d_pPrioFlags != NULL) free(d_pPrioFlags);
 		return GD_ALLOC_FAILED;
 	}
-	i_Pixels[1] = i_Height;
-	i_Pixels[0] = i_Width;
+	i_Pixels[Y] = i_Height;
+	i_Pixels[X] = i_Width;
 
 	return CleanBuffer();
 }

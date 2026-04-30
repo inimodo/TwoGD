@@ -61,6 +61,21 @@ uint8_t codec2d::DrawLine(V2* v_pPointA, V2* v_pPointB, COLOR* c_pColor, uint8_t
 	return GD_TASK_OKAY;
 }
 
+uint8_t codec2d::DrawBezier(V2* v_pPointA, V2* v_pPointS, V2* v_pPointB, COLOR* c_pColor, int i_DivPerCurve, uint8_t i_PixelFlag, uint8_t i_PrioFlag)
+{
+	V2 v_Last;
+	for (float f_T = 0; f_T <= 1.0f; f_T += (1.0f / (float)i_DivPerCurve))
+	{
+		V2 v_Current = Berzier(*v_pPointA, *v_pPointB, *v_pPointS, f_T);
+		if (f_T != 0.0f) 
+		{
+			DrawLine(&v_Last, &v_Current, c_pColor, i_PixelFlag, i_PrioFlag);
+		}
+		v_Last = v_Current;
+	}
+	return GD_TASK_OKAY;
+}
+
 uint8_t codec2d::DrawRect(V2* v_pPointA, V2* v_pPointB, COLOR* c_pColor, uint8_t i_PixelFlag, uint8_t i_PrioFlag)
 {
 	V2 v_Temp(v_pPointA->f_Pos[0], v_pPointA->f_Pos[1]);
@@ -74,9 +89,27 @@ uint8_t codec2d::DrawRect(V2* v_pPointA, V2* v_pPointB, COLOR* c_pColor, uint8_t
 
 uint8_t codec2d::DrawHLine(V2* v_pPoint, uint32_t  i_Length, COLOR* c_pColor, uint8_t i_PixelFlag, uint8_t i_PrioFlag)
 {
-	__REGISTER uint32_t i_rIndex = VINDEX(v_pPoint), i_Pos = 0;
+	if (v_pPoint->f_Pos[X] >= o_Image->i_Pixels[X] || v_pPoint->f_Pos[Y] < 0 || v_pPoint->f_Pos[Y] >= o_Image->i_Pixels[Y])
+	{
+		return GD_OUTOFBOUND;
+	}
+
+	V2 v_Set = V2(v_pPoint->f_Pos[X], v_pPoint->f_Pos[Y]);
+	uint32_t i_SetLength = i_Length;
+	if (v_pPoint->f_Pos[X] < 0) 
+	{
+		v_Set.f_Pos[X] = 0;
+	}
+
+	if ((int)v_Set.f_Pos[X]+ i_Length >= o_Image->i_Pixels[X])
+	{
+
+		i_SetLength = o_Image->i_Pixels[X] - v_Set.f_Pos[X];
+	}
+
+	__REGISTER uint32_t i_rIndex = VINDEX((&v_Set)), i_Pos = 0;
 	DWORD dw_Color = c_pColor->GetAsHex();
-	for (uint32_t i_Index = 0; i_Index < i_Length; i_Index++)
+	for (uint32_t i_Index = 0; i_Index < i_SetLength; i_Index++)
 	{
 		i_Pos = i_Index + i_rIndex;
 		if (i_Pos >= o_Image->i_OutputSize || i_Pos < 0) continue;

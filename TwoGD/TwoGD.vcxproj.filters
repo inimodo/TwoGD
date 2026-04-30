@@ -48,10 +48,16 @@
     <ClCompile Include="src\env\world_ctrlr.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\ttf\font_handler.cpp">
+    <ClCompile Include="src\gui\font_handler.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="src\env\performace_logger.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gui\gui_handler.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gui\gui_button.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
