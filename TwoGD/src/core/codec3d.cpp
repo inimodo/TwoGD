@@ -1,80 +1,17 @@
 #include "..\twogd.h"
 
-camera::camera()
+codec3d::codec3d() 
 {
-	f_FOV = 2;
-	f_Frustum[0] = 30;
-	f_Frustum[1] = 1;
-	i_Dimensions[0] = 16 * 50;
-	i_Dimensions[1] = 9 * 50;
-	i_Position = V3(0, 0, 0);
-	i_Rotation = V3(0, 0, 0);
-	V2 v_ScreenPos = V2((float)i_Dimensions[0], (float)i_Dimensions[1]);
-	V3 v_Angles = V3(0, 0, 0);
-	f_CutoffAngles[0] = v_Angles.f_Pos[X];
-	f_CutoffAngles[1] = v_Angles.f_Pos[Y];
+
 }
 
-camera::camera(FLOAT f_Frustum_Low_, FLOAT f_Frustum_Far_, uint32_t i_Dimensions_Width_, uint32_t i_Dimensions_Height_, FLOAT f_FOV_, V3 i_Position_, V3 i_Rotation_)
+codec3d::codec3d(CANVAS* o_pCanvas, CAM3D* o_pCamera) 
 {
-	f_FOV = f_FOV_;
-	f_Frustum[0] = f_Frustum_Low_;
-	f_Frustum[1] = f_Frustum_Far_;
-	i_Dimensions[0] = i_Dimensions_Width_;
-	i_Dimensions[1] = i_Dimensions_Height_;
-	i_Position = i_Position_;
-	i_Rotation = i_Rotation_;
-
-	V2 v_ScreenPos = V2((float)i_Dimensions[0], (float)i_Dimensions[1]);
-	V3 v_Angles = V3(0, 0, 0);
-	Relate(&v_ScreenPos, &v_Angles);
-	f_CutoffAngles[0] = v_Angles.f_Pos[X] + DEGTORAD(10);
-	f_CutoffAngles[1] = v_Angles.f_Pos[Y] + DEGTORAD(10);
+	o_Image = o_pCanvas;
+	o_Camera = o_pCamera;
 }
 
-inline uint8_t camera::Translate(V3* v_pPoint, V2* v_pResult)
-{
-	V3 o_Delta = *v_pPoint - i_Position;
-	float f_abs = o_Delta.Length();
-
-	if (f_abs > f_Frustum[1] || f_abs < f_Frustum[0]) return GD_OUTOFBOUND;
-
-	o_Delta.CamRotateThisOpt(i_Rotation);
-
-	if (o_Delta.f_Pos[2] < 0) return GD_OUTOFBOUND;
-
-	float f_leftright = asin(o_Delta.f_Pos[0] / f_abs);
-	float f_updown = asin(o_Delta.f_Pos[1] / f_abs);
-
-	if ((b_UseCutoffAngles == TRUE) &&
-		(abs(f_leftright) > f_CutoffAngles[0] || abs(f_updown) > f_CutoffAngles[1])) return GD_OUTOFBOUND;
-
-	float f_standoff = i_Dimensions[0] / f_FOV;
-	v_pResult->f_Pos[0] = tan(f_leftright) * f_standoff;
-	v_pResult->f_Pos[1] = (tan(f_updown) / cos(f_leftright)) * f_standoff;
-
-	v_pResult->f_Pos[1] *= -1; // Flip because y=0 is on top
-	v_pResult->f_Pos[0] += i_Dimensions[0] / 2.0f;
-	v_pResult->f_Pos[1] += i_Dimensions[1] / 2.0f;
-
-	return GD_TASK_OKAY;
-}
-
-uint8_t camera::Relate(V2* v_pScreenPos, V3* v_pAngle)
-{
-	float f_standoff = i_Dimensions[0] / f_FOV;
-	V2 f_Input = V2(
-		(v_pScreenPos->f_Pos[0] - (i_Dimensions[0] / 2.0f)) / f_standoff,
-		(v_pScreenPos->f_Pos[1] - (i_Dimensions[1] / 2.0f)) / -f_standoff
-	);
-
-	v_pAngle->f_Pos[0] = atan(f_Input.f_Pos[0]);
-	v_pAngle->f_Pos[1] = -atan(f_Input.f_Pos[1] * cos(v_pAngle->f_Pos[0]));
-
-	return GD_TASK_OKAY;
-}
-
-uint8_t codec3d::DrawObject(OBJ3D* o_Object, COLOR* c_pColor, uint8_t i_PixelFlag, uint8_t i_PrioFlag)
+uint8_t codec3d::DrawObjectFilled(OBJ3D* o_Object, COLOR* c_pColor, uint8_t i_PixelFlag, uint8_t i_PrioFlag)
 {
 	for (uint32_t i_Vertex = 0; i_Vertex < o_Object->i_Faces; i_Vertex++)
 	{
@@ -87,31 +24,31 @@ uint8_t codec3d::DrawObject(OBJ3D* o_Object, COLOR* c_pColor, uint8_t i_PixelFla
 	return GD_TASK_OKAY;
 }
 
-//uint8_t codec3d::DrawObject(OBJ3D* o_Object, COLOR* c_pColor, uint8_t i_PixelFlag, uint8_t i_PrioFlag)
-//{
-//	V2 v_PointA, v_PointB;
-//	V3 v_pVertexA, v_pVertexB;
-//	COLOR c_Color;
-//	for (uint32_t i_Vertex = 0; i_Vertex < o_Object->i_Faces; i_Vertex++)
-//	{
-//		for (INT i_Index = 0; i_Index < 3; i_Index++)
-//		{
-//			c_Color = *c_pColor;
-//			v_pVertexA = o_Object->o_pFace[i_Vertex].v_Point[i_Index] + o_Object->v_Anchor;
-//			if (o_Camera->Translate(&v_pVertexA, &v_PointA) == GD_OUTOFBOUND)continue;
-//			v_pVertexB = o_Object->o_pFace[i_Vertex].v_Point[(i_Index + 1) % 3] + o_Object->v_Anchor;
-//			if (o_Camera->Translate(&v_pVertexB, &v_PointB) == GD_OUTOFBOUND)continue;
-//
-//			if (o_Camera->s_Shader != NULL)
-//			{
-//				if (o_Camera->s_Shader(o_Camera, &v_pVertexA, &v_PointA, &c_Color) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
-//				if (o_Camera->s_Shader(o_Camera, &v_pVertexB, &v_PointB, &c_Color) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
-//			}
-//			DrawLine(&v_PointA, &v_PointB, &c_Color, i_PixelFlag, i_PrioFlag);
-//		}
-//	}
-//	return GD_TASK_OKAY;
-//}
+uint8_t codec3d::DrawObjectWireframe(OBJ3D* o_Object, COLOR* c_pColor, uint8_t i_PixelFlag, uint8_t i_PrioFlag)
+{
+	V2 v_PointA, v_PointB;
+	V3 v_pVertexA, v_pVertexB;
+	COLOR c_Color;
+	for (uint32_t i_Vertex = 0; i_Vertex < o_Object->i_Faces; i_Vertex++)
+	{
+		for (INT i_Index = 0; i_Index < 3; i_Index++)
+		{
+			c_Color = *c_pColor;
+			v_pVertexA = o_Object->o_pFace[i_Vertex].v_Point[i_Index] + o_Object->v_Anchor;
+			if (o_Camera->Translate(&v_pVertexA, &v_PointA) == GD_OUTOFBOUND)continue;
+			v_pVertexB = o_Object->o_pFace[i_Vertex].v_Point[(i_Index + 1) % 3] + o_Object->v_Anchor;
+			if (o_Camera->Translate(&v_pVertexB, &v_PointB) == GD_OUTOFBOUND)continue;
+
+			if (o_Camera->s_Shader != NULL)
+			{
+				if (o_Camera->s_Shader(o_Camera, &v_pVertexA, &v_PointA, &c_Color) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
+				if (o_Camera->s_Shader(o_Camera, &v_pVertexB, &v_PointB, &c_Color) == GD_OUTOFBOUND)return GD_OUTOFBOUND;
+			}
+			DrawLine(&v_PointA, &v_PointB, &c_Color, i_PixelFlag, i_PrioFlag);
+		}
+	}
+	return GD_TASK_OKAY;
+}
 
 uint8_t codec3d::DrawEdge(V3* v_pVertexA, V3* v_pVertexB, COLOR* c_pColor, uint8_t i_PixelFlag, uint8_t i_PrioFlag)
 {

@@ -1,5 +1,27 @@
 #include "..\twogd.h"
 
+vec3::vec3()
+{
+	f_Pos[0] = 0;
+	f_Pos[1] = 0;
+	f_Pos[2] = 0;
+}
+
+vec3::vec3(float f_X = 0, float f_Y = 0, float f_Z = 0)
+{
+	f_Pos[0] = f_X;
+	f_Pos[1] = f_Y;
+	f_Pos[2] = f_Z;
+}
+
+vec3::vec3(float f_dPos[3])
+{
+	f_Pos[0] = f_dPos[0];
+	f_Pos[1] = f_dPos[1];
+	f_Pos[2] = f_dPos[2];
+}
+
+
 void V3::NormalizeThis()
 {
 	*this = NormalizeTo();
@@ -203,23 +225,3 @@ V3 operator * (V3& v_Pos, float& f_Lenght)
 	return V3(v_Pos.f_Pos[0] * f_Lenght, v_Pos.f_Pos[1] * f_Lenght, v_Pos.f_Pos[2] * f_Lenght);
 }
 
-vec3::vec3()
-{
-	f_Pos[0] = 0;
-	f_Pos[1] = 0;
-	f_Pos[2] = 0;
-}
-
-vec3::vec3(float f_X = 0, float f_Y = 0, float f_Z = 0)
-{
-	f_Pos[0] = f_X;
-	f_Pos[1] = f_Y;
-	f_Pos[2] = f_Z;
-}
-
-vec3::vec3(float f_dPos[3])
-{
-	f_Pos[0] = f_dPos[0];
-	f_Pos[1] = f_dPos[1];
-	f_Pos[2] = f_dPos[2];
-}

@@ -2,6 +2,16 @@
 
 #define VINDEX(v2) ((int)v2->f_Pos[1] * o_Image->i_Pixels[0] + (int)v2->f_Pos[0])
 
+codec2d::codec2d()
+{
+
+}
+
+codec2d::codec2d(CANVAS* o_pCanvas) 
+{
+	o_Image = o_pCanvas;
+}
+
 inline uint8_t codec2d::SetPixel(V2* v_pPoint, COLOR* c_pColor, uint8_t i_PixelFlag, uint8_t i_PrioFlag)
 {
 	if (v_pPoint->f_Pos[0] <= 0 || v_pPoint->f_Pos[0] >= o_Image->i_Pixels[0])return GD_OUTOFBOUND;
@@ -103,8 +113,7 @@ uint8_t codec2d::DrawHLine(V2* v_pPoint, uint32_t  i_Length, COLOR* c_pColor, ui
 
 	if ((int)v_Set.f_Pos[X]+ i_Length >= o_Image->i_Pixels[X])
 	{
-
-		i_SetLength = o_Image->i_Pixels[X] - v_Set.f_Pos[X];
+		i_SetLength = o_Image->i_Pixels[X] - (uint8_t)v_Set.f_Pos[X];
 	}
 
 	__REGISTER uint32_t i_rIndex = VINDEX((&v_Set)), i_Pos = 0;

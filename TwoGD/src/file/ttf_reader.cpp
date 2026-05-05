@@ -23,6 +23,10 @@ V2 Midpoint(V2 v_A, V2 v_B)
 	return v_R;
 }
 
+font_handler::font_handler()
+{
+}
+
 font_handler::font_handler(CODEC2D* o_pCodec, LPSTR c_pFontFolder, int i_DivPerCurve)
 {
 	this->i_Padding = 5;
@@ -580,30 +584,21 @@ uint8_t font_handler::Load(LPSTR s_Path)
 }
 
 
-uint8_t font_handler::Dispose()
+void font_handler::Dispose()
 {
 	for (int i_Index = 0; i_Index < ASCII_CHARS; i_Index++)
 	{
-		if (this->v_pFont[i_Index].b_Loaded == FALSE)
+		if (v_pFont[i_Index].b_Loaded == FALSE)
 		{
 			continue;
 		}
-		this->v_pFont[i_Index].Dispose();
+		v_pFont[i_Index].b_Loaded = FALSE;
+		if (v_pFont[i_Index].l_pLines != NULL) 
+		{
+			free(v_pFont[i_Index].l_pLines);
+			v_pFont[i_Index].l_pLines = NULL;
+		}
 	}
 	Free();
-	return GD_TASK_OKAY;
 }
 
-cmap::cmap()
-{
-	b_Loaded = FALSE;
-}
-
-uint8_t cmap::Dispose()
-{
-	if (this->l_pLines != NULL)
-	{
-		free(this->l_pLines);
-	}
-	return GD_TASK_OKAY;
-}

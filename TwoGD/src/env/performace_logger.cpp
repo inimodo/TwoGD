@@ -4,7 +4,17 @@ using namespace std::chrono;
 
 perlog::perlog()
 {
-
+	i_BufferSize = 10;
+	i_Buffer = (int*)malloc(sizeof(int) * i_BufferSize);
+	if (i_Buffer == NULL)
+	{
+		i_BufferSize = 0;
+		return;
+	}
+	for (int i_Index = 0; i_Index < i_BufferSize; i_Index++)
+	{
+		i_Buffer[i_Index] = 0;
+	}
 }
 
 perlog::perlog(int i_BufferSize_)

@@ -5,16 +5,18 @@
 #define WINDOW_HEIGHT 9
 #define GRID_SIZE 50
 
+
+
 CODEC3D o_3DCodec;
 CODEC2D o_2DCodec;
 CONSOLE o_Console;
 CANVAS o_Img;
 CAM3D o_Cam;
 CAMCTRLR o_CamCtrlr;
-WORLD o_Wrld;
 FONTHANDLER o_fhandler;
 FONTHANDLER o_fhandler2;
 PERLOG o_Perlog;
+
 float f_Size = 100;
 int DrawGrid() 
 {
@@ -104,47 +106,20 @@ void gdCreateWinExec(WIN* o_Win)
 	o_Win->i_XPos = 0;
 	o_Win->i_YPos = 0;
 	o_Win->dw_Style = (WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
-	o_Win->i_CmdShow = SW_MAXIMIZE;
+	o_Win->i_CmdShow = SW_MAXIMIZE; 
 }
 
 unsigned char  gdMain(WIN* o_Win)
 {
-	o_Console.Create();
-	
-	RECT o_rect;
-	GetWindowRect(o_Win->hd_WindowHandle,&o_rect);
-	o_Win->i_Width = o_rect.left + o_rect.right;
-	o_Win->i_Height = o_rect.top + o_rect.bottom;
-	
-	o_Cam = CAM3D(
-		(FLOAT)0.01f,
-		(FLOAT)250.0,
-		(uint32_t)o_Win->i_Width,
-		(uint32_t)o_Win->i_Height,
-		(FLOAT)2.0f,
-		V3(0, 2, 0),
-		V3(0, 0, 0)
-	);
-
+	o_Console = CONSOLE();
+	o_Cam = CAM3D(o_Win->i_Width, o_Win->i_Height);
 	o_CamCtrlr = CAMCTRLR(&o_Cam, &o_3DCodec);
-	o_CamCtrlr.f_MoveSpeed = 0.4f;
-	o_CamCtrlr.f_ViewSpeed = 0.1f;
-	o_Img.Prepare(o_Win->i_Width, o_Win->i_Height);
+	o_Img = CANVAS(o_Win->i_Width, o_Win->i_Height);
 	o_2DCodec = CODEC2D(&o_Img);
 	o_3DCodec = CODEC3D(&o_Img, &o_Cam);
 	o_fhandler = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font.ttf");
 	o_fhandler2 = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font2.ttf");
 	o_Perlog = PERLOG(10);
-	o_Wrld = WORLD(&o_3DCodec);
-	o_Wrld.AppendLayer((const LPSTR)"3dobj\\obj2.obj", co_Red);
-	o_Wrld.o_Layers[0].o_Obj.v_Anchor = V3(10, 1, 0);
-	o_Wrld.AppendLayer((const LPSTR)"3dobj\\obj3.obj", co_Blue);
-	o_Wrld.o_Layers[1].o_Obj.v_Anchor = V3(-10, 1, 0);
-	o_Wrld.AppendLayer((const LPSTR)"3dobj\\obj2.obj", co_Green);
-	o_Wrld.o_Layers[2].o_Obj.v_Anchor = V3(0, 1, 10);
-	o_Wrld.AppendLayer((const LPSTR)"3dobj\\obj2.obj", co_Pink);
-	o_Wrld.o_Layers[3].o_Obj.v_Anchor = V3(0, 1, -10);
-
 	return TRUE;
 }
 
@@ -156,7 +131,6 @@ DWORD*  gdUpdate(WIN * o_Win)
 	o_CamCtrlr.UpdateCamCtrlr(o_Win);
 	o_CamCtrlr.DrawCrosshair();
 	DrawGrid();
-	o_Wrld.Render();
 	o_Perlog.Stop();
 	return o_Img.d_pOutputStream;
 }
@@ -164,7 +138,6 @@ DWORD*  gdUpdate(WIN * o_Win)
 void  gdClose() 
 {
 	o_Img.Dispose();
-	o_Wrld.Dispose();
 	o_Perlog.Dispose();
 	o_fhandler.Dispose();
 }

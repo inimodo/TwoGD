@@ -43,6 +43,16 @@ int  wWinMain(HINSTANCE h_Instance, HINSTANCE, PWSTR c_pCmdLine, int i_CmdShow)
 	ShowWindow(o_Win.hd_WindowHandle, o_Win.i_CmdShow);
 	UpdateWindow(o_Win.hd_WindowHandle);
 
+	RECT o_rect;
+	GetWindowRect(o_Win.hd_WindowHandle, &o_rect);
+	o_Win.i_FullScreenWidth = o_rect.left + o_rect.right;
+	o_Win.i_FullScreenHeight = o_rect.top + o_rect.bottom;
+	if (o_Win.i_CmdShow == SW_MAXIMIZE) 
+	{
+		o_Win.i_Width = o_Win.i_FullScreenWidth;
+		o_Win.i_Height = o_Win.i_FullScreenHeight;
+	}
+
 	if (gdMain(&o_Win) == NULL)
 	{
 		return NULL;
