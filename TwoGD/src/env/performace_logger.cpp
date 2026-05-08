@@ -40,7 +40,10 @@ void perlog::Start()
 void perlog::Stop()
 {
 	a_Stop = high_resolution_clock::now();
-	memmove(i_Buffer + 1, i_Buffer, (i_BufferSize - 1) * sizeof(long long));
+	if (i_BufferSize > 1) 
+	{
+		memmove(i_Buffer + 1, i_Buffer, (i_BufferSize - 1) * sizeof(long long));
+	}
 	i_Buffer[0] = (int)duration_cast<milliseconds>(a_Stop - a_Start).count();
 }
 

@@ -9,12 +9,17 @@ console::console()
 	f_Console = freopen("CONOUT$", "w", stdout);
 }
 
-void console::Clear()
+console::console(LPCWSTR c_ConsoleTitle)
 {
-
+	if (AllocConsole() == NULL)
+	{
+		return;
+	}
+	f_Console = freopen("CONOUT$", "w", stdout);
+	SetConsoleTitleW(c_ConsoleTitle);
 }
 
-BOOL  console::Rename(const wchar_t* c_ConsoleTitle)
+BOOL  console::Rename(LPCWSTR c_ConsoleTitle)
 {
 	return SetConsoleTitleW(c_ConsoleTitle);
 
@@ -22,7 +27,7 @@ BOOL  console::Rename(const wchar_t* c_ConsoleTitle)
 
 void console::SetColor(int i_HexColor)
 {
-	SetConsoleTextAttribute(h_ConsoleHandle, i_HexColor);
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), i_HexColor);
 }
 
 BOOL  console::Destroy()

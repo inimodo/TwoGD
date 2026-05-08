@@ -96,7 +96,6 @@ uint8_t codec2d::DrawRect(V2* v_pPointA, V2* v_pPointB, COLOR* c_pColor, uint8_t
 	}
 	return GD_TASK_OKAY;
 }
-
 uint8_t codec2d::DrawHLine(V2* v_pPoint, uint32_t  i_Length, COLOR* c_pColor, uint8_t i_PixelFlag, uint8_t i_PrioFlag)
 {
 	if (v_pPoint->f_Pos[X] >= o_Image->i_Pixels[X] || v_pPoint->f_Pos[Y] < 0 || v_pPoint->f_Pos[Y] >= o_Image->i_Pixels[Y])
@@ -111,13 +110,13 @@ uint8_t codec2d::DrawHLine(V2* v_pPoint, uint32_t  i_Length, COLOR* c_pColor, ui
 		v_Set.f_Pos[X] = 0;
 	}
 
-	if ((int)v_Set.f_Pos[X]+ i_Length >= o_Image->i_Pixels[X])
+	if (((int)v_Set.f_Pos[X] + i_Length) >= o_Image->i_Pixels[X])
 	{
-		i_SetLength = o_Image->i_Pixels[X] - (uint8_t)v_Set.f_Pos[X];
+		i_SetLength = o_Image->i_Pixels[X] - (uint32_t)v_Set.f_Pos[X];
 	}
-
 	__REGISTER uint32_t i_rIndex = VINDEX((&v_Set)), i_Pos = 0;
 	DWORD dw_Color = c_pColor->GetAsHex();
+
 	for (uint32_t i_Index = 0; i_Index < i_SetLength; i_Index++)
 	{
 		i_Pos = i_Index + i_rIndex;

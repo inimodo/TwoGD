@@ -5,8 +5,6 @@
 #define WINDOW_HEIGHT 9
 #define GRID_SIZE 50
 
-
-
 CODEC3D o_3DCodec;
 CODEC2D o_2DCodec;
 CONSOLE o_Console;
@@ -21,42 +19,37 @@ float f_Size = 100;
 int DrawGrid() 
 {
 	int i_EdgeCount = 3;
-	V3 v_PointA = V3(0,0,0),v_PointB= V3(0,0,0);
+	V3 v_PointAA = V3(0,0,0),v_PointAB= V3(0,0,0);
+	V3 v_PointBA = V3(0,0,0),v_PointBB= V3(0,0,0);
+	FACE f_Face;
 	float f_TempX= -GRID_SIZE, f_TempY= -GRID_SIZE;
 	for (int i_X = -GRID_SIZE; i_X < GRID_SIZE; i_X++)
 	{
 		for (int i_Y = -GRID_SIZE; i_Y < GRID_SIZE; i_Y++)
 		{
-			v_PointA.f_Pos[X] = i_X;
-			v_PointA.f_Pos[Z] = i_Y+1;
-			v_PointB.f_Pos[X] = i_X;
-			v_PointB.f_Pos[Z] = i_Y;
-			o_3DCodec.DrawEdge(&v_PointA, &v_PointB, (COLOR*)&co_Gray,PF_OVERWRITE_ALLOWED,100);
-			v_PointB.f_Pos[X]++;
-			v_PointB.f_Pos[Z]++;
-			o_3DCodec.DrawEdge(&v_PointA, &v_PointB, (COLOR*)&co_Gray, PF_OVERWRITE_ALLOWED, 100);
-			i_EdgeCount += 2;
+			if (i_X % 2 || i_Y % 2)continue;
+			v_PointAA.f_Pos[X] = i_X;
+			v_PointAA.f_Pos[Z] = i_Y;
+
+			v_PointAB.f_Pos[X] = i_X+1;
+			v_PointAB.f_Pos[Z] = i_Y;
+
+			v_PointBA.f_Pos[X] = i_X;
+			v_PointBA.f_Pos[Z] = i_Y+1;
+
+			v_PointBB.f_Pos[X] = i_X+1;
+			v_PointBB.f_Pos[Z] = i_Y+1;
+			f_Face.v_Point[0] = v_PointAA;
+			f_Face.v_Point[1] = v_PointAB;
+			f_Face.v_Point[2] = v_PointBA;
+			o_3DCodec.DrawFace(&f_Face,(COLOR*) & co_White);
+			f_Face.v_Point[0] = v_PointAB;
+			f_Face.v_Point[1] = v_PointBB;
+			f_Face.v_Point[2] = v_PointBA;
+			o_3DCodec.DrawFace(&f_Face, (COLOR*)&co_White);
 		}
 	}
-	v_PointA = V3(0,0, -(GRID_SIZE));
-	v_PointB = V3(0,0, -(GRID_SIZE));
 
-	for (int i_X = -GRID_SIZE; i_X < GRID_SIZE; i_X++)
-	{
-		v_PointA.f_Pos[X] = i_X;
-		v_PointB.f_Pos[X] = i_X+1;
-		o_3DCodec.DrawEdge(&v_PointA, &v_PointB, (COLOR*)&co_Gray, PF_OVERWRITE_ALLOWED, 100);
-		i_EdgeCount += 1;
-	}
-	v_PointA = V3((GRID_SIZE), 0, 0);
-	v_PointB = V3((GRID_SIZE), 0, 0);
-	for (int i_X = -GRID_SIZE; i_X < GRID_SIZE; i_X++)
-	{
-		v_PointA.f_Pos[Z] = i_X;
-		v_PointB.f_Pos[Z] = i_X + 1;
-		o_3DCodec.DrawEdge(&v_PointA, &v_PointB, (COLOR*)&co_Gray, PF_OVERWRITE_ALLOWED, 100);
-		i_EdgeCount += 1;
-	}
 
 	V3 vec_Null = V3(0.0f, 0.0f, 0.0f);
 	V3 vec_UnitvX = V3(1.0f, 0.0f, 0.0f);
@@ -111,8 +104,11 @@ void gdCreateWinExec(WIN* o_Win)
 
 unsigned char  gdMain(WIN* o_Win)
 {
-	o_Console = CONSOLE();
+	o_Console = CONSOLE(o_Win->c_WinTitle);
 	o_Cam = CAM3D(o_Win->i_Width, o_Win->i_Height);
+	o_Cam.i_Position.f_Pos[Y] = 60;
+	o_Cam.i_Rotation.f_Pos[Y] = -M_PI/2.0;
+
 	o_CamCtrlr = CAMCTRLR(&o_Cam, &o_3DCodec);
 	o_Img = CANVAS(o_Win->i_Width, o_Win->i_Height);
 	o_2DCodec = CODEC2D(&o_Img);
@@ -125,12 +121,15 @@ unsigned char  gdMain(WIN* o_Win)
 
 DWORD*  gdUpdate(WIN * o_Win)
 {
+	system("cls");
 	o_Img.CleanBuffer();
 	o_Perlog.Start();
-	o_fhandler.Write(V2(10, 30), 25, "%.0fms\n", o_Perlog.GetDelta());
 	o_CamCtrlr.UpdateCamCtrlr(o_Win);
 	o_CamCtrlr.DrawCrosshair();
 	DrawGrid();
+	o_fhandler.Write(V2(10, 30), 25, "%.0fms\n", o_Perlog.GetDelta());
+	o_fhandler.Write(V2(10, 60), 25, "P%.1f Y%.1f\n", o_Cam.i_Rotation.f_Pos[X], o_Cam.i_Rotation.f_Pos[Y]);
+	o_fhandler.Write(V2(10, 90), 25, "X%.1f Y%.1f Z%.1f\n", o_Cam.i_Position.f_Pos[X], o_Cam.i_Position.f_Pos[Y], o_Cam.i_Position.f_Pos[Z]);
 	o_Perlog.Stop();
 	return o_Img.d_pOutputStream;
 }

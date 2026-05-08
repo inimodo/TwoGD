@@ -300,13 +300,13 @@ public:
 typedef class console {
 public:
 	console();
+	console(LPCWSTR c_ConsoleTitle);
 
 	FILE* f_Console;
 	HANDLE h_ConsoleHandle;
 
-	void  Clear();
 	BOOL  Destroy();
-	BOOL  Rename(const wchar_t* c_ConsoleTitle);
+	BOOL  Rename(LPCWSTR c_ConsoleTitle);
 	void  SetColor(int i_HexColor);
 }CONSOLE;
 
