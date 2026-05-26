@@ -140,13 +140,12 @@ font_handler::font_handler(CODEC2D* o_pCodec, LPSTR c_pFontFolder, int i_DivPerC
 	}
 }
 
-void font_handler::Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...)
+int32_t font_handler::Write(int32_t i_LastCursor, V2 v_pAnchor, float f_Scale, const char* c_pformat, va_list va_Args)
 {
-	va_list o_args;
-	va_start(o_args, c_pformat);
 	CHAR c_new[MAXIMAL_TEXT_LENGTH];
-	vsprintf(c_new, c_pformat, o_args);
+	vsprintf(c_new, c_pformat, va_Args);
 	V2 v_Cursor = V2(v_pAnchor.f_Pos);
+	v_Cursor.f_Pos[X] += (float)i_LastCursor;
 	float f_PixelScale = f_Scale / (float)ttf_HEAD.i_UnitsPerEm;
 	int i_Index = 0;
 	while (c_new[i_Index] != '\0')
@@ -166,6 +165,21 @@ void font_handler::Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...
 		v_Cursor.f_Pos[X] += this->i_Padding + this->v_pFont[(int)c_new[i_Index]].i_Width * f_PixelScale;
 		i_Index++;
 	}
+	return (int32_t)v_Cursor.f_Pos[X];
+}
+
+int32_t font_handler::Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...)
+{
+	va_list o_args;
+	va_start(o_args, c_pformat);
+	return this->Write(0, v_pAnchor, f_Scale, c_pformat, o_args);
+}
+
+int32_t font_handler::Write(int32_t i_LastCursor, V2 v_pAnchor, float f_Scale, const char* c_pformat, ...)
+{
+	va_list o_args;
+	va_start(o_args, c_pformat);
+	return this->Write(i_LastCursor, v_pAnchor, f_Scale, c_pformat, o_args);
 }
 
 void font_handler::Free()

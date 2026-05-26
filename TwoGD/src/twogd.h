@@ -158,9 +158,9 @@ public:
 
 static const COLOR co_Gray = COLOR(55, 55, 55);
 static const COLOR co_White = COLOR(255, 255, 255);
-static const COLOR co_Red = COLOR(0, 0, 255);
-static const COLOR co_Green = COLOR(0, 255, 0);
-static const COLOR co_Blue = COLOR(255, 0, 0);
+static const COLOR co_Red = COLOR(49, 49, 255);
+static const COLOR co_Green = COLOR(49, 255, 49);
+static const COLOR co_Blue = COLOR(255, 150, 0);
 static const COLOR co_Pink = COLOR(255, 0, 255);
 
 typedef struct line {
@@ -484,7 +484,9 @@ public:
 	uint32_t i_SpaceWidth;
 	COLOR c_Color;
 
-	void Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...);
+	int32_t Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...);
+	int32_t Write(int32_t i_LastCursor, V2 v_pAnchor, float f_Scale, const char* c_pformat, ...);
+	int32_t Write(int32_t i_LastCursor, V2 v_pAnchor, float f_Scale, const char* c_pformat, va_list va_Args);
 	void Dispose();
 
 private:

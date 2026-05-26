@@ -42,7 +42,6 @@ void camctrlr::UpdateCamCtrlr(WIN* o_Win)
 
 
 		v_UnitVec.RotateThis(o_camera->i_Rotation);
-		v_UnitVec.f_Pos[Y] = 0;
 		o_camera->i_Position = o_camera->i_Position + v_UnitVec;
 
 		if (GetAsyncKeyState(VK_SPACE) != 0)o_camera->i_Position.f_Pos[1] += f_MoveSpeed;

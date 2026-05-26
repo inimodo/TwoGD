@@ -1,6 +1,7 @@
 #include "..\twogd.h"
 
 #define VINDEX(v2) ((int)v2->f_Pos[1] * o_Image->i_Pixels[0] + (int)v2->f_Pos[0])
+#define VINDEX(v2) ((int)v2->f_Pos[1] * o_Image->i_Pixels[0] + (int)v2->f_Pos[0])
 
 codec2d::codec2d()
 {
@@ -96,35 +97,43 @@ uint8_t codec2d::DrawRect(V2* v_pPointA, V2* v_pPointB, COLOR* c_pColor, uint8_t
 	}
 	return GD_TASK_OKAY;
 }
+
 uint8_t codec2d::DrawHLine(V2* v_pPoint, uint32_t  i_Length, COLOR* c_pColor, uint8_t i_PixelFlag, uint8_t i_PrioFlag)
 {
-	if (v_pPoint->f_Pos[X] >= o_Image->i_Pixels[X] || v_pPoint->f_Pos[Y] < 0 || v_pPoint->f_Pos[Y] >= o_Image->i_Pixels[Y])
+	int32_t i_X = (int32_t)v_pPoint->f_Pos[X];
+	int32_t i_Y = (int32_t)v_pPoint->f_Pos[Y];
+	int32_t i_XMax = (int32_t)o_Image->i_Pixels[X];
+	int32_t i_YMax = (int32_t)o_Image->i_Pixels[Y];
+	int32_t i_SetLength = (int32_t)i_Length;
+
+	if (i_X >= i_XMax || i_Y < 0 || i_Y >= i_YMax)
 	{
 		return GD_OUTOFBOUND;
 	}
 
-	V2 v_Set = V2(v_pPoint->f_Pos[X], v_pPoint->f_Pos[Y]);
-	uint32_t i_SetLength = i_Length;
-	if (v_pPoint->f_Pos[X] < 0) 
+	if (i_X < 0)
 	{
-		v_Set.f_Pos[X] = 0;
+		i_SetLength = i_SetLength + i_X;
+		i_X = 0;
 	}
 
-	if (((int)v_Set.f_Pos[X] + i_Length) >= o_Image->i_Pixels[X])
+	if ((i_X + i_SetLength) >= i_XMax)
 	{
-		i_SetLength = o_Image->i_Pixels[X] - (uint32_t)v_Set.f_Pos[X];
+		i_SetLength = i_XMax - i_X;
 	}
-	__REGISTER uint32_t i_rIndex = VINDEX((&v_Set)), i_Pos = 0;
+
 	DWORD dw_Color = c_pColor->GetAsHex();
-
-	for (uint32_t i_Index = 0; i_Index < i_SetLength; i_Index++)
+	int32_t i_rIndex = i_Y * i_XMax + i_X;
+	DWORD* __restrict d_pOutputStream = o_Image->d_pOutputStream+i_rIndex;
+	uint8_t* __restrict d_pPixelFlags = o_Image->d_pPixelFlags+i_rIndex;
+	uint8_t* __restrict d_pPrioFlags = o_Image->d_pPrioFlags+i_rIndex;
+	for (int32_t i_Index = 0; i_Index < i_SetLength; i_Index++)
 	{
-		i_Pos = i_Index + i_rIndex;
-		if (i_Pos >= o_Image->i_OutputSize || i_Pos < 0) continue;
-		o_Image->d_pOutputStream[i_Pos] = dw_Color;
-		o_Image->d_pPixelFlags[i_Pos] = i_PixelFlag;
-		o_Image->d_pPrioFlags[i_Pos] = i_PrioFlag;
+		*d_pOutputStream++ = dw_Color;
+		*d_pPixelFlags++ = i_PixelFlag;
+		*d_pPrioFlags++ = i_PrioFlag;
 	}
+
 	return GD_TASK_OKAY;
 }
 

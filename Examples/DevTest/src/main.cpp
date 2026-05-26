@@ -15,19 +15,18 @@ FONTHANDLER o_fhandler;
 FONTHANDLER o_fhandler2;
 PERLOG o_Perlog;
 
-float f_Size = 100;
 int DrawGrid() 
 {
-	int i_EdgeCount = 3;
+	int i_EdgeCount = 0;
 	V3 v_PointAA = V3(0,0,0),v_PointAB= V3(0,0,0);
 	V3 v_PointBA = V3(0,0,0),v_PointBB= V3(0,0,0);
 	FACE f_Face;
 	float f_TempX= -GRID_SIZE, f_TempY= -GRID_SIZE;
-	for (int i_X = -GRID_SIZE; i_X < GRID_SIZE; i_X++)
+	for (int i_Y = -GRID_SIZE; i_Y < GRID_SIZE; i_Y++)
 	{
-		for (int i_Y = -GRID_SIZE; i_Y < GRID_SIZE; i_Y++)
+		for (int i_X = -GRID_SIZE; i_X < GRID_SIZE; i_X++)
 		{
-			if (i_X % 2 || i_Y % 2)continue;
+			if ((i_X+(i_Y % 2)) % 2)continue;
 			v_PointAA.f_Pos[X] = i_X;
 			v_PointAA.f_Pos[Z] = i_Y;
 
@@ -47,6 +46,7 @@ int DrawGrid()
 			f_Face.v_Point[1] = v_PointBB;
 			f_Face.v_Point[2] = v_PointBA;
 			o_3DCodec.DrawFace(&f_Face, (COLOR*)&co_White);
+			i_EdgeCount++;
 		}
 	}
 
@@ -62,7 +62,7 @@ int DrawGrid()
 
 	return i_EdgeCount;
 }
-
+float f_Size = 100;
 void MouseScroll(BOOL b_Up,POINT v_ScrollPoint) 
 {
 	if (b_Up)f_Size += 2;
@@ -95,7 +95,7 @@ void gdCreateWinExec(WIN* o_Win)
 	o_Win->v_pRightMouseDown = RightMouseDown;
 	o_Win->v_pRightMouseUp = RightMouseUp;
 	o_Win->v_pMouseScroll = MouseScroll;
-	o_Win->c_WinTitle = (wchar_t*)L"Demo Window";
+	o_Win->c_WinTitle = (wchar_t*)L"DevTest";
 	o_Win->i_XPos = 0;
 	o_Win->i_YPos = 0;
 	o_Win->dw_Style = (WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
@@ -106,7 +106,7 @@ unsigned char  gdMain(WIN* o_Win)
 {
 	o_Console = CONSOLE(o_Win->c_WinTitle);
 	o_Cam = CAM3D(o_Win->i_Width, o_Win->i_Height);
-	o_Cam.i_Position.f_Pos[Y] = 60;
+	o_Cam.i_Position.f_Pos[Y] = 70;
 	o_Cam.i_Rotation.f_Pos[Y] = -M_PI/2.0;
 
 	o_CamCtrlr = CAMCTRLR(&o_Cam, &o_3DCodec);
@@ -115,22 +115,33 @@ unsigned char  gdMain(WIN* o_Win)
 	o_3DCodec = CODEC3D(&o_Img, &o_Cam);
 	o_fhandler = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font.ttf");
 	o_fhandler2 = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font2.ttf");
-	o_Perlog = PERLOG(10);
+	o_Perlog = PERLOG(20);
 	return TRUE;
 }
 
 DWORD*  gdUpdate(WIN * o_Win)
 {
-	system("cls");
 	o_Img.CleanBuffer();
-	o_Perlog.Start();
 	o_CamCtrlr.UpdateCamCtrlr(o_Win);
-	o_CamCtrlr.DrawCrosshair();
 	DrawGrid();
-	o_fhandler.Write(V2(10, 30), 25, "%.0fms\n", o_Perlog.GetDelta());
-	o_fhandler.Write(V2(10, 60), 25, "P%.1f Y%.1f\n", o_Cam.i_Rotation.f_Pos[X], o_Cam.i_Rotation.f_Pos[Y]);
-	o_fhandler.Write(V2(10, 90), 25, "X%.1f Y%.1f Z%.1f\n", o_Cam.i_Position.f_Pos[X], o_Cam.i_Position.f_Pos[Y], o_Cam.i_Position.f_Pos[Z]);
+	
 	o_Perlog.Stop();
+	o_Perlog.Start();
+	
+	o_fhandler.c_Color = co_White;
+	if(o_Perlog.GetDelta() > 40.0)o_fhandler.c_Color = co_Red;
+	o_fhandler.Write(V2(10, 30), 25, "%.0fFPS @ %.1fms\n", 1.0f/(o_Perlog.GetDelta()/1000.0f), o_Perlog.GetDelta());
+	o_fhandler.c_Color = co_White;
+	o_fhandler.Write(V2(10, 90), 25, "P %.1f Y %.1f\n", RADTODEG(o_Cam.i_Rotation.f_Pos[X]), RADTODEG(o_Cam.i_Rotation.f_Pos[Y]));
+
+	o_fhandler.c_Color = co_Red;
+	int32_t i_LastCursor = o_fhandler.Write(V2(10, 60), 25, "X %.1f \n", o_Cam.i_Position.f_Pos[X]);
+	o_fhandler.c_Color = co_Green;
+	i_LastCursor = o_fhandler.Write(i_LastCursor,V2(10, 60), 25, "Y %.1f \n", o_Cam.i_Position.f_Pos[Y]);
+	o_fhandler.c_Color = co_Blue;
+	o_fhandler.Write(i_LastCursor,V2(10, 60), 25, "Z %.1f\n", o_Cam.i_Position.f_Pos[Z]);
+	o_CamCtrlr.DrawCrosshair();
+	
 	return o_Img.d_pOutputStream;
 }
 

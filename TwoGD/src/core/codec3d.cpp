@@ -66,7 +66,7 @@ uint8_t codec3d::DrawEdge(V3* v_pVertexA, V3* v_pVertexB, COLOR* c_pColor, uint8
 
 uint8_t codec3d::DrawFace(FACE* o_Face, COLOR* c_pColor, uint8_t i_PixelFlag, uint8_t i_PrioFlag)
 {
-	int i_YMin = 1000000000;
+	int i_YMin = o_Image->i_Pixels[Y];
 	int i_YMax = 0;
 	LINE l_Lines[3];
 	for (int i_Index = 0; i_Index < 3; i_Index++)
@@ -118,30 +118,25 @@ uint8_t codec3d::DrawFace(FACE* o_Face, COLOR* c_pColor, uint8_t i_PixelFlag, ui
 			i_EdgeCount++;
 		}
 
-		for (int i_Sort = 0; i_Sort < i_EdgeCount; i_Sort++)
+		if (f_Edges[0] > f_Edges[1])
 		{
-			int i_Highest = 0;
-			for (int i_Cylce = 0; i_Cylce < i_EdgeCount; i_Cylce++)
-			{
-				if (f_Edges[i_Cylce] > f_Edges[i_Highest])
-				{
-					i_Highest = i_Cylce;
-				}
-			}
-			f_EdgesSorted[i_EdgeCount - i_Sort - 1] = f_Edges[i_Highest];
-			f_Edges[i_Highest] = 0;
+			f_EdgesSorted[0] = f_Edges[1];
+			f_EdgesSorted[1] = f_Edges[0];
 		}
-		if (i_EdgeCount % 2 != 0)
+		else 
+		{
+			f_EdgesSorted[1] = f_Edges[1];
+			f_EdgesSorted[0] = f_Edges[0];
+		}
+
+		if (i_EdgeCount != 2)
 		{
 			continue;
 		}
-		for (int i_Index = 0; i_Index < i_EdgeCount; i_Index += 2)
-		{
-			v_Point.f_Pos[Y] = f_Y;
-			v_Point.f_Pos[X] = f_EdgesSorted[i_Index];
-			if (f_EdgesSorted[i_Index + 1] - f_EdgesSorted[i_Index] < 0) continue;
-			DrawHLine(&v_Point, (uint32_t)(f_EdgesSorted[i_Index + 1] - f_EdgesSorted[i_Index]+1), c_pColor);
-		}
+
+		v_Point.f_Pos[Y] = f_Y;
+		v_Point.f_Pos[X] = f_EdgesSorted[0];
+		DrawHLine(&v_Point, (uint32_t)(f_EdgesSorted[1] - f_EdgesSorted[0] + 1), c_pColor);
 	}
 	return GD_TASK_OKAY;
 }
