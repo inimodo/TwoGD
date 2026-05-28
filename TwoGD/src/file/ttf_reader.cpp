@@ -31,7 +31,6 @@ font_handler::font_handler(CODEC2D* o_pCodec, LPSTR c_pFontFolder, int i_DivPerC
 {
 	this->i_Padding = 5;
 	this->i_SpaceWidth = 10;
-	this->c_Color = COLOR(255, 255, 255);
 	this->o_pCodec = o_pCodec;
 	i_LastError = this->Load(c_pFontFolder);
 
@@ -140,7 +139,7 @@ font_handler::font_handler(CODEC2D* o_pCodec, LPSTR c_pFontFolder, int i_DivPerC
 	}
 }
 
-int32_t font_handler::Write(int32_t i_LastCursor, V2 v_pAnchor, float f_Scale, const char* c_pformat, va_list va_Args)
+int32_t font_handler::Write(int32_t i_LastCursor, V2 v_pAnchor, float f_Scale, COLOR* c_pColor, const char* c_pformat, va_list va_Args)
 {
 	CHAR c_new[MAXIMAL_TEXT_LENGTH];
 	vsprintf(c_new, c_pformat, va_Args);
@@ -161,25 +160,25 @@ int32_t font_handler::Write(int32_t i_LastCursor, V2 v_pAnchor, float f_Scale, c
 			i_Index++;
 			continue;
 		}
-		this->o_pCodec->DrawChar(&this->v_pFont[(int)c_new[i_Index]], &v_Cursor, &this->c_Color, f_PixelScale);
+		this->o_pCodec->DrawChar(&this->v_pFont[(int)c_new[i_Index]], &v_Cursor, c_pColor, f_PixelScale);
 		v_Cursor.f_Pos[X] += this->i_Padding + this->v_pFont[(int)c_new[i_Index]].i_Width * f_PixelScale;
 		i_Index++;
 	}
 	return (int32_t)v_Cursor.f_Pos[X];
 }
 
-int32_t font_handler::Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...)
+int32_t font_handler::Write(V2 v_pAnchor, float f_Scale, COLOR* c_pColor, const char* c_pformat, ...)
 {
 	va_list o_args;
 	va_start(o_args, c_pformat);
-	return this->Write(0, v_pAnchor, f_Scale, c_pformat, o_args);
+	return this->Write(0, v_pAnchor, f_Scale, c_pColor, c_pformat, o_args);
 }
 
-int32_t font_handler::Write(int32_t i_LastCursor, V2 v_pAnchor, float f_Scale, const char* c_pformat, ...)
+int32_t font_handler::Write(int32_t i_LastCursor, V2 v_pAnchor, float f_Scale, COLOR* c_pColor, const char* c_pformat, ...)
 {
 	va_list o_args;
 	va_start(o_args, c_pformat);
-	return this->Write(i_LastCursor, v_pAnchor, f_Scale, c_pformat, o_args);
+	return this->Write(i_LastCursor, v_pAnchor, f_Scale, c_pColor, c_pformat, o_args);
 }
 
 void font_handler::Free()

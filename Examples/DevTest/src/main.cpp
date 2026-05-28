@@ -14,6 +14,7 @@ CAMCTRLR o_CamCtrlr;
 FONTHANDLER o_fhandler;
 FONTHANDLER o_fhandler2;
 PERLOG o_Perlog;
+STATLOG o_Statlog;
 
 int DrawGrid() 
 {
@@ -108,40 +109,29 @@ unsigned char  gdMain(WIN* o_Win)
 	o_Cam = CAM3D(o_Win->i_Width, o_Win->i_Height);
 	o_Cam.i_Position.f_Pos[Y] = 70;
 	o_Cam.i_Rotation.f_Pos[Y] = -M_PI/2.0;
-
-	o_CamCtrlr = CAMCTRLR(&o_Cam, &o_3DCodec);
 	o_Img = CANVAS(o_Win->i_Width, o_Win->i_Height);
 	o_2DCodec = CODEC2D(&o_Img);
 	o_3DCodec = CODEC3D(&o_Img, &o_Cam);
 	o_fhandler = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font.ttf");
 	o_fhandler2 = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font2.ttf");
+	o_CamCtrlr = CAMCTRLR(&o_Cam, &o_3DCodec,&o_fhandler);
 	o_Perlog = PERLOG(20);
+	o_Statlog = STATLOG(&o_Perlog,&o_fhandler,&o_Cam);
 	return TRUE;
 }
 
 DWORD*  gdUpdate(WIN * o_Win)
 {
+	o_Perlog.Stop();
+	o_Perlog.Start();
+	
 	o_Img.CleanBuffer();
 	o_CamCtrlr.UpdateCamCtrlr(o_Win);
 	DrawGrid();
 	
-	o_Perlog.Stop();
-	o_Perlog.Start();
-	
-	o_fhandler.c_Color = co_White;
-	if(o_Perlog.GetDelta() > 40.0)o_fhandler.c_Color = co_Red;
-	o_fhandler.Write(V2(10, 30), 25, "%.0fFPS @ %.1fms\n", 1.0f/(o_Perlog.GetDelta()/1000.0f), o_Perlog.GetDelta());
-	o_fhandler.c_Color = co_White;
-	o_fhandler.Write(V2(10, 90), 25, "P %.1f Y %.1f\n", RADTODEG(o_Cam.i_Rotation.f_Pos[X]), RADTODEG(o_Cam.i_Rotation.f_Pos[Y]));
 
-	o_fhandler.c_Color = co_Red;
-	int32_t i_LastCursor = o_fhandler.Write(V2(10, 60), 25, "X %.1f \n", o_Cam.i_Position.f_Pos[X]);
-	o_fhandler.c_Color = co_Green;
-	i_LastCursor = o_fhandler.Write(i_LastCursor,V2(10, 60), 25, "Y %.1f \n", o_Cam.i_Position.f_Pos[Y]);
-	o_fhandler.c_Color = co_Blue;
-	o_fhandler.Write(i_LastCursor,V2(10, 60), 25, "Z %.1f\n", o_Cam.i_Position.f_Pos[Z]);
 	o_CamCtrlr.DrawCrosshair();
-	
+	o_Statlog.PrintStats();
 	return o_Img.d_pOutputStream;
 }
 

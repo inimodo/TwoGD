@@ -169,6 +169,7 @@
     <ClCompile Include="src\core\codec3d.cpp" />
     <ClCompile Include="src\core\matrix3x3.cpp" />
     <ClCompile Include="src\core\vec3d.cpp" />
+    <ClCompile Include="src\env\statistics_logger.cpp.cpp" />
     <ClCompile Include="src\file\file_handler.cpp" />
     <ClCompile Include="src\file\ttf_reader.cpp" />
     <ClCompile Include="src\env\performace_logger.cpp" />

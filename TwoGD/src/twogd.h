@@ -310,29 +310,6 @@ public:
 	void  SetColor(int i_HexColor);
 }CONSOLE;
 
-#define CHST_BASIC 0xA
-#define CHST_AXIS  0xB
-
-typedef class camctrlr {
-public:
-	camctrlr();
-	camctrlr(CAM3D* o_camera, CODEC3D* o_pCodec);
-
-	CAM3D* o_camera;
-	CODEC3D* o_pCodec;
-	BOOL b_MouseCtrl = TRUE;
-	float f_MoveSpeed = 0.4f;
-	float f_ViewSpeed = 0.1f;
-	float f_MouseSensitivity = 2.0f;
-	BOOL b_ShowCH = TRUE;
-	COLOR c_CHColor = co_White;
-	int i_CHStyle = CHST_AXIS;
-	float f_CHSize = 0.2f;
-
-	void UpdateCamCtrlr(WIN* o_Win);
-	void DrawCrosshair();
-}CAMCTRLR;
-
 typedef struct m3x3 {
 public:
 	m3x3();
@@ -356,21 +333,6 @@ M3X3 operator * (M3X3  const& m_M, float const& f_S);
 M3X3 operator * (M3X3  const& m_M1, M3X3 const& m_M2);
 M3X3 operator + (M3X3  const& m_M1, M3X3 const& m_M2);
 V3 operator * (M3X3  const& m_M, V3 const& v_V);
-
-typedef class perlog {
-public:
-	perlog();
-	perlog(int i_BufferSize);
-
-	void Start();
-	void Stop();
-	float GetDelta();
-	uint8_t Dispose();
-private:
-	std::chrono::high_resolution_clock::time_point a_Start, a_Stop;
-	int* i_Buffer;
-	int i_BufferSize;
-} PERLOG;
 
 typedef struct {
 	uint32_t i_ScalerType;
@@ -482,11 +444,10 @@ public:
 	uint8_t i_LastError;
 	uint32_t i_Padding;
 	uint32_t i_SpaceWidth;
-	COLOR c_Color;
 
-	int32_t Write(V2 v_pAnchor, float f_Scale, const char* c_pformat, ...);
-	int32_t Write(int32_t i_LastCursor, V2 v_pAnchor, float f_Scale, const char* c_pformat, ...);
-	int32_t Write(int32_t i_LastCursor, V2 v_pAnchor, float f_Scale, const char* c_pformat, va_list va_Args);
+	int32_t Write(V2 v_pAnchor, float f_Scale, COLOR* c_pColor, const char* c_pformat, ...);
+	int32_t Write(int32_t i_LastCursor, V2 v_pAnchor, float f_Scale, COLOR* c_pColor, const char* c_pformat, ...);
+	int32_t Write(int32_t i_LastCursor, V2 v_pAnchor, float f_Scale, COLOR* c_pColor, const char* c_pformat, va_list va_Args);
 	void Dispose();
 
 private:
@@ -517,3 +478,58 @@ private:
 	CODEC2D* o_pCodec;
 	FONTHANDLER* o_pFont;
 } GUI;
+
+
+typedef class perlog {
+public:
+	perlog();
+	perlog(int i_BufferSize);
+
+	void Start();
+	void Stop();
+	float GetDelta();
+	uint8_t Dispose();
+private:
+	std::chrono::high_resolution_clock::time_point a_Start, a_Stop;
+	int* i_Buffer;
+	int i_BufferSize;
+} PERLOG;
+
+typedef class statlog
+{
+public:
+	statlog();
+	statlog(PERLOG* o_pPerlog, FONTHANDLER* o_pFont, CAM3D* o_pCam);
+
+	CAM3D* o_pCam;
+	FONTHANDLER* o_pFont;
+	PERLOG* o_pPerlog;
+
+	void PrintStats();
+
+}STATLOG;
+
+#define CHST_BASIC 0xA
+#define CHST_AXIS  0xB
+#define CHST_AXIS_WITH_NAME  0xC
+
+typedef class camctrlr {
+public:
+	camctrlr();
+	camctrlr(CAM3D* o_pCamera, CODEC3D* o_pCodec, FONTHANDLER* o_pFont = NULL);
+
+	CAM3D* o_pCamera;
+	CODEC3D* o_pCodec;
+	FONTHANDLER* o_pFont;
+	BOOL b_MouseCtrl = TRUE;
+	float f_MoveSpeed = 0.4f;
+	float f_ViewSpeed = 0.1f;
+	float f_MouseSensitivity = 2.0f;
+	BOOL b_ShowCH = TRUE;
+	COLOR c_CHColor = co_White;
+	int i_CHStyle = CHST_AXIS_WITH_NAME;
+	float f_CHSize = 0.2f;
+
+	void UpdateCamCtrlr(WIN* o_Win);
+	void DrawCrosshair();
+}CAMCTRLR;

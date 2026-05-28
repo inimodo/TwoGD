@@ -5,15 +5,16 @@ camctrlr::camctrlr()
 
 }
 
-camctrlr::camctrlr(CAM3D* o_camera_, CODEC3D* o_pCodec_)
+camctrlr::camctrlr(CAM3D* o_pCamera_, CODEC3D* o_pCodec_, FONTHANDLER* o_pFont_)
 {
-	o_camera = o_camera_;
+	o_pCamera = o_pCamera_;
 	o_pCodec = o_pCodec_;
+	o_pFont = o_pFont_;
 }
 
 void camctrlr::UpdateCamCtrlr(WIN* o_Win)
 {
-	V2 v_Middle = V2(o_camera->i_Dimensions[0] / 2.0f, o_camera->i_Dimensions[1] / 2.0f);
+	V2 v_Middle = V2(o_pCamera->i_Dimensions[0] / 2.0f, o_pCamera->i_Dimensions[1] / 2.0f);
 	if (GetAsyncKeyState(VK_LCONTROL) != 0) b_MouseCtrl = !b_MouseCtrl;
 	if (o_Win->b_HasFocus && b_MouseCtrl)
 	{
@@ -29,8 +30,8 @@ void camctrlr::UpdateCamCtrlr(WIN* o_Win)
 		float f_Ampl = 1.0f / (float)v_Delta.Distance(v_Middle);
 		v_Delta = v_Delta - v_Middle;
 
-		o_camera->i_Rotation.f_Pos[X] -= v_Delta.f_Pos[X] * f_MouseSensitivity * 0.001f;
-		o_camera->i_Rotation.f_Pos[Y] -= v_Delta.f_Pos[Y] * f_MouseSensitivity * 0.001f;
+		o_pCamera->i_Rotation.f_Pos[X] -= v_Delta.f_Pos[X] * f_MouseSensitivity * 0.001f;
+		o_pCamera->i_Rotation.f_Pos[Y] -= v_Delta.f_Pos[Y] * f_MouseSensitivity * 0.001f;
 
 		V3 v_UnitVec = V3(0, 0, 0);
 
@@ -41,27 +42,27 @@ void camctrlr::UpdateCamCtrlr(WIN* o_Win)
 		if (GetAsyncKeyState('A') != 0) v_UnitVec.f_Pos[X] += -f_MoveSpeed;
 
 
-		v_UnitVec.RotateThis(o_camera->i_Rotation);
-		o_camera->i_Position = o_camera->i_Position + v_UnitVec;
+		v_UnitVec.RotateThis(o_pCamera->i_Rotation);
+		o_pCamera->i_Position = o_pCamera->i_Position + v_UnitVec;
 
-		if (GetAsyncKeyState(VK_SPACE) != 0)o_camera->i_Position.f_Pos[1] += f_MoveSpeed;
-		if (GetAsyncKeyState(VK_LSHIFT) != 0)o_camera->i_Position.f_Pos[1] -= f_MoveSpeed;
+		if (GetAsyncKeyState(VK_SPACE) != 0)o_pCamera->i_Position.f_Pos[1] += f_MoveSpeed;
+		if (GetAsyncKeyState(VK_LSHIFT) != 0)o_pCamera->i_Position.f_Pos[1] -= f_MoveSpeed;
 
 
-		if (GetAsyncKeyState(VK_LEFT) != 0)o_camera->i_Rotation.f_Pos[0] += f_ViewSpeed;
-		if (GetAsyncKeyState(VK_RIGHT) != 0)o_camera->i_Rotation.f_Pos[0] -= f_ViewSpeed;
+		if (GetAsyncKeyState(VK_LEFT) != 0)o_pCamera->i_Rotation.f_Pos[0] += f_ViewSpeed;
+		if (GetAsyncKeyState(VK_RIGHT) != 0)o_pCamera->i_Rotation.f_Pos[0] -= f_ViewSpeed;
 
-		if (GetAsyncKeyState(VK_UP) != 0)o_camera->i_Rotation.f_Pos[1] += f_ViewSpeed;
-		if (GetAsyncKeyState(VK_DOWN) != 0)o_camera->i_Rotation.f_Pos[1] -= f_ViewSpeed;
+		if (GetAsyncKeyState(VK_UP) != 0)o_pCamera->i_Rotation.f_Pos[1] += f_ViewSpeed;
+		if (GetAsyncKeyState(VK_DOWN) != 0)o_pCamera->i_Rotation.f_Pos[1] -= f_ViewSpeed;
 
-		if (GetAsyncKeyState(VK_ADD) != 0)o_camera->f_FOV += 0.01f;
-		if (GetAsyncKeyState(VK_SUBTRACT) != 0)o_camera->f_FOV -= 0.01f;
+		if (GetAsyncKeyState(VK_ADD) != 0)o_pCamera->f_FOV += 0.01f;
+		if (GetAsyncKeyState(VK_SUBTRACT) != 0)o_pCamera->f_FOV -= 0.01f;
 
 		if (GetAsyncKeyState(VK_NUMPAD0) != 0)
 		{
-			o_camera->i_Rotation = v_UnitVec;
-			o_camera->i_Position = V3(0, 2, 0);
-			o_camera->f_FOV = 2;
+			o_pCamera->i_Rotation = v_UnitVec;
+			o_pCamera->i_Position = V3(0, 2, 0);
+			o_pCamera->f_FOV = 2;
 		}
 	}
 	else
@@ -80,25 +81,36 @@ void camctrlr::DrawCrosshair()
 	V3 v_UnitY = V3(0, f_CHSize, 0);
 	V3 v_UnitZ = V3(0, 0, f_CHSize);
 
-	switch (i_CHStyle)
+
+	if (i_CHStyle == CHST_BASIC) 
 	{
-	case CHST_BASIC:
 		o_pCodec->DrawHLine(&v_X, (uint32_t)(f_CHSize * 2.0f), &c_CHColor);
 		o_pCodec->DrawVLine(&v_Y, (uint32_t)(f_CHSize * 2.0f), &c_CHColor);
-
-		break;
-	case CHST_AXIS:
-
-		v_Anchor.RotateThis(o_pCodec->o_Camera->i_Rotation);
-
-		v_Anchor = v_Anchor + o_pCodec->o_Camera->i_Position;
-		v_UnitX = v_UnitX + v_Anchor;
-		v_UnitY = v_UnitY + v_Anchor;
-		v_UnitZ = v_UnitZ + v_Anchor;
-
-		o_pCodec->DrawEdge(&v_Anchor, &v_UnitX, (COLOR*)&co_Red, PF_OVERWRITE_FORBIDDEN, 0);
-		o_pCodec->DrawEdge(&v_Anchor, &v_UnitY, (COLOR*)&co_Green, PF_OVERWRITE_FORBIDDEN, 0);
-		o_pCodec->DrawEdge(&v_Anchor, &v_UnitZ, (COLOR*)&co_Blue, PF_OVERWRITE_FORBIDDEN, 0);
-		break;
+		return;
 	}
+
+	v_Anchor.RotateThis(o_pCodec->o_Camera->i_Rotation);
+
+	v_Anchor = v_Anchor + o_pCodec->o_Camera->i_Position;
+	v_UnitX = v_UnitX + v_Anchor;
+	v_UnitY = v_UnitY + v_Anchor;
+	v_UnitZ = v_UnitZ + v_Anchor;
+
+	o_pCodec->DrawEdge(&v_Anchor, &v_UnitX, (COLOR*)&co_Red, PF_OVERWRITE_FORBIDDEN, 0);
+	o_pCodec->DrawEdge(&v_Anchor, &v_UnitY, (COLOR*)&co_Green, PF_OVERWRITE_FORBIDDEN, 0);
+	o_pCodec->DrawEdge(&v_Anchor, &v_UnitZ, (COLOR*)&co_Blue, PF_OVERWRITE_FORBIDDEN, 0);
+
+	if (i_CHStyle != CHST_AXIS_WITH_NAME || o_pFont == NULL) 
+	{
+		return;
+	}
+
+	V2 v_Location = V2();
+	o_pCodec->o_Camera->Translate(&v_UnitX,&v_Location);
+	o_pFont->Write(v_Location, 20, (COLOR*)&co_Red, "X");
+	o_pCodec->o_Camera->Translate(&v_UnitY, &v_Location);
+	o_pFont->Write(v_Location, 20, (COLOR*)&co_Green,"Y");
+	o_pCodec->o_Camera->Translate(&v_UnitZ, &v_Location);
+	o_pFont->Write(v_Location, 20, (COLOR*)&co_Blue, "Z");
+	
 }
