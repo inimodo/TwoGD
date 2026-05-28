@@ -115,6 +115,7 @@ unsigned char  gdMain(WIN* o_Win)
 	o_fhandler = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font.ttf");
 	o_fhandler2 = FONTHANDLER(&o_2DCodec, (const LPSTR)"font\\font2.ttf");
 	o_CamCtrlr = CAMCTRLR(&o_Cam, &o_3DCodec,&o_fhandler);
+	o_CamCtrlr.f_MoveSpeed = 0.8f;
 	o_Perlog = PERLOG(20);
 	o_Statlog = STATLOG(&o_Perlog,&o_fhandler,&o_Cam);
 	return TRUE;
@@ -122,12 +123,12 @@ unsigned char  gdMain(WIN* o_Win)
 
 DWORD*  gdUpdate(WIN * o_Win)
 {
-	o_Perlog.Stop();
-	o_Perlog.Start();
 	
 	o_Img.CleanBuffer();
 	o_CamCtrlr.UpdateCamCtrlr(o_Win);
+	o_Perlog.Start();
 	DrawGrid();
+	o_Perlog.Stop();
 	
 
 	o_CamCtrlr.DrawCrosshair();

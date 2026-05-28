@@ -78,9 +78,9 @@ void V3::CamRotateThisOpt(V3 v_Rot)
 	);
 
 	*this = V3(
-		f_cos_X * v_x.f_Pos[0] + f_sin_X * v_x.f_Pos[2],
-		v_x.f_Pos[1],
-		-f_sin_X * v_x.f_Pos[0] + f_cos_X * v_x.f_Pos[2]
+		f_cos_X * v_x.f_Pos[X] + f_sin_X * v_x.f_Pos[Z],
+		v_x.f_Pos[Y],
+		-f_sin_X * v_x.f_Pos[X] + f_cos_X * v_x.f_Pos[Z]
 	);
 }
 
